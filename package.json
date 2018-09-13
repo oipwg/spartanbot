@@ -1,0 +1,32 @@
+{
+  "name": "spartanbot",
+  "version": "1.0.0",
+  "description": "Defend the Network",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oipwg/spartanbot.git"
+  },
+  "author": "Sky Young <sky@alexandria.io>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/oipwg/spartanbot/issues"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.0.0",
+    "@babel/core": "^7.0.1",
+    "@babel/preset-env": "^7.0.0",
+    "babel-core": "^7.0.0-bridge.0",
+    "babel-jest": "^23.6.0",
+    "jest": "^23.6.0",
+    "jsdoc": "^3.5.5",
+    "jsdoc-template": "git+https://github.com/oipwg/jsdoc-template.git"
+  },
+  "homepage": "https://github.com/oipwg/spartanbot#readme"
+}
