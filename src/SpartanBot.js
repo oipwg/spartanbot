@@ -204,7 +204,7 @@ class SpartanBot {
 	 *
 	 * @private
 	 */
-	deserialize(){
+	async deserialize(){
 		let data_from_storage = {}
 
 		if (localStorage.getItem('spartanbot-storage'))
@@ -215,7 +215,7 @@ class SpartanBot {
 
 		if (data_from_storage.rental_providers){
 			for (let provider of data_from_storage.rental_providers){
-				// this.rental_providers.push()
+				await this.setupRentalProvider(provider)
 			}
 		}
 
