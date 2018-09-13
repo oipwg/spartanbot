@@ -21,6 +21,66 @@ describe("SpartanBot", () => {
 		})
 	})
 
+	describe("RentalProviders", () => {
+		it("Should be able to setup new MRR RentalProvider", async () => {
+			let spartan = new SpartanBot({ memory: true })
+
+			let setup = await spartan.setupRentalProvider({
+				type: "MiningRigRentals",
+				api_key: "test-api-key",
+				api_secret: "test-api-secret"
+			})
+
+			expect(setup.type).toBe("MiningRigRentals")
+		})
+		it("Should be able to get all rental providers", async () => {
+			let spartan = new SpartanBot({ memory: true })
+
+			await spartan.setupRentalProvider({
+				type: "MiningRigRentals",
+				api_key: "test-api-key",
+				api_secret: "test-api-secret"
+			})
+
+			await spartan.setupRentalProvider({
+				type: "MiningRigRentals",
+				api_key: "test-api-key2",
+				api_secret: "test-api-secret2"
+			})
+
+			let providers = spartan.getRentalProviders()
+
+			expect(providers.length).toBe(2)
+		})
+		it("Should be able to delete a rental provider", async () => {
+			let spartan = new SpartanBot({ memory: true })
+
+			await spartan.setupRentalProvider({
+				type: "MiningRigRentals",
+				api_key: "test-api-key",
+				api_secret: "test-api-secret"
+			})
+
+			await spartan.setupRentalProvider({
+				type: "MiningRigRentals",
+				api_key: "test-api-key2",
+				api_secret: "test-api-secret2"
+			})
+
+			let providers = spartan.getRentalProviders()
+
+			expect(providers.length).toBe(2)
+
+			spartan.deleteRentalProvider(providers[0].getUID())
+
+			let updated_providers = spartan.getRentalProviders()
+
+			expect(updated_providers.length).toBe(1)
+			expect(updated_providers[0].api_key).toBe(providers[1].api_key)
+			expect(updated_providers[0].api_secret).toBe(providers[1].api_secret)
+		})
+	})
+
 	describe("Manual Rental", () => {
 		it("Should be able to rent manually (no confirmation function)", async () => {
 			let spartan = new SpartanBot()
@@ -51,12 +111,21 @@ describe("SpartanBot", () => {
 	})
 
 	describe("Save and Reload", () => {
-		it("Should be able to Serialize & Deserialize", () => {
+		it("Should be able to Serialize & Deserialize", async () => {
 			let spartan = new SpartanBot({ test: "setting" })
+
+			let setup = await spartan.setupRentalProvider({
+				type: "MiningRigRentals",
+				api_key: "test-api-key",
+				api_secret: "test-api-secret"
+			})
 
 			spartan.serialize()
 
 			let spartan2 = new SpartanBot()
+
+			// Wait for deserialization to finish
+			await spartan2._deserialize
 
 			expect(spartan2.getSetting('test')).toBe("setting")
 		})

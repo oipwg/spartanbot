@@ -1,3 +1,7 @@
+import { MRRProvider } from './RentalProviders'
+
+const SUPPORTED_RENTAL_PROVIDERS = [ MRRProvider ]
+
 let localStorage
 
 if (typeof window === "undefined" || typeof window.localStorage === "undefined") {
@@ -60,12 +64,78 @@ class SpartanBot {
 	 * @return {[type]} [description]
 	 */
 	async setupRentalProvider(settings){
-		await waitFn(2000)
+		// Force settings to be passed
+		if (!settings.type)
+			throw new Error("settings.type is required!")
+		if (!settings.api_key)
+			throw new Error("settings.api_key is required!")
+		if (!settings.api_secret)
+			throw new Error("settings.api_secret is required!")
 
-		return {
-			success: true,
-			message: "Successfully Setup Rental Provider"
+		// Match to a supported provider (if possible)
+		let provider_match
+		for (let provider of SUPPORTED_RENTAL_PROVIDERS){
+			if (provider.getType() === settings.type){
+				provider_match = provider;
+			}
 		}
+
+		// Check if we didn't match to a provider
+		if (!provider_match)
+			throw new Error("No Provider found that matches settings.type")
+
+		// Create the new provider
+		let new_provider = new provider_match(settings)
+
+		// Test to make sure the API keys work
+		try {
+			await new_provider.testAuthorization()
+		} catch (e) {
+			throw new Error("API Key and/or API Secret are not valid!\n" + e)
+		}
+
+		this.rental_providers.push(new_provider)
+
+		// Save new Provider
+		this.serialize()
+
+		// Return info to the user
+		return {
+			message: "Successfully Setup Rental Provider",
+			type: settings.type
+		}
+	}
+
+	/**
+	 * Get all Rental Providers from SpartanBot
+	 * @return {Array.<MRRProvider>} Returns an array containing all the available providers
+	 */
+	getRentalProviders(){
+		return this.rental_providers
+	}
+
+	/**
+	 * Delete a Rental Provider from SpartanBot
+	 * @param  {String} uid - The uid of the Rental Provider to remove (can be acquired by running `.getUID()` on a RentalProvider)
+	 * @return {Boolean} Returns true upon success
+	 */
+	deleteRentalProvider(uid){
+		if (!uid)
+			throw new Error("You must include the UID of the Provider you want to remove")
+
+		let new_provider_array = []
+
+		for (let i = 0; i < this.rental_providers.length; i++){
+			if (this.rental_providers[i].getUID() !== uid){
+				new_provider_array.push(this.rental_providers[i])
+			}
+		}
+
+		this.rental_providers = new_provider_array
+
+		this.serialize()
+
+		return true
 	}
 	
 	/**
