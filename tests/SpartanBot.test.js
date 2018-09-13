@@ -6,6 +6,21 @@ afterAll(() => {
 })
 
 describe("SpartanBot", () => {
+	describe("Settings", () => {
+		it("Should be able to set a setting", () => {
+			let spartan = new SpartanBot()
+
+			spartan.setSetting("test-setting", "test-setting-data")
+			expect(spartan.settings['test-setting']).toBe("test-setting-data")
+		})
+		it("Should be able to get a setting", () => {
+			let spartan = new SpartanBot()
+
+			spartan.setSetting("test-setting2", "test-setting-data2")
+			expect(spartan.getSetting('test-setting2')).toBe("test-setting-data2")
+		})
+	})
+
 	describe("Manual Rental", () => {
 		it("Should be able to rent manually (no confirmation function)", async () => {
 			let spartan = new SpartanBot()
@@ -34,6 +49,7 @@ describe("SpartanBot", () => {
 			expect(rental.info).toBe("Manual Rental Cancelled")
 		})
 	})
+
 	describe("Save and Reload", () => {
 		it("Should be able to Serialize & Deserialize", () => {
 			let spartan = new SpartanBot({ test: "setting" })

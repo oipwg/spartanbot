@@ -7,6 +7,10 @@ if (typeof window === "undefined" || typeof window.localStorage === "undefined")
 	}
 } else {localStorage = window.localStorage}
 
+let waitFn = async (time) => {
+	setTimeout(() => { return }, time || 1000)
+}
+
 /**
  * Rent hashrate based on a set of circumstances
  */
@@ -25,17 +29,43 @@ class SpartanBot {
 		this.deserialize()
 	}
 
+	/**
+	 * Get a setting back from SpartanBot
+	 * @param  {String} key - The setting key you wish to get the value of
+	 * @return {Object|String|Array.<Object>} Returns the value of the requested setting
+	 */
 	getSetting(key){
 		return this.settings[key]
 	}
 
+	/**
+	 * Set a setting
+	 * @param {[type]} key   [description]
+	 * @param {[type]} value [description]
+	 */
 	setSetting(key, value){
 		if (key !== undefined && value !== undefined)
 			this.settings[key] = value
+
+		// Save the latest
+		this.serialize()
 	}
 
-	async setupRentalProvider(){
+	/**
+	 * Setup a new Rental Provider for use
+	 * @param {Object} settings - The settings for the Rental Provider
+	 * @param {String} settings.type - The "type" of the rental provider. Currently only accepts "MiningRigRentals".
+	 * @param {String} settings.api_key - The API Key for the Rental Provider
+	 * @param {String} settings.api_secret - The API Secret for the Rental Provider
+	 * @return {[type]} [description]
+	 */
+	async setupRentalProvider(settings){
+		await waitFn(2000)
 
+		return {
+			success: true,
+			message: "Successfully Setup Rental Provider"
+		}
 	}
 	
 	/**
@@ -46,10 +76,6 @@ class SpartanBot {
 	 * @return {Promise<Object>} Returns a Promise that will resolve to an Object that contains information about the rental request
 	 */
 	async manualRental(hashrate, duration, confirmation){
-		let waitFn = async () => {
-			setTimeout(() => { return }, 1000)
-		}
-
 		await waitFn()
 
 		// Check if the user wants to proceed with the purchase
@@ -112,7 +138,7 @@ class SpartanBot {
 			data_from_storage = JSON.parse(localStorage.getItem('spartanbot-storage'))
 
 		if (data_from_storage.settings)
-			this.settings = data_from_storage.settings
+			this.settings = Object.assign({}, data_from_storage.settings, this.settings)
 
 		if (data_from_storage.rental_providers){
 			for (let provider of data_from_storage.rental_providers){
