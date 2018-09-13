@@ -8,13 +8,13 @@ afterAll(() => {
 describe("SpartanBot", () => {
 	describe("Settings", () => {
 		it("Should be able to set a setting", () => {
-			let spartan = new SpartanBot()
+			let spartan = new SpartanBot({ memory: true })
 
 			spartan.setSetting("test-setting", "test-setting-data")
 			expect(spartan.settings['test-setting']).toBe("test-setting-data")
 		})
 		it("Should be able to get a setting", () => {
-			let spartan = new SpartanBot()
+			let spartan = new SpartanBot({ memory: true })
 
 			spartan.setSetting("test-setting2", "test-setting-data2")
 			expect(spartan.getSetting('test-setting2')).toBe("test-setting-data2")
@@ -83,14 +83,14 @@ describe("SpartanBot", () => {
 
 	describe("Manual Rental", () => {
 		it("Should be able to rent manually (no confirmation function)", async () => {
-			let spartan = new SpartanBot()
+			let spartan = new SpartanBot({ memory: true })
 
 			let rental = await spartan.manualRental(1000, 86400)
 
 			expect(rental.success).toBe(true)
 		})
 		it("Should be able to use confirmation function", async () => {
-			let spartan = new SpartanBot()
+			let spartan = new SpartanBot({ memory: true })
 
 			let rental = await spartan.manualRental(1000, 86400, async (info) => {
 				return true
@@ -99,7 +99,7 @@ describe("SpartanBot", () => {
 			expect(rental.success).toBe(true)
 		})
 		it("Should be able to cancel", async () => {
-			let spartan = new SpartanBot()
+			let spartan = new SpartanBot({ memory: true })
 
 			let rental = await spartan.manualRental(1000, 86400, async (info) => {
 				return false

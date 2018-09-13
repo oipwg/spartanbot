@@ -22,6 +22,7 @@ class SpartanBot {
 	/**
 	 * Create a new SpartanBot
 	 * @param  {Object} settings - The settings for the SpartanBot node
+	 * @param {Boolean} [settings.memory=false] - Should SpartanBot only run in Memory and not save anything to disk
 	 * @return {SpartanBot}
 	 */
 	constructor(settings){
@@ -29,8 +30,9 @@ class SpartanBot {
 
 		this.rental_providers = []
 
-		// Try to load state from LocalStorage
-		this.deserialize()
+		// Try to load state from LocalStorage if we are not memory only
+		if (!this.settings.memory)
+			this._deserialize = this.deserialize()
 	}
 
 	/**
@@ -192,7 +194,8 @@ class SpartanBot {
 			serialized.rental_providers.push(provider.serialize())
 		}
 
-		localStorage.setItem('spartanbot-storage', JSON.stringify(serialized))
+		if (!this.settings.memory)
+			localStorage.setItem('spartanbot-storage', JSON.stringify(serialized))
 	}
 
 	/**
