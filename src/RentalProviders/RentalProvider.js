@@ -6,8 +6,11 @@ import uid from 'uid'
 class RentalProvider {
 	/**
 	 * Create a new Rental Provider
-	 * @param  {[type]} settings [description]
-	 * @return {[type]}         [description]
+	 * @param  {Object} settings - Settings for the RentalProvider
+	 * @param {String} settings.api_key - The API Key for the Rental Provider
+	 * @param {String} settings.api_secret - The API Secret for the Rental Provider
+	 * @param {String} [settings.uid] - The unique identifier for this Rental Provider
+	 * @return {RentalProvider} 
 	 */
 	constructor(settings = {}){
 		this.uid = settings.uid || uid()

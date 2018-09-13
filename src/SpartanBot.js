@@ -46,8 +46,8 @@ class SpartanBot {
 
 	/**
 	 * Set a setting
-	 * @param {[type]} key   [description]
-	 * @param {[type]} value [description]
+	 * @param {String} key - What setting you wish to set
+	 * @param {*} value - The value you wish to set the setting to
 	 */
 	setSetting(key, value){
 		if (key !== undefined && value !== undefined)
@@ -63,7 +63,7 @@ class SpartanBot {
 	 * @param {String} settings.type - The "type" of the rental provider. Currently only accepts "MiningRigRentals".
 	 * @param {String} settings.api_key - The API Key for the Rental Provider
 	 * @param {String} settings.api_secret - The API Secret for the Rental Provider
-	 * @return {[type]} [description]
+	 * @return {Promise<Object>} Returns a promise that will resolve after the rental provider has been setup
 	 */
 	async setupRentalProvider(settings){
 		// Force settings to be passed

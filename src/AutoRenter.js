@@ -6,7 +6,7 @@ class AutoRenter {
 	 * [constructor description]
 	 * @param  {Object} options - The Options for the AutoRenter
 	 * @param  {Array.<RentalProvider>} options.rental_providers - The Rental Providers that you wish to use to rent miners.
-	 * @return {[type]}         [description]
+	 * @return {Boolean}
 	 */
 	constructor(options){
 

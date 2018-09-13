@@ -7,7 +7,9 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "prepare": "npm run generate-docs && npm run compile",
+    "generate-docs": "node_modules/.bin/jsdoc --readme ./README.md -c jsdoc.json"
   },
   "repository": {
     "type": "git",
