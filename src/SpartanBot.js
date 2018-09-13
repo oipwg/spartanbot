@@ -1,13 +1,40 @@
+let localStorage
+
+if (typeof window === "undefined" || typeof window.localStorage === "undefined") {
+	if (typeof localStorage === "undefined") {
+		var LocalStorage = require('node-localstorage').LocalStorage;
+		localStorage = new LocalStorage('./localStorage');
+	}
+} else {localStorage = window.localStorage}
+
 /**
  * Rent hashrate based on a set of circumstances
  */
 class SpartanBot {
 	/**
-	 * [constructor description]
-	 * @param  {[type]} options [description]
-	 * @return {[type]}         [description]
+	 * Create a new SpartanBot
+	 * @param  {Object} settings - The settings for the SpartanBot node
+	 * @return {SpartanBot}
 	 */
-	constructor(options){
+	constructor(settings){
+		this.settings = settings || {}
+
+		this.rental_providers = []
+
+		// Try to load state from LocalStorage
+		this.deserialize()
+	}
+
+	getSetting(key){
+		return this.settings[key]
+	}
+
+	setSetting(key, value){
+		if (key !== undefined && value !== undefined)
+			this.settings[key] = value
+	}
+
+	async setupRentalProvider(){
 
 	}
 	
@@ -50,6 +77,50 @@ class SpartanBot {
 			success: true,
 			info: "Successfully rented miners"
 		}		
+	}
+
+	/**
+	 * Serialize all information about SpartanBot to LocalStorage (save the current state)
+	 * @return {Boolean} Returns true if successful
+	 *
+	 * @private
+	 */
+	serialize(){
+		let serialized = {
+			rental_providers: []
+		}
+
+		serialized.settings = JSON.parse(JSON.stringify(this.settings))
+
+		for (let provider of this.rental_providers){
+			serialized.rental_providers.push(provider.serialize())
+		}
+
+		localStorage.setItem('spartanbot-storage', JSON.stringify(serialized))
+	}
+
+	/**
+	 * Load all serialized (saved) data from LocalStorage
+	 * @return {Boolean} Returns true on deserialize success
+	 *
+	 * @private
+	 */
+	deserialize(){
+		let data_from_storage = {}
+
+		if (localStorage.getItem('spartanbot-storage'))
+			data_from_storage = JSON.parse(localStorage.getItem('spartanbot-storage'))
+
+		if (data_from_storage.settings)
+			this.settings = data_from_storage.settings
+
+		if (data_from_storage.rental_providers){
+			for (let provider of data_from_storage.rental_providers){
+				// this.rental_providers.push()
+			}
+		}
+
+		return true
 	}
 }
 
