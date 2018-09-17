@@ -1,12 +1,13 @@
 {
   "name": "spartanbot",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "description": "Defend the Network",
   "main": "lib/index.js",
   "directories": {
     "test": "tests"
   },
   "scripts": {
+    "compile": "npx babel src --out-dir lib",
     "test": "jest",
     "prepare": "npm run generate-docs && npm run compile",
     "generate-docs": "node_modules/.bin/jsdoc --readme ./README.md -c jsdoc.json"

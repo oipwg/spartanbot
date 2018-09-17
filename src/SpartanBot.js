@@ -68,12 +68,24 @@ class SpartanBot {
 	 */
 	async setupRentalProvider(settings){
 		// Force settings to be passed
-		if (!settings.type)
-			throw new Error("settings.type is required!")
-		if (!settings.api_key)
-			throw new Error("settings.api_key is required!")
-		if (!settings.api_secret)
-			throw new Error("settings.api_secret is required!")
+		if (!settings.type){
+			return {
+				success: false,
+				message: "settings.type is required!"
+			}
+		}
+		if (!settings.api_key){
+			return {
+				success: false,
+				message: "settings.api_key is required!"
+			}
+		}
+		if (!settings.api_secret){
+			return {
+				success: false,
+				message: "settings.api_secret is required!"
+			}
+		}
 
 		// Match to a supported provider (if possible)
 		let provider_match
@@ -84,17 +96,28 @@ class SpartanBot {
 		}
 
 		// Check if we didn't match to a provider
-		if (!provider_match)
-			throw new Error("No Provider found that matches settings.type")
+		if (!provider_match){
+			return {
+				success: false,
+				message: "No Provider found that matches settings.type"
+			}
+		}
 
 		// Create the new provider
 		let new_provider = new provider_match(settings)
 
 		// Test to make sure the API keys work
 		try {
-			await new_provider.testAuthorization()
+			let authorized = await new_provider.testAuthorization()
+
+			if (!authorized){
+				return {
+					success: false,
+					message: "Provider Authorization Failed"
+				}
+			}
 		} catch (e) {
-			throw new Error("API Key and/or API Secret are not valid!\n" + e)
+			throw new Error("Unable to check Provider Authorization!\n" + e)
 		}
 
 		this.rental_providers.push(new_provider)
@@ -104,6 +127,7 @@ class SpartanBot {
 
 		// Return info to the user
 		return {
+			success: true,
 			message: "Successfully Setup Rental Provider",
 			type: settings.type
 		}
