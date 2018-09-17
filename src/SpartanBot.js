@@ -1,4 +1,5 @@
 import { MRRProvider } from './RentalProviders'
+import AutoRenter from './AutoRenter'
 
 const SUPPORTED_RENTAL_PROVIDERS = [ MRRProvider ]
 
@@ -67,12 +68,24 @@ class SpartanBot {
 	 */
 	async setupRentalProvider(settings){
 		// Force settings to be passed
-		if (!settings.type)
-			throw new Error("settings.type is required!")
-		if (!settings.api_key)
-			throw new Error("settings.api_key is required!")
-		if (!settings.api_secret)
-			throw new Error("settings.api_secret is required!")
+		if (!settings.type){
+			return {
+				success: false,
+				message: "settings.type is required!"
+			}
+		}
+		if (!settings.api_key){
+			return {
+				success: false,
+				message: "settings.api_key is required!"
+			}
+		}
+		if (!settings.api_secret){
+			return {
+				success: false,
+				message: "settings.api_secret is required!"
+			}
+		}
 
 		// Match to a supported provider (if possible)
 		let provider_match
@@ -83,17 +96,28 @@ class SpartanBot {
 		}
 
 		// Check if we didn't match to a provider
-		if (!provider_match)
-			throw new Error("No Provider found that matches settings.type")
+		if (!provider_match){
+			return {
+				success: false,
+				message: "No Provider found that matches settings.type"
+			}
+		}
 
 		// Create the new provider
 		let new_provider = new provider_match(settings)
 
 		// Test to make sure the API keys work
 		try {
-			await new_provider.testAuthorization()
+			let authorized = await new_provider.testAuthorization()
+
+			if (!authorized){
+				return {
+					success: false,
+					message: "Provider Authorization Failed"
+				}
+			}
 		} catch (e) {
-			throw new Error("API Key and/or API Secret are not valid!\n" + e)
+			throw new Error("Unable to check Provider Authorization!\n" + e)
 		}
 
 		this.rental_providers.push(new_provider)
@@ -103,9 +127,33 @@ class SpartanBot {
 
 		// Return info to the user
 		return {
+			success: true,
 			message: "Successfully Setup Rental Provider",
 			type: settings.type
 		}
+	}
+
+	/**
+	 * Get all of the Supported Rental Providers that you can Setup
+	 * @return {Array.<String>} Returns an array containing all the supported providers "type" strings
+	 */
+	getSupportedRentalProviders(){
+		let supported_provider_types = []
+
+		// Itterate through all supported rental providers
+		for (let provider of SUPPORTED_RENTAL_PROVIDERS){
+			// Grab the type of the provider
+			let provider_type = provider.getType()
+
+			// Check if we have already added the provider to the array
+			if (supported_provider_types.indexOf(provider_type) === -1){
+				// If not, add it to the array
+				supported_provider_types.push(provider_type)
+			}
+		}
+
+		// Return the Array of all Supported Rental Provider types
+		return supported_provider_types
 	}
 
 	/**
@@ -148,33 +196,21 @@ class SpartanBot {
 	 * @return {Promise<Object>} Returns a Promise that will resolve to an Object that contains information about the rental request
 	 */
 	async manualRental(hashrate, duration, confirmation){
-		await waitFn()
+		this.autorenter = new AutoRenter({
+			rental_providers: this.rental_providers
+		})
 
-		// Check if the user wants to proceed with the purchase
-		if (confirmation){
-			let confirmed = false
+		try {
+			let rental_info = await this.autorenter.rent({
+				hashrate,
+				duration,
+				confirm: confirmation
+			})
 
-			try {
-				confirmed = await confirmation({
-					total_cost: 25.31,
-					total_hashrate: 2513
-				})
-			} catch (e) {}
-
-			if (!confirmed){
-				return {
-					success: false,
-					info: "Manual Rental Cancelled"
-				}
-			}
+			return rental_info
+		} catch (e) {
+			throw new Error("Unable to rent using AutoRenter!\n" + e)
 		}
-
-		await waitFn()
-
-		return {
-			success: true,
-			info: "Successfully rented miners"
-		}		
 	}
 
 	/**

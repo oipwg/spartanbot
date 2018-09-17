@@ -31,7 +31,15 @@ describe("SpartanBot", () => {
 				api_secret: "test-api-secret"
 			})
 
+			expect(setup.success).toBe(true)
 			expect(setup.type).toBe("MiningRigRentals")
+		})
+		it("Should be able to get supported rental provider type array", async () => {
+			let spartan = new SpartanBot({ memory: true })
+
+			let providers = spartan.getSupportedRentalProviders()
+
+			expect(providers).toEqual(["MiningRigRentals"])
 		})
 		it("Should be able to get all rental providers", async () => {
 			let spartan = new SpartanBot({ memory: true })
