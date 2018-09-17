@@ -65,3 +65,6 @@ localStorage/*
 
 #JetBrains
 .idea
+
+//MRR api information
+apikey.js
