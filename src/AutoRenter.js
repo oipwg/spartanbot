@@ -4,13 +4,15 @@
 class AutoRenter {
 	/**
 	 * [constructor description]
-	 * @param  {Object} options - The Options for the AutoRenter
-	 * @param  {Array.<RentalProvider>} options.rental_providers - The Rental Providers that you wish to use to rent miners.
+	 * @param  {Object} settings - The Options for the AutoRenter
+	 * @param  {Array.<RentalProvider>} settings.rental_providers - The Rental Providers that you wish to use to rent miners.
 	 * @return {Boolean}
 	 */
-	constructor(options){
-
+	constructor(settings){
+		this.settings = settings
+		this.rental_providers = settings.rental_providers
 	}
+	
 	/**
 	 * Rent an amount of hashrate for a period of time
 	 * @param {Object} options - The Options for the rental operation
@@ -19,7 +21,32 @@ class AutoRenter {
 	 * @param {Function} [options.confirm] - This function will be run to decide if the rental should proceed. If it returns `true`, the rental will continue, if false, the rental cancels
 	 * @return {Promise<Object>} Returns a Promise that will resolve to an Object containing info about the rental made
 	 */
-	rent(options){
+	async rent(options){
+		// Make sure we have some Rental Providers, if not, return failure
+		if (!(this.rental_providers.length >= 1)){
+			return {
+				success: false,
+				type: "NO_RENTAL_PROVIDERS"
+				message: "Rent Cancelled, no RentalProviders found to rent from"
+			}
+		}
 
+		let rental_info = await this.rental_providers[0].rent({
+			hashrate: options.hashrate,
+			duration: options.duration,
+			confirm: async (prepurchase_info) => {
+				if (options.confirm){
+					try {
+						let should_continue = await options.confirm(prepurchase_info)
+						return should_continue
+					} catch (e) { 
+						return false 
+					}
+				}
+				return true
+			}
+		})
+
+		return rental_info
 	}
 }
