@@ -109,6 +109,29 @@ class SpartanBot {
 	}
 
 	/**
+	 * Get all of the Supported Rental Providers that you can Setup
+	 * @return {Array.<String>} Returns an array containing all the supported providers "type" strings
+	 */
+	getSupportedRentalProviders(){
+		let supported_provider_types = []
+
+		// Itterate through all supported rental providers
+		for (let provider of SUPPORTED_RENTAL_PROVIDERS){
+			// Grab the type of the provider
+			let provider_type = provider.getType()
+
+			// Check if we have already added the provider to the array
+			if (supported_provider_types.indexOf(provider_type) === -1){
+				// If not, add it to the array
+				supported_provider_types.push(provider_type)
+			}
+		}
+
+		// Return the Array of all Supported Rental Provider types
+		return supported_provider_types
+	}
+
+	/**
 	 * Get all Rental Providers from SpartanBot
 	 * @return {Array.<MRRProvider>} Returns an array containing all the available providers
 	 */
@@ -157,7 +180,8 @@ class SpartanBot {
 			try {
 				confirmed = await confirmation({
 					total_cost: 25.31,
-					total_hashrate: 2513
+					total_hashrate: 2513,
+					total_rigs: 1234
 				})
 			} catch (e) {}
 
