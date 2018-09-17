@@ -1,4 +1,5 @@
 import { MRRProvider } from './RentalProviders'
+import AutoRenter from './AutoRenter'
 
 const SUPPORTED_RENTAL_PROVIDERS = [ MRRProvider ]
 
@@ -171,34 +172,21 @@ class SpartanBot {
 	 * @return {Promise<Object>} Returns a Promise that will resolve to an Object that contains information about the rental request
 	 */
 	async manualRental(hashrate, duration, confirmation){
-		await waitFn()
+		this.autorenter = new AutoRenter({
+			rental_providers: this.rental_providers
+		})
 
-		// Check if the user wants to proceed with the purchase
-		if (confirmation){
-			let confirmed = false
+		try {
+			let rental_info = await this.autorenter.rent({
+				hashrate,
+				duration,
+				confirm: confirmation
+			})
 
-			try {
-				confirmed = await confirmation({
-					total_cost: 25.31,
-					total_hashrate: 2513,
-					total_rigs: 1234
-				})
-			} catch (e) {}
-
-			if (!confirmed){
-				return {
-					success: false,
-					info: "Manual Rental Cancelled"
-				}
-			}
+			return rental_info
+		} catch (e) {
+			throw new Error("Unable to rent using AutoRenter!\n" + e)
 		}
-
-		await waitFn()
-
-		return {
-			success: true,
-			info: "Successfully rented miners"
-		}		
 	}
 
 	/**
