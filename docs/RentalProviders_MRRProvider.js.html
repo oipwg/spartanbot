@@ -76,7 +76,7 @@
       OIP HDMW
     </h3>
 
-    <h3>Classes</h3><ul><li id="AutoRenter-nav"><a href="AutoRenter.html">AutoRenter</a><ul class='methods'><li data-type="method" id="AutoRenter-rent-nav"><a href="AutoRenter.html#rent">rent</a></li></ul></li><li id="MRRProvider-nav"><a href="MRRProvider.html">MRRProvider</a><ul class='methods'><li data-type="method" id="MRRProvider-getType-nav"><a href="MRRProvider.html#.getType">getType</a></li><li data-type="method" id="MRRProvider-serialize-nav"><a href="MRRProvider.html#serialize">serialize</a></li><li data-type="method" id="MRRProvider-testAuthorization-nav"><a href="MRRProvider.html#testAuthorization">testAuthorization</a></li></ul></li><li id="RentalProvider-nav"><a href="RentalProvider.html">RentalProvider</a><ul class='methods'><li data-type="method" id="RentalProvider-getType-nav"><a href="RentalProvider.html#.getType">getType</a></li><li data-type="method" id="RentalProvider-serialize-nav"><a href="RentalProvider.html#serialize">serialize</a></li><li data-type="method" id="RentalProvider-testAuthorization-nav"><a href="RentalProvider.html#testAuthorization">testAuthorization</a></li></ul></li><li id="SpartanBot-nav"><a href="SpartanBot.html">SpartanBot</a><ul class='methods'><li data-type="method" id="SpartanBot-deleteRentalProvider-nav"><a href="SpartanBot.html#deleteRentalProvider">deleteRentalProvider</a></li><li data-type="method" id="SpartanBot-getRentalProviders-nav"><a href="SpartanBot.html#getRentalProviders">getRentalProviders</a></li><li data-type="method" id="SpartanBot-getSetting-nav"><a href="SpartanBot.html#getSetting">getSetting</a></li><li data-type="method" id="SpartanBot-manualRental-nav"><a href="SpartanBot.html#manualRental">manualRental</a></li><li data-type="method" id="SpartanBot-setSetting-nav"><a href="SpartanBot.html#setSetting">setSetting</a></li><li data-type="method" id="SpartanBot-setupRentalProvider-nav"><a href="SpartanBot.html#setupRentalProvider">setupRentalProvider</a></li></ul></li></ul>
+    <h3>Classes</h3><ul><li id="AutoRenter-nav"><a href="AutoRenter.html">AutoRenter</a><ul class='methods'><li data-type="method" id="AutoRenter-rent-nav"><a href="AutoRenter.html#rent">rent</a></li></ul></li><li id="MRRProvider-nav"><a href="MRRProvider.html">MRRProvider</a><ul class='methods'><li data-type="method" id="MRRProvider-getType-nav"><a href="MRRProvider.html#.getType">getType</a></li><li data-type="method" id="MRRProvider-getProfileID-nav"><a href="MRRProvider.html#getProfileID">getProfileID</a></li><li data-type="method" id="MRRProvider-getRigsToRent-nav"><a href="MRRProvider.html#getRigsToRent">getRigsToRent</a></li><li data-type="method" id="MRRProvider-rent-nav"><a href="MRRProvider.html#rent">rent</a></li><li data-type="method" id="MRRProvider-serialize-nav"><a href="MRRProvider.html#serialize">serialize</a></li><li data-type="method" id="MRRProvider-testAuthorization-nav"><a href="MRRProvider.html#testAuthorization">testAuthorization</a></li></ul></li><li id="RentalProvider-nav"><a href="RentalProvider.html">RentalProvider</a><ul class='methods'><li data-type="method" id="RentalProvider-getType-nav"><a href="RentalProvider.html#.getType">getType</a></li><li data-type="method" id="RentalProvider-serialize-nav"><a href="RentalProvider.html#serialize">serialize</a></li><li data-type="method" id="RentalProvider-testAuthorization-nav"><a href="RentalProvider.html#testAuthorization">testAuthorization</a></li></ul></li><li id="SpartanBot-nav"><a href="SpartanBot.html">SpartanBot</a><ul class='methods'><li data-type="method" id="SpartanBot-deleteRentalProvider-nav"><a href="SpartanBot.html#deleteRentalProvider">deleteRentalProvider</a></li><li data-type="method" id="SpartanBot-getRentalProviders-nav"><a href="SpartanBot.html#getRentalProviders">getRentalProviders</a></li><li data-type="method" id="SpartanBot-getSetting-nav"><a href="SpartanBot.html#getSetting">getSetting</a></li><li data-type="method" id="SpartanBot-manualRental-nav"><a href="SpartanBot.html#manualRental">manualRental</a></li><li data-type="method" id="SpartanBot-setSetting-nav"><a href="SpartanBot.html#setSetting">setSetting</a></li><li data-type="method" id="SpartanBot-setupRentalProvider-nav"><a href="SpartanBot.html#setupRentalProvider">setupRentalProvider</a></li></ul></li></ul>
   </nav>
 
   <div id="main">
@@ -92,6 +92,7 @@
 <section>
   <article>
     <pre class="prettyprint source linenums"><code>import RentalProvider from './RentalProvider'
+import MiningRigRentals from 'miningrigrentals-api-v2'
 
 /**
  * A Rental Provider for MiningRigRentals
@@ -107,6 +108,8 @@ class MRRProvider extends RentalProvider {
 	 */
 	constructor(settings){
 		super(settings)
+
+		this.api = new MiningRigRentals({key: this.api_key, secret: this.api_secret})
 	}
 
 	/**
@@ -123,9 +126,113 @@ class MRRProvider extends RentalProvider {
 	 * @return {Promise} Returns a Promise that will resolve upon success, and reject on failure
 	 */
 	async testAuthorization(){
-		return true
+		try {
+			let profile = await this.api.whoami();
+			log(profile)
+			return !!(profile.success &amp;&amp; profile.data &amp;&amp; profile.data.authed);
+		} catch (err) {
+			throw new Error(err)
+		}
 	}
 
+	/**
+	 * Get MiningRigRentals Profile ID (needed to rent rigs)
+	 * @returns {Promise&lt;number>}
+	 */
+	async getProfileID() {
+		let profile;
+		try {
+			profile = await this.api.whoami();
+		} catch (err) {
+			throw new Error(`error getting profile data: ${err}`)
+		}
+		if (profile.data) {
+			return profile.data.userid
+		}
+	}
+	/**
+	 * Get the rigs needed to fulfill rental requirements
+	 * @param {number} hashrate - in megahertz(mh)
+	 * @param {number} duration - in hours
+	 * @returns {Promise&lt;Array.&lt;Object>>}
+	 */
+	async getRigsToRent(hashrate, duration) {
+		//get profileID
+		let profileID
+		try {
+			profileID =  await this.getProfileID()
+		} catch (err) {
+			throw new Error(`Could not fetch profile ID \n ${err}`)
+		}
+
+		let rigOpts = {
+			type: 'scrypt',
+			minhours: {
+				min: duration
+			}
+		}
+		let rigsRequest;
+		try {
+			rigsRequest = await this.api.getRigs(rigOpts)
+		} catch (err) {
+			throw new Error(`Could not fetch rig list \n ${err}`)
+		}
+		let available_rigs = [];
+		if (rigsRequest.success &amp;&amp; rigsRequest.data) {
+			if (rigsRequest.data.records.length === 0) {
+				throw new Error(`No rigs found`)
+			}
+			let newRPIrigs = [], allOtherRigs = [];
+			for (let rig of rigsRequest.data.records) {
+				if (rig.rpi === 'new') {
+					newRPIrigs.push(rig)
+				} else {allOtherRigs.push(rig)}
+			}
+			allOtherRigs.sort((a,b) => {
+				return (b.rpi - a.rpi)
+			});
+			available_rigs = newRPIrigs.concat(allOtherRigs)
+		}
+
+		let rigs_to_rent = [], hashpower = 0;
+		for (let rig of available_rigs) {
+			if ((hashpower + rig.hashrate.advertised.hash) &lt;= hashrate) {
+				let tmpObj = {};
+				tmpObj['rig'] = rig.id;
+				tmpObj['length'] = duration
+				tmpObj['profile'] = profileID
+				// console.log(rig.hashrate.advertised.hash, rig.rpi)
+				tmpObj['hashrate'] = rig.hashrate.advertised.hash
+				hashpower += rig.hashrate.advertised.hash
+				rigs_to_rent.push(tmpObj)
+			}
+		}
+		return rigs_to_rent
+	}
+
+	/**
+	 * Rent rigs based on hashrate and time
+	 * @param {Object} options
+	 * @param {number} options.hashrate - The hashrate in MH
+	 * @param {number} options.duration - Duration of rent
+	 * @param {string} [options.type='scrypt'] - Type of rig (Scrypt, x11, sha256, etc)
+	 * @returns {Promise&lt;*>}
+	 */
+	async rent(options) {
+		//get rigs
+		let rigs_to_rent = [];
+		try {
+			rigs_to_rent = await this.getRigsToRent(options.hashrate, options.duration)
+		} catch (err) {
+			throw new Error(`Failed to fetch rigs to rent \n ${err}`)
+		}
+
+		//confirmation
+		confirmation(rigs_to_rent)
+
+		//rent rigs
+		//success
+	}
 	/**
 	 * Get back a "Serialized" state of the Provider
 	 * @return {Object} Returns a JSON object that contains the current rental provider state
@@ -138,6 +245,13 @@ class MRRProvider extends RentalProvider {
 			uid: this.uid
 		}
 	}
+}
+let log = (data) => {console.log(data)}
+let confirmation = async (data) => {
+	setTimeout(() => {
+		log(data);
+		return true
+	}, 2000)
 }
 
 export default MRRProvider</code></pre>
