@@ -86,12 +86,14 @@ class SpartanBot {
 
 		// Save the latest
 		this.serialize()
+
+		return true
 	}
 
 	/**
 	 * Get the balance of the internal wallet
 	 * @param  {Boolean} [fiat_value=false] - `true` if the balance should returned be in Fiat, `false` if the balance should be returned in the regular coin values
-	 * @return {[type]}            [description]
+	 * @return {Promise} 
 	 */
 	async getWalletBalance(fiat_value){
 		if (!this.wallet)
