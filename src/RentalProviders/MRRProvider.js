@@ -124,6 +124,45 @@ class MRRProvider extends RentalProvider {
 	}
 
 	/**
+	 * Get the confirmed account balance for a specific coin (defaults to BTC)
+	 * @param {string} [coin='BTC'] - The coin you wish to get a balance for [BTC, LTC, ETH, DASH]
+	 * @returns {Promise<(number|Object)>} - will return an object if success is false ex. {success: false}
+	 */
+	async getBalance(coin) {
+		try {
+			let response = await this.api.getAccountBalance()
+			if (response.success) {
+				if (coin) {
+					return Number(response.data[coin.toUpperCase()].confirmed)
+				} else {
+					return Number(response.data['BTC'].confirmed)
+				}
+			} else {
+				return {success: false}
+			}
+		} catch (err) {
+			throw new Error(`Could not fetch account balance \n ${err}`)
+		}
+	}
+	/**
+	 * Get Back balances for all coins, confirmed and unconfirmed
+	 * @returns {Promise<Object>}
+	 */
+	async getBalances() {
+		try {
+			let response = await this.api.getAccountBalance()
+			if (response.success) {
+				return response.data
+			} else {
+				return {success: false}
+			}
+		}
+		 catch (err) {
+			throw new Error(`Could not fetch account balance \n ${err}`)
+		}
+	}
+
+	/**
 	 * Rent rigs based on hashrate and time
 	 * @param {Object} options
 	 * @param {number} options.hashrate - The hashrate in MH
@@ -133,6 +172,9 @@ class MRRProvider extends RentalProvider {
 	 * @returns {Promise<*>}
 	 */
 	async rent(options) {
+		//check balance
+		let balance, hasSufficientBalance = true;
+		this.getBalance()
 		//get rigs
 		let rigs_to_rent = [];
 		try {

@@ -26,12 +26,40 @@ describe("MRRProvider", () => {
 			expect(err).toBeUndefined()
 		}
 	});
+	it('get default account balance (BTC) | getBalance', async () => {
+		let mrr = new MRRProvider(apikey);
+		try {
+			let balance = await mrr.getBalance();
+			expect(typeof balance === 'number').toBeTruthy()
+		} catch (err) {
+			expect(err).toBeUndefined()
+		}
+	});
+	it('get account balance for another coin| getBalance', async () => {
+		let mrr = new MRRProvider(apikey);
+		try {
+			let balance = await mrr.getBalance('ltc');
+			expect(typeof balance === 'number').toBeTruthy()
+		} catch (err) {
+			expect(err).toBeUndefined()
+		}
+	});
+	it('get all balances | getBalances', async () => {
+		let mrr = new MRRProvider(apikey);
+		try {
+			let balance = await mrr.getBalances();
+			expect(balance.success === undefined).toBeTruthy()
+		} catch (err) {
+			expect(err).toBeUndefined()
+		}
+	});
 	it('should fetch qualified rigs| getRigsToRent', async () =>{
 		let mrr = new MRRProvider(apikey);
 		let thrown;
-		let hashMh = 5000, duration = 5;
+		let hashMh = 500, duration = 3;
 		try {
 			let rigs = await mrr.getRigsToRent(hashMh, duration);
+			console.log(rigs)
 			// expect(success).toBeTruthy()
 			let hashpower = 0;
 			for (let rig of rigs) {
@@ -47,8 +75,9 @@ describe("MRRProvider", () => {
 			expect(thrown).toBeFalsy()
 		}
 	});
-	/*it('rent rigs', async () => {
+	it('rent rigs', async () => {
 		let mrr = new MRRProvider(apikey);
+		let rentalCanceled = false;
 		let rentOptions = {
 			hashrate: 500,
 			duration: 3,
@@ -56,16 +85,16 @@ describe("MRRProvider", () => {
 		}
 		try {
 			let rentalConfirmation = await mrr.rent(rentOptions);
-			// console.log('rental confirmation: ', rentalConfirmation)
+			console.log('rental confirmation: ', rentalConfirmation)
 		} catch (err) {
 			// console.log(`Error: ${err}`)
 			expect(err).toBeUndefined()
 		}
-	}, 250 * 1000);*/
+	}, 250 * 1000);
 })
 
 let confirmFn = async (data) => {
-	return false
+	return true
 	// setTimeout( () => {
 	// 	Promise.resolve(true)
 	// }, 2000)
