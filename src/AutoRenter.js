@@ -50,6 +50,7 @@ class AutoRenter {
 							total_hashrate: prepurchase_info.total_hashrate,
 							total_rigs: prepurchase_info.rigs.length
 						})
+						
 						return should_continue
 					} catch (e) { 
 						return false 

@@ -193,6 +193,7 @@ class MRRProvider extends RentalProvider {
 		}
 
 		return {
+			success: true,
 			rented_rigs,
 			total_rigs_rented: rented_rigs.length,
 			btc_total_price: spent_btc_amount,
