@@ -22,37 +22,6 @@ class AutoRenter {
 	 * @return {Promise<Object>} Returns a Promise that will resolve to an Object containing info about the rental made
 	 */
 	async rent(options){
-		// Mock function to respond for now...
-		if (options.confirm){
-			let confirmed = false
-
-			try {
-				confirmed = await options.confirm({
-					total_cost: 25.31,
-					total_hashrate: 2513,
-					total_rigs: 7
-				})
-			} catch (e) {}
-
-			if (!confirmed){
-				return {
-					success: false,
-					info: "Manual Rental Cancelled"
-				}
-			}
-		}
-
-		return {
-			success: true,
-			info: "Successfully rented miners"
-		}
-
-
-
-
-		/***************************************/
-		/*********** ACTUAL CODE ***************/
-		/***************************************/
 		// Make sure we have some Rental Providers, if not, return failure
 		if (!(this.rental_providers.length >= 1)){
 			return {
