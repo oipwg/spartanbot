@@ -50,7 +50,7 @@ class AutoRenter {
 							total_hashrate: prepurchase_info.total_hashrate,
 							total_rigs: prepurchase_info.rigs.length
 						})
-						
+
 						return should_continue
 					} catch (e) { 
 						return false 
@@ -60,7 +60,13 @@ class AutoRenter {
 			}
 		})
 
-		return rental_info
+		let btc_to_usd_rate = await this.exchange.getExchangeRate("bitcoin", "usd")
+
+		return {
+			total_rigs_rented: rental_info.rented_rigs.length,
+			total_cost: (rental_info.btc_total_price * btc_to_usd_rate).toFixed(2),
+			total_hashrate: rental_info.total_hashrate
+		}
 	}
 }
 
