@@ -1,28 +1,29 @@
 import MRRProvider from '../src/RentalProviders/MRRProvider';
-import apikey from './apikey';
+import { config } from 'dotenv'
+config()
+
+const apikey = {
+	api_key: process.env.API_KEY,
+	api_secret: process.env.API_SECRET
+};
 
 describe("MRRProvider", () => {
 	it('should authorize MRR API access | testAuthorization', async () => {
 		let mrr = new MRRProvider(apikey);
-		let thrown;
 		try {
 			let success = await mrr.testAuthorization();
 			expect(success).toBeTruthy()
 		} catch (err) {
-			thrown = false;
-			expect(thrown).toBeFalsy()
+			expect(err).toBeUndefined()
 		}
 	});
 	it('should get my profile ID | getProfileID', async () => {
 		let mrr = new MRRProvider(apikey);
-		let thrown;
 		try {
 			let profileID = await mrr.getProfileID();
-			// console.log(profileID)
 			expect(typeof profileID === 'number').toBeTruthy()
 		} catch (err) {
-			thrown = false;
-			expect(thrown).toBeFalsy()
+			expect(err).toBeUndefined()
 		}
 	});
 	it('should fetch qualified rigs| getRigsToRent', async () =>{
@@ -37,7 +38,7 @@ describe("MRRProvider", () => {
 				hashpower += rig.hashrate
 			}
 			let enoughHash= false
-			if (hashpower <= 5000) {
+			if (hashpower <= hashMh) {
 				enoughHash = true
 			}
 			expect(enoughHash).toBeTruthy()

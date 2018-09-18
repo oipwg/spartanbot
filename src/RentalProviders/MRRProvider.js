@@ -48,12 +48,13 @@ class MRRProvider extends RentalProvider {
 	async getProfileID() {
 		let profile;
 		try {
-			profile = await this.api.getProfiles();
+			profile = await this.api.getPoolProfiles();
 		} catch (err) {
 			throw new Error(`error getting profile data: ${err}`)
 		}
 		if (profile.data) {
-			return profile.data[0].id
+			//ToDo: be able to pick a pool profile to use
+			return Number(profile.data[0].id)
 		}
 	}
 	/**
