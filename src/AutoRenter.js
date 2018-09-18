@@ -1,3 +1,5 @@
+import Exchange from 'oip-exchange-rate';
+
 /**
  * Manages Rentals of Miners from multiple API's
  */
@@ -11,6 +13,7 @@ class AutoRenter {
 	constructor(settings){
 		this.settings = settings
 		this.rental_providers = settings.rental_providers
+		this.exchange = new Exchange();
 	}
 	
 	/**
@@ -40,7 +43,13 @@ class AutoRenter {
 			confirm: async (prepurchase_info) => {
 				if (options.confirm){
 					try {
-						let should_continue = await options.confirm(prepurchase_info)
+						let btc_to_usd_rate = await this.exchange.getExchangeRate("bitcoin", "usd")
+
+						let should_continue = await options.confirm({
+							total_cost: (prepurchase_info.btc_total_price * btc_to_usd_rate).toFixed(2),
+							total_hashrate: prepurchase_info.total_hashrate,
+							total_rigs: prepurchase_info.rigs.length
+						})
 						return should_continue
 					} catch (e) { 
 						return false 

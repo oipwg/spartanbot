@@ -102,16 +102,23 @@ class MRRProvider extends RentalProvider {
 
 		let rigs_to_rent = [], hashpower = 0;
 		for (let rig of available_rigs) {
-			if ((hashpower + rig.hashrate.advertised.hash) <= hashrate) {
-				let tmpObj = {};
-				tmpObj['rig'] = Number(rig.id);
-				tmpObj['length'] = duration
-				tmpObj['profile'] = Number(profileID)
-				// tmpObj['hashrate'] = rig.hashrate.advertised.hash
+			if ((hashpower + rig.hashrate.advertised.hash) <= hashrate) {				
 				hashpower += rig.hashrate.advertised.hash
-				rigs_to_rent.push(tmpObj)
+
+				let rig_hashrate = rig.hashrate.advertised.hash
+
+				rigs_to_rent.push({
+					rental_info: {
+						rig: parseInt(rig.id),
+						length: duration,
+						profile: parseInt(profileID)
+					},
+					hashrate: rig.hashrate.advertised.hash,
+					btc_price: parseFloat(rig.price.BTC.hour) * duration
+				})
 			}
 		}
+
 		return rigs_to_rent
 	}
 
@@ -136,7 +143,20 @@ class MRRProvider extends RentalProvider {
 		//confirmation
 		if (options.confirm) {
 			try {
-				let confirmed = await options.confirm(rigs_to_rent)
+				let btc_total_price = 0
+				let total_hashrate = 0
+
+				for (let rig of rigs_to_rent){
+					btc_total_price += rig.btc_price
+					total_hashrate += rig.hashrate
+				}
+
+				let confirmed = await options.confirm({
+					btc_total_price,
+					total_hashrate,
+					rigs: rigs_to_rent
+				})
+
 				if (!confirmed) {
 					return {
 						success: false,
@@ -150,38 +170,34 @@ class MRRProvider extends RentalProvider {
 
 		//rent rigs
 		let rentalConfirmation = {};
-		// let time = Date.now()
+		
 		for (let rig of rigs_to_rent) {
 			try {
 				let rental = await this.api.createRental(rig)
-				// let newTime = Date.now();
-				// console.log((newTime-time)/1000)
-				// time = newTime
 				rentalConfirmation[rig.rig] = rental
 			} catch (err) {
 				rentalConfirmation[rig.rig] = `Error renting rig: ${err}`
 			}
 		}
-		// let rentalObject = {}
-		// for (let rig of rigs_to_rent) {
-		// 	rentalObject[`${rig.rig}`] = rig
-		// }
-		// console.log('rental object: ', rentalObject)
-		// let rentalPromises = {}
-		// for (let rig in rentalObject) {
-		// 	rentalPromises[rig] = this.api.createRental(rentalObject[rig])
-		// }
-		//
-		// let rentalConfirmation = {};
-		// for (let rig in rentalPromises) {
-		// 	try {
-		// 		rentalConfirmation[rig] = await rentalPromises[rig]
-		// 	} catch (err) {
-		// 		rentalConfirmation[rig] = `Error attempting to rent ${rentalObject[rig]} \n ${err}`
-		// 	}
-		// }
-		//return confirmation
-		return rentalConfirmation
+
+		let rented_rigs = []
+		let spent_btc_amount = 0
+		let total_rented_hashrate = 0
+
+		for (var rig in rentalConfirmation){
+			if (rentalConfirmation[rig].success){
+				rented_rigs.push(rentalConfirmation[rig].data)
+				spent_btc_amount += parseFloat(rentalConfirmation[rig].data.price.BTC.hour) * parseInt(rentalConfirmation[rig].data.length)
+				total_rented_hashrate += rig.hashrate.advertised.hash
+			}
+		}
+
+		return {
+			rented_rigs,
+			total_rigs_rented: rented_rigs.length,
+			btc_total_price: spent_btc_amount,
+			total_hashrate: total_rented_hashrate
+		}
 	}
 	/**
 	 * Get back a "Serialized" state of the Provider
