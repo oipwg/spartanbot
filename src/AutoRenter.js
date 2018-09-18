@@ -60,12 +60,15 @@ class AutoRenter {
 			}
 		})
 
+		if (!rental_info.success)
+			return rental_info
+
 		let btc_to_usd_rate = await this.exchange.getExchangeRate("bitcoin", "usd")
 		let total_rigs = 0
 
 		if (rental_info.rented_rigs)
 			total_rigs = rental_info.rented_rigs.length
-		
+
 		return {
 			success: true,
 			total_rigs_rented: total_rigs,
