@@ -1,4 +1,5 @@
 import SpartanBot from '../src/SpartanBot'
+import apikey from './apikey';
 
 // After all the tests have run, remove the test data :)
 afterAll(() => {
@@ -19,6 +20,12 @@ describe("SpartanBot", () => {
 			spartan.setSetting("test-setting2", "test-setting-data2")
 			expect(spartan.getSetting('test-setting2')).toBe("test-setting-data2")
 		})
+		it("Should be able to get settings", () => {
+			let spartan = new SpartanBot({ memory: true })
+
+			spartan.setSetting("test-setting2", "test-setting-data2")
+			expect(spartan.getSettings()).toEqual({"memory": true, "test-setting2": "test-setting-data2"})
+		})
 	})
 
 	describe("RentalProviders", () => {
@@ -27,8 +34,8 @@ describe("SpartanBot", () => {
 
 			let setup = await spartan.setupRentalProvider({
 				type: "MiningRigRentals",
-				api_key: "test-api-key",
-				api_secret: "test-api-secret"
+				api_key: apikey.api_key,
+				api_secret: apikey.api_secret
 			})
 
 			expect(setup.success).toBe(true)
@@ -46,14 +53,14 @@ describe("SpartanBot", () => {
 
 			await spartan.setupRentalProvider({
 				type: "MiningRigRentals",
-				api_key: "test-api-key",
-				api_secret: "test-api-secret"
+				api_key: apikey.api_key,
+				api_secret: apikey.api_secret
 			})
 
 			await spartan.setupRentalProvider({
 				type: "MiningRigRentals",
-				api_key: "test-api-key2",
-				api_secret: "test-api-secret2"
+				api_key: apikey.api_key,
+				api_secret: apikey.api_secret
 			})
 
 			let providers = spartan.getRentalProviders()
@@ -65,14 +72,14 @@ describe("SpartanBot", () => {
 
 			await spartan.setupRentalProvider({
 				type: "MiningRigRentals",
-				api_key: "test-api-key",
-				api_secret: "test-api-secret"
+				api_key: apikey.api_key,
+				api_secret: apikey.api_secret
 			})
 
 			await spartan.setupRentalProvider({
 				type: "MiningRigRentals",
-				api_key: "test-api-key2",
-				api_secret: "test-api-secret2"
+				api_key: apikey.api_key,
+				api_secret: apikey.api_secret
 			})
 
 			let providers = spartan.getRentalProviders()
@@ -90,6 +97,7 @@ describe("SpartanBot", () => {
 	})
 
 	describe("Manual Rental", () => {
+		/*
 		it("Should be able to rent manually (no confirmation function)", async () => {
 			let spartan = new SpartanBot({ memory: true })
 
@@ -106,15 +114,22 @@ describe("SpartanBot", () => {
 
 			expect(rental.success).toBe(true)
 		})
+		*/
 		it("Should be able to cancel", async () => {
 			let spartan = new SpartanBot({ memory: true })
+
+			await spartan.setupRentalProvider({
+				type: "MiningRigRentals",
+				api_key: apikey.api_key,
+				api_secret: apikey.api_secret
+			})
 
 			let rental = await spartan.manualRental(1000, 86400, async (info) => {
 				return false
 			})
 
 			expect(rental.success).toBe(false)
-			expect(rental.info).toBe("Manual Rental Cancelled")
+			expect(rental.info).toBe("Rental Cancelled")
 		})
 	})
 
@@ -122,10 +137,19 @@ describe("SpartanBot", () => {
 		it("Should be able to Serialize & Deserialize", async () => {
 			let spartan = new SpartanBot({ test: "setting" })
 
+			await spartan._deserialize
+			await spartan._wallet_create
+
+			let account_identifier = spartan.oip_account
+			let wallet_mnemonic = spartan.wallet._account.wallet.mnemonic
+
+			expect(spartan.wallet._storageAdapter._username).toBe(account_identifier)
+			expect(spartan.wallet._account.wallet.mnemonic).toBe(wallet_mnemonic)
+
 			let setup = await spartan.setupRentalProvider({
 				type: "MiningRigRentals",
-				api_key: "test-api-key",
-				api_secret: "test-api-secret"
+				api_key: apikey.api_key,
+				api_secret: apikey.api_secret
 			})
 
 			spartan.serialize()
@@ -134,6 +158,11 @@ describe("SpartanBot", () => {
 
 			// Wait for deserialization to finish
 			await spartan2._deserialize
+			await spartan2._wallet_login
+
+			expect(spartan2.oip_account).toBe(account_identifier)
+			expect(spartan2.wallet._storageAdapter._username).toBe(account_identifier)
+			expect(spartan2.wallet._account.wallet.mnemonic).toBe(wallet_mnemonic)
 
 			expect(spartan2.getSetting('test')).toBe("setting")
 		})

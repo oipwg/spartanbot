@@ -1,3 +1,5 @@
+import { Account } from 'oip-account'
+
 import { MRRProvider } from './RentalProviders'
 import AutoRenter from './AutoRenter'
 
@@ -32,8 +34,28 @@ class SpartanBot {
 		this.rental_providers = []
 
 		// Try to load state from LocalStorage if we are not memory only
-		if (!this.settings.memory)
-			this._deserialize = this.deserialize()
+		if (!this.settings.memory){
+
+			this._deserialize = this.deserialize().then(() => {
+				// If we are not memory only, load the wallet using OIP Account
+
+				// Check if the oip_account has been created
+				if (this.oip_account){
+					// Login to the wallet
+					this.wallet = new Account(this.oip_account, undefined, {discover: false})
+					this._wallet_login = this.wallet.login()
+				} else {
+					this.wallet = new Account(undefined, undefined, {discover: false})
+
+					// Create and save wallet
+					this._wallet_create = this.wallet.create().then((wallet_info) => {
+						// Save the identifier to the localstorage
+						this.oip_account = wallet_info.identifier
+						this.serialize()
+					})
+				}
+			})
+		}
 	}
 
 	/**
@@ -64,6 +86,25 @@ class SpartanBot {
 
 		// Save the latest
 		this.serialize()
+	}
+
+	/**
+	 * Get the balance of the internal wallet
+	 * @param  {Boolean} [fiat_value=false] - `true` if the balance should returned be in Fiat, `false` if the balance should be returned in the regular coin values
+	 * @return {[type]}            [description]
+	 */
+	async getWalletBalance(fiat_value){
+		if (!this.wallet)
+			return {
+				success: false,
+				info: "NO_WALLET",
+				message: "No wallet was found in SpartanBot, may be running in memory mode"
+			}
+
+		if (fiat_value)
+			return await this.wallet._account.wallet.getFiatBalances(["flo"])
+		else
+			return await this.wallet._account.wallet.getCoinBalances(["flo"])
 	}
 
 	/**
@@ -232,11 +273,13 @@ class SpartanBot {
 			rental_providers: []
 		}
 
-		serialized.settings = JSON.parse(JSON.stringify(this.settings))
+		serialized.settings = this.settings
 
 		for (let provider of this.rental_providers){
 			serialized.rental_providers.push(provider.serialize())
 		}
+
+		serialized.oip_account = this.oip_account
 
 		if (!this.settings.memory)
 			localStorage.setItem('spartanbot-storage', JSON.stringify(serialized))
@@ -261,6 +304,10 @@ class SpartanBot {
 			for (let provider of data_from_storage.rental_providers){
 				await this.setupRentalProvider(provider)
 			}
+		}
+
+		if (data_from_storage.oip_account){
+			this.oip_account = data_from_storage.oip_account
 		}
 
 		return true
