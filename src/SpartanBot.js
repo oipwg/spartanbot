@@ -37,6 +37,14 @@ class SpartanBot {
 	}
 
 	/**
+	 * Get all setting back from SpartanBot
+	 * @return {Object} Returns an object containing all the available settings
+	 */
+	getSettings(){
+		return JSON.parse(JSON.stringify(this.settings))
+	}
+
+	/**
 	 * Get a setting back from SpartanBot
 	 * @param  {String} key - The setting key you wish to get the value of
 	 * @return {Object|String|Array.<Object>} Returns the value of the requested setting
