@@ -35,7 +35,6 @@ class MRRProvider extends RentalProvider {
 	async testAuthorization(){
 		try {
 			let profile = await this.api.whoami();
-			console.log(profile)
 			return !!(profile.success && profile.data && profile.data.authed);
 		} catch (err) {
 			throw new Error(err)
@@ -151,15 +150,14 @@ class MRRProvider extends RentalProvider {
 
 		//rent rigs
 		let rentalConfirmation = {};
-		let time = Date.now()
+		// let time = Date.now()
 		for (let rig of rigs_to_rent) {
 			try {
 				let rental = await this.api.createRental(rig)
-				let newTime = Date.now();
-				console.log((newTime-time)/1000)
-				time = newTime
+				// let newTime = Date.now();
+				// console.log((newTime-time)/1000)
+				// time = newTime
 				rentalConfirmation[rig.rig] = rental
-				console.log(rental)
 			} catch (err) {
 				rentalConfirmation[rig.rig] = `Error renting rig: ${err}`
 			}

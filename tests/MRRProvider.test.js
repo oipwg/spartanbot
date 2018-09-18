@@ -18,7 +18,7 @@ describe("MRRProvider", () => {
 		let thrown;
 		try {
 			let profileID = await mrr.getProfileID();
-			console.log(profileID)
+			// console.log(profileID)
 			expect(typeof profileID === 'number').toBeTruthy()
 		} catch (err) {
 			thrown = false;
@@ -49,15 +49,15 @@ describe("MRRProvider", () => {
 	it('rent rigs', async () => {
 		let mrr = new MRRProvider(apikey);
 		let rentOptions = {
-			hashrate: 5000,
-			duration: 5,
+			hashrate: 500,
+			duration: 3,
 			confirm: confirmFn
 		}
 		try {
 			let rentalConfirmation = await mrr.rent(rentOptions);
-			console.log('rental confirmation: ', rentalConfirmation)
+			// console.log('rental confirmation: ', rentalConfirmation)
 		} catch (err) {
-			console.log(`Error: ${err}`)
+			// console.log(`Error: ${err}`)
 			expect(err).toBeUndefined()
 		}
 	}, 250 * 1000);
