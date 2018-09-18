@@ -31,9 +31,12 @@ class AutoRenter {
 			}
 		}
 
+		// tmp convert for MRRProvider
+		let hours = options.duration / 60 / 60
+
 		let rental_info = await this.rental_providers[0].rent({
 			hashrate: options.hashrate,
-			duration: options.duration,
+			duration: hours,
 			confirm: async (prepurchase_info) => {
 				if (options.confirm){
 					try {
