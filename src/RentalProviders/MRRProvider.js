@@ -187,7 +187,7 @@ class MRRProvider extends RentalProvider {
 		for (let rig in rentalConfirmation){
 			if (rentalConfirmation[rig].success){
 				rented_rigs.push(rentalConfirmation[rig].data)
-				spent_btc_amount += parseFloat(rentalConfirmation[rig].data.price.paid) * parseInt(rentalConfirmation[rig].data.length)
+				spent_btc_amount += parseFloat(rentalConfirmation[rig].data.price.paid)
 				total_rented_hashrate += rentalConfirmation[rig].data.hashrate.advertised.hash
 			}
 		}
