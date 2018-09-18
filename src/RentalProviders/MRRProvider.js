@@ -173,10 +173,10 @@ class MRRProvider extends RentalProvider {
 		
 		for (let rig of rigs_to_rent) {
 			try {
-				let rental = await this.api.createRental(rig)
-				rentalConfirmation[rig.rig] = rental
+				let rental = await this.api.createRental(rig.rental_info)
+				rentalConfirmation[rig.rental_info.rig] = rental
 			} catch (err) {
-				rentalConfirmation[rig.rig] = `Error renting rig: ${err}`
+				rentalConfirmation[rig.rental_info.rig] = `Error renting rig: ${err}`
 			}
 		}
 
@@ -184,11 +184,11 @@ class MRRProvider extends RentalProvider {
 		let spent_btc_amount = 0
 		let total_rented_hashrate = 0
 
-		for (var rig in rentalConfirmation){
+		for (let rig in rentalConfirmation){
 			if (rentalConfirmation[rig].success){
 				rented_rigs.push(rentalConfirmation[rig].data)
-				spent_btc_amount += parseFloat(rentalConfirmation[rig].data.price.BTC.hour) * parseInt(rentalConfirmation[rig].data.length)
-				total_rented_hashrate += rig.hashrate.advertised.hash
+				spent_btc_amount += parseFloat(rentalConfirmation[rig].data.price.paid) * parseInt(rentalConfirmation[rig].data.length)
+				total_rented_hashrate += rentalConfirmation[rig].data.hashrate.advertised.hash
 			}
 		}
 
