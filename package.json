@@ -37,6 +37,8 @@
   },
   "homepage": "https://github.com/oipwg/spartanbot#readme",
   "dependencies": {
+    "lodash": "^4.17.11",
+    "lodash.combinations": "^18.9.19",
     "dotenv": "^6.0.0",
     "miningrigrentals-api-v2": "^1.0.4",
     "node-localstorage": "^1.3.1",
