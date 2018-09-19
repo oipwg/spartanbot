@@ -104,6 +104,18 @@ describe("MRRProvider", () => {
 			console.log(`Err: \n ${err}`)
 		}
 	}, 250 * 1000);
+	it('get all pools | getPools', async () => {
+		let mrr = new MRRProvider(apikey);
+		let response = await mrr.getPools()
+		expect(response.success).toBeTruthy()
+	});
+	it('get pools by ID| getPools', async () => {
+		let mrr = new MRRProvider(apikey);
+		let ids = [176897, 176889]
+		let response = await mrr.getPools(ids)
+		console.log(response)
+		expect(response.success).toBeTruthy()
+	});
 })
 
 let confirmFn = async (data) => {
