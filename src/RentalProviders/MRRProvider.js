@@ -103,7 +103,7 @@ class MRRProvider extends RentalProvider {
 
 		let rigs_to_rent = [], hashpower = 0;
 		for (let rig of available_rigs) {
-			if ((hashpower + rig.hashrate.advertised.hash) <= hashrate) {				
+			if ((hashpower + rig.hashrate.advertised.hash) <= hashrate) {
 				hashpower += rig.hashrate.advertised.hash
 
 				let rig_hashrate = rig.hashrate.advertised.hash
@@ -122,7 +122,6 @@ class MRRProvider extends RentalProvider {
 
 		return rigs_to_rent
 	}
-
 	/**
 	 * Get the confirmed account balance for a specific coin (defaults to BTC)
 	 * @param {string} [coin='BTC'] - The coin you wish to get a balance for [BTC, LTC, ETH, DASH]
@@ -161,7 +160,19 @@ class MRRProvider extends RentalProvider {
 			throw new Error(`Could not fetch account balance \n ${err}`)
 		}
 	}
-
+	/**
+	 * Get the total cost to rent multiple rigs
+	 * @param {Array.<Object>} rigs_to_rent - See MRRProvider.getRigsToRent()
+	 * @returns {number}
+	 */
+	getRentalCost(rigs_to_rent) {
+		let cost = 0
+		for (let rig of rigs_to_rent) {
+			//ToDo: make the crypto-currency dynamic
+			cost += rig.btc_price
+		}
+		return cost
+	}
 	/**
 	 * Rent rigs based on hashrate and time
 	 * @param {Object} options
@@ -172,9 +183,14 @@ class MRRProvider extends RentalProvider {
 	 * @returns {Promise<*>}
 	 */
 	async rent(options) {
-		//check balance
-		let balance, hasSufficientBalance = true;
-		this.getBalance()
+		//get balance
+		let balance;
+		try {
+			balance = await this.getBalance()
+		} catch (err) {
+			throw new Error(err)
+		}
+
 		//get rigs
 		let rigs_to_rent = [];
 		try {
