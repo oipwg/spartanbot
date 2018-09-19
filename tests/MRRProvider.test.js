@@ -76,19 +76,13 @@ describe("MRRProvider", () => {
 	});
 	it('rent rigs', async () => {
 		let mrr = new MRRProvider(apikey);
-		let rentalCanceled = false;
 		let rentOptions = {
 			hashrate: 500,
 			duration: 3,
 			confirm: confirmFn
 		}
-		try {
-			let rentalConfirmation = await mrr.rent(rentOptions);
-			console.log('rental confirmation: ', rentalConfirmation)
-		} catch (err) {
-			// console.log(`Error: ${err}`)
-			expect(err).toBeUndefined()
-		}
+		let rentalConfirmation = await mrr.rent(rentOptions);
+		console.log('rental confirmation: ', rentalConfirmation)
 	}, 250 * 1000);
 	it('create pool and add it to profile | createPool', async () => {
 		let mrr = new MRRProvider(apikey);
@@ -104,12 +98,12 @@ describe("MRRProvider", () => {
 		};
 		try {
 			let response = await mrr.createPool(options)
+			expect(response.success).toBeTruthy()
 			console.log(response)
 		} catch (err) {
 			console.log(`Err: \n ${err}`)
 		}
-
-	});
+	}, 250 * 1000);
 })
 
 let confirmFn = async (data) => {
