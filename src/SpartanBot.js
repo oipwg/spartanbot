@@ -104,9 +104,9 @@ class SpartanBot {
 			}
 
 		if (fiat_value)
-			return await this.wallet._account.wallet.getFiatBalances(["flo"])
+			return await this.wallet.wallet.getFiatBalances(["flo"])
 		else
-			return await this.wallet._account.wallet.getCoinBalances(["flo"])
+			return await this.wallet.wallet.getCoinBalances(["flo"])
 	}
 
 	/**
