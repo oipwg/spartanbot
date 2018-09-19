@@ -76,7 +76,7 @@
       OIP HDMW
     </h3>
 
-    <h3>Classes</h3><ul><li id="AutoRenter-nav"><a href="AutoRenter.html">AutoRenter</a><ul class='methods'><li data-type="method" id="AutoRenter-rent-nav"><a href="AutoRenter.html#rent">rent</a></li></ul></li><li id="MRRProvider-nav"><a href="MRRProvider.html">MRRProvider</a><ul class='methods'><li data-type="method" id="MRRProvider-getType-nav"><a href="MRRProvider.html#.getType">getType</a></li><li data-type="method" id="MRRProvider-getProfileID-nav"><a href="MRRProvider.html#getProfileID">getProfileID</a></li><li data-type="method" id="MRRProvider-getRigsToRent-nav"><a href="MRRProvider.html#getRigsToRent">getRigsToRent</a></li><li data-type="method" id="MRRProvider-rent-nav"><a href="MRRProvider.html#rent">rent</a></li><li data-type="method" id="MRRProvider-serialize-nav"><a href="MRRProvider.html#serialize">serialize</a></li><li data-type="method" id="MRRProvider-testAuthorization-nav"><a href="MRRProvider.html#testAuthorization">testAuthorization</a></li></ul></li><li id="RentalProvider-nav"><a href="RentalProvider.html">RentalProvider</a><ul class='methods'><li data-type="method" id="RentalProvider-getType-nav"><a href="RentalProvider.html#.getType">getType</a></li><li data-type="method" id="RentalProvider-serialize-nav"><a href="RentalProvider.html#serialize">serialize</a></li><li data-type="method" id="RentalProvider-testAuthorization-nav"><a href="RentalProvider.html#testAuthorization">testAuthorization</a></li></ul></li><li id="SpartanBot-nav"><a href="SpartanBot.html">SpartanBot</a><ul class='methods'><li data-type="method" id="SpartanBot-deleteRentalProvider-nav"><a href="SpartanBot.html#deleteRentalProvider">deleteRentalProvider</a></li><li data-type="method" id="SpartanBot-getRentalProviders-nav"><a href="SpartanBot.html#getRentalProviders">getRentalProviders</a></li><li data-type="method" id="SpartanBot-getSetting-nav"><a href="SpartanBot.html#getSetting">getSetting</a></li><li data-type="method" id="SpartanBot-manualRental-nav"><a href="SpartanBot.html#manualRental">manualRental</a></li><li data-type="method" id="SpartanBot-setSetting-nav"><a href="SpartanBot.html#setSetting">setSetting</a></li><li data-type="method" id="SpartanBot-setupRentalProvider-nav"><a href="SpartanBot.html#setupRentalProvider">setupRentalProvider</a></li></ul></li></ul>
+    <h3>Classes</h3><ul><li id="AutoRenter-nav"><a href="AutoRenter.html">AutoRenter</a><ul class='methods'><li data-type="method" id="AutoRenter-rent-nav"><a href="AutoRenter.html#rent">rent</a></li></ul></li><li id="MRRProvider-nav"><a href="MRRProvider.html">MRRProvider</a><ul class='methods'><li data-type="method" id="MRRProvider-getType-nav"><a href="MRRProvider.html#.getType">getType</a></li><li data-type="method" id="MRRProvider-getBalance-nav"><a href="MRRProvider.html#getBalance">getBalance</a></li><li data-type="method" id="MRRProvider-getBalances-nav"><a href="MRRProvider.html#getBalances">getBalances</a></li><li data-type="method" id="MRRProvider-getProfileID-nav"><a href="MRRProvider.html#getProfileID">getProfileID</a></li><li data-type="method" id="MRRProvider-getRentalCost-nav"><a href="MRRProvider.html#getRentalCost">getRentalCost</a></li><li data-type="method" id="MRRProvider-getRigsToRent-nav"><a href="MRRProvider.html#getRigsToRent">getRigsToRent</a></li><li data-type="method" id="MRRProvider-rent-nav"><a href="MRRProvider.html#rent">rent</a></li><li data-type="method" id="MRRProvider-serialize-nav"><a href="MRRProvider.html#serialize">serialize</a></li><li data-type="method" id="MRRProvider-testAuthorization-nav"><a href="MRRProvider.html#testAuthorization">testAuthorization</a></li></ul></li><li id="RentalProvider-nav"><a href="RentalProvider.html">RentalProvider</a><ul class='methods'><li data-type="method" id="RentalProvider-getType-nav"><a href="RentalProvider.html#.getType">getType</a></li><li data-type="method" id="RentalProvider-serialize-nav"><a href="RentalProvider.html#serialize">serialize</a></li><li data-type="method" id="RentalProvider-testAuthorization-nav"><a href="RentalProvider.html#testAuthorization">testAuthorization</a></li></ul></li><li id="SpartanBot-nav"><a href="SpartanBot.html">SpartanBot</a><ul class='methods'><li data-type="method" id="SpartanBot-deleteRentalProvider-nav"><a href="SpartanBot.html#deleteRentalProvider">deleteRentalProvider</a></li><li data-type="method" id="SpartanBot-getRentalProviders-nav"><a href="SpartanBot.html#getRentalProviders">getRentalProviders</a></li><li data-type="method" id="SpartanBot-getSetting-nav"><a href="SpartanBot.html#getSetting">getSetting</a></li><li data-type="method" id="SpartanBot-getSettings-nav"><a href="SpartanBot.html#getSettings">getSettings</a></li><li data-type="method" id="SpartanBot-getSupportedRentalProviders-nav"><a href="SpartanBot.html#getSupportedRentalProviders">getSupportedRentalProviders</a></li><li data-type="method" id="SpartanBot-getWalletBalance-nav"><a href="SpartanBot.html#getWalletBalance">getWalletBalance</a></li><li data-type="method" id="SpartanBot-manualRental-nav"><a href="SpartanBot.html#manualRental">manualRental</a></li><li data-type="method" id="SpartanBot-setSetting-nav"><a href="SpartanBot.html#setSetting">setSetting</a></li><li data-type="method" id="SpartanBot-setupRentalProvider-nav"><a href="SpartanBot.html#setupRentalProvider">setupRentalProvider</a></li></ul></li></ul>
   </nav>
 
   <div id="main">
@@ -93,6 +93,8 @@
   <article>
     <pre class="prettyprint source linenums"><code>import RentalProvider from './RentalProvider'
 import MiningRigRentals from 'miningrigrentals-api-v2'
+require('lodash.combinations');
+let _ = require('lodash');
 
 /**
  * A Rental Provider for MiningRigRentals
@@ -128,7 +130,6 @@ class MRRProvider extends RentalProvider {
 	async testAuthorization(){
 		try {
 			let profile = await this.api.whoami();
-			log(profile)
 			return !!(profile.success &amp;&amp; profile.data &amp;&amp; profile.data.authed);
 		} catch (err) {
 			throw new Error(err)
@@ -137,17 +138,18 @@ class MRRProvider extends RentalProvider {
 
 	/**
 	 * Get MiningRigRentals Profile ID (needed to rent rigs)
-	 * @returns {Promise&lt;number>}
+	 * @returns {Promise&lt;number>} - the id of the first data object
 	 */
 	async getProfileID() {
 		let profile;
 		try {
-			profile = await this.api.whoami();
+			profile = await this.api.getPoolProfiles();
 		} catch (err) {
 			throw new Error(`error getting profile data: ${err}`)
 		}
 		if (profile.data) {
-			return profile.data.userid
+			//ToDo: be able to pick a pool profile to use
+			return Number(profile.data[0].id)
 		}
 	}
 	/**
@@ -168,7 +170,7 @@ class MRRProvider extends RentalProvider {
 		let rigOpts = {
 			type: 'scrypt',
 			minhours: {
-				min: duration
+				max: duration
 			}
 		}
 		let rigsRequest;
@@ -197,28 +199,93 @@ class MRRProvider extends RentalProvider {
 		let rigs_to_rent = [], hashpower = 0;
 		for (let rig of available_rigs) {
 			if ((hashpower + rig.hashrate.advertised.hash) &lt;= hashrate) {
-				let tmpObj = {};
-				tmpObj['rig'] = rig.id;
-				tmpObj['length'] = duration
-				tmpObj['profile'] = profileID
-				// console.log(rig.hashrate.advertised.hash, rig.rpi)
-				tmpObj['hashrate'] = rig.hashrate.advertised.hash
 				hashpower += rig.hashrate.advertised.hash
-				rigs_to_rent.push(tmpObj)
+
+				let rig_hashrate = rig.hashrate.advertised.hash
+
+				rigs_to_rent.push({
+					rental_info: {
+						rig: parseInt(rig.id),
+						length: duration,
+						profile: parseInt(profileID)
+					},
+					hashrate: rig.hashrate.advertised.hash,
+					btc_price: parseFloat(rig.price.BTC.hour) * duration
+				})
 			}
 		}
+
 		return rigs_to_rent
 	}
-
+	/**
+	 * Get the confirmed account balance for a specific coin (defaults to BTC)
+	 * @param {string} [coin='BTC'] - The coin you wish to get a balance for [BTC, LTC, ETH, DASH]
+	 * @returns {Promise&lt;(number|Object)>} - will return an object if success is false ex. {success: false}
+	 */
+	async getBalance(coin) {
+		try {
+			let response = await this.api.getAccountBalance()
+			if (response.success) {
+				if (coin) {
+					return Number(response.data[coin.toUpperCase()].confirmed)
+				} else {
+					return Number(response.data['BTC'].confirmed)
+				}
+			} else {
+				return {success: false}
+			}
+		} catch (err) {
+			throw new Error(`Could not fetch account balance \n ${err}`)
+		}
+	}
+	/**
+	 * Get Back balances for all coins, confirmed and unconfirmed
+	 * @returns {Promise&lt;Object>}
+	 */
+	async getBalances() {
+		try {
+			let response = await this.api.getAccountBalance()
+			if (response.success) {
+				return response.data
+			} else {
+				return {success: false}
+			}
+		}
+		 catch (err) {
+			throw new Error(`Could not fetch account balance \n ${err}`)
+		}
+	}
+	/**
+	 * Get the total cost to rent multiple rigs
+	 * @param {Array.&lt;Object>} rigs_to_rent - See MRRProvider.getRigsToRent()
+	 * @returns {number}
+	 */
+	getRentalCost(rigs_to_rent) {
+		let cost = 0
+		for (let rig of rigs_to_rent) {
+			//ToDo: make the crypto-currency dynamic
+			cost += rig.btc_price
+		}
+		return cost
+	}
 	/**
 	 * Rent rigs based on hashrate and time
 	 * @param {Object} options
 	 * @param {number} options.hashrate - The hashrate in MH
 	 * @param {number} options.duration - Duration of rent
+	 * @param {Function} [options.confirm] - An async function for confirmation
 	 * @param {string} [options.type='scrypt'] - Type of rig (Scrypt, x11, sha256, etc)
 	 * @returns {Promise&lt;*>}
 	 */
 	async rent(options) {
+		//get balance
+		let balance;
+		try {
+			balance = await this.getBalance()
+		} catch (err) {
+			throw new Error(err)
+		}
+
 		//get rigs
 		let rigs_to_rent = [];
 		try {
@@ -228,10 +295,72 @@ class MRRProvider extends RentalProvider {
 		}
 
 		//confirmation
-		confirmation(rigs_to_rent)
+		if (options.confirm) {
+			try {
+				let btc_total_price = 0
+				let total_hashrate = 0
+
+				for (let rig of rigs_to_rent){
+					btc_total_price += rig.btc_price
+					total_hashrate += rig.hashrate
+				}
+
+				let warning;
+				if (btc_total_price > balance) {
+					warning = {}
+					warning['type'] = "LOW_BALANCE";
+					warning['cost'] = btc_total_price;
+					warning['balance'] = balance
+				}
+
+				let confirmed = await options.confirm({
+					btc_total_price,
+					total_hashrate,
+					rigs: rigs_to_rent,
+					warning
+				})
+
+				if (!confirmed) {
+					return {
+						success: false,
+						info: "Rental Cancelled"
+					}
+				}
+			} catch (err) {
+				throw new Error(err)
+			}
+		}
 
 		//rent rigs
-		//success
+		let rentalConfirmation = {};
+		
+		for (let rig of rigs_to_rent) {
+			try {
+				let rental = await this.api.createRental(rig.rental_info)
+				rentalConfirmation[rig.rental_info.rig] = rental
+			} catch (err) {
+				rentalConfirmation[rig.rental_info.rig] = `Error renting rig: ${err}`
+			}
+		}
+
+		let rented_rigs = []
+		let spent_btc_amount = 0
+		let total_rented_hashrate = 0
+
+		for (let rig in rentalConfirmation){
+			if (rentalConfirmation[rig].success){
+				rented_rigs.push(rentalConfirmation[rig].data)
+				spent_btc_amount += parseFloat(rentalConfirmation[rig].data.price.paid)
+				total_rented_hashrate += rentalConfirmation[rig].data.hashrate.advertised.hash
+			}
+		}
+
+		return {
+			success: true,
+			rented_rigs,
+			btc_total_price: spent_btc_amount,
+			total_hashrate: total_rented_hashrate
+		}
 	}
 	/**
 	 * Get back a "Serialized" state of the Provider
@@ -245,13 +374,6 @@ class MRRProvider extends RentalProvider {
 			uid: this.uid
 		}
 	}
-}
-let log = (data) => {console.log(data)}
-let confirmation = async (data) => {
-	setTimeout(() => {
-		log(data);
-		return true
-	}, 2000)
 }
 
 export default MRRProvider</code></pre>
