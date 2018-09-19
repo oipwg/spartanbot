@@ -58,6 +58,79 @@ class MRRProvider extends RentalProvider {
 		}
 	}
 	/**
+	 * Creates a pool and adds it to a newly created pool profile
+	 * @param {Object} options
+	 * @param {string} options.profileName - Name of the profile
+	 * @param {string} options.algo - Algorithm ('scrypt', 'x11', etc)
+	 * @param {string} options.name - Name to identify the pool with
+	 * @param {string} options.host - Pool host, the part after stratum+tcp://
+	 * @param {number} options.port - Pool port, the part after the : in most pool host strings
+	 * @param {string} options.user - Your workname
+	 * @param {number} options.priority - 0-4
+	 * @param {string} [options.pass] - Worker password
+	 * @param {string} [options.notes] - Additional notes to help identify the pool for you
+	 * @returns {Promise<Object>} - returns an object with the profileID and poolid on success
+	 */
+	async createPool(options) {
+		let poolProfile;
+		try {
+			let response = await this.api.createPoolProfile(options.profileName, options.algo)
+			if (response.success) {
+				poolProfile = response.data.id
+			}
+		} catch (err) {
+			throw new Error(`Could not create Pool Profile \n ${err}`)
+		}
+		let pool;
+		let poolParams = {};
+		for (let opt in options) {
+			if (opt !== 'profileName') {
+				if (opt === 'algo') {
+					poolParams.type = options[opt]
+				}
+				poolParams[opt] = options[opt]
+			}
+		}
+		try {
+			let response = await this.api.createPool(poolParams)
+			if (response.success) {
+				pool = response.data.id
+			}
+		} catch (err) {
+			throw new Error(`Could not create pool \n ${err}`)
+		}
+
+		let addPoolToProfileOptions = {
+			profileID: poolProfile,
+			poolid: pool,
+			priority: options.priority,
+			algo: options.algo,
+			name: options.name
+		};
+
+		let success;
+		try {
+			let response = await this.api.addPoolToProfile(addPoolToProfileOptions)
+			if (response.success) {
+				success = response.data
+			}
+		} catch (err) {
+			throw new Error(`Failed to add pool: ${pool} to profile: ${poolProfile} \n ${err}`)
+		}
+		let returnObject
+		if (success.success) {
+			returnObject = {
+				profileID: success.id,
+				poolid: pool,
+				success: true,
+				message: success.message
+			}
+		} else {
+			returnObject = success
+		}
+		return returnObject
+	}
+	/**
 	 * Get the rigs needed to fulfill rental requirements
 	 * @param {number} hashrate - in megahertz(mh)
 	 * @param {number} duration - in hours
@@ -103,10 +176,10 @@ class MRRProvider extends RentalProvider {
 
 		let rigs_to_rent = [], hashpower = 0;
 		for (let rig of available_rigs) {
-			if ((hashpower + rig.hashrate.advertised.hash) <= hashrate) {
-				hashpower += rig.hashrate.advertised.hash
+			let rig_hashrate = rig.hashrate.advertised.hash
+			if ((hashpower + rig_hashrate) <= hashrate) {
+				hashpower += rig_hashrate
 
-				let rig_hashrate = rig.hashrate.advertised.hash
 
 				rigs_to_rent.push({
 					rental_info: {
@@ -114,7 +187,7 @@ class MRRProvider extends RentalProvider {
 						length: duration,
 						profile: parseInt(profileID)
 					},
-					hashrate: rig.hashrate.advertised.hash,
+					hashrate: rig_hashrate,
 					btc_price: parseFloat(rig.price.BTC.hour) * duration
 				})
 			}
@@ -199,6 +272,7 @@ class MRRProvider extends RentalProvider {
 			throw new Error(`Failed to fetch rigs to rent \n ${err}`)
 		}
 
+		let warning = {};
 		//confirmation
 		if (options.confirm) {
 			try {
@@ -210,10 +284,17 @@ class MRRProvider extends RentalProvider {
 					total_hashrate += rig.hashrate
 				}
 
+				if (btc_total_price > balance) {
+					warning.type = "LOW_BALANCE";
+					warning.cost = btc_total_price;
+					warning.balance = balance
+				}
+
 				let confirmed = await options.confirm({
 					btc_total_price,
 					total_hashrate,
-					rigs: rigs_to_rent
+					rigs: rigs_to_rent,
+					warning
 				})
 
 				if (!confirmed) {
@@ -255,7 +336,8 @@ class MRRProvider extends RentalProvider {
 			success: true,
 			rented_rigs,
 			btc_total_price: spent_btc_amount,
-			total_hashrate: total_rented_hashrate
+			total_hashrate: total_rented_hashrate,
+			warning
 		}
 	}
 	/**

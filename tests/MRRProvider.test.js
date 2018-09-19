@@ -55,24 +55,23 @@ describe("MRRProvider", () => {
 	});
 	it('should fetch qualified rigs| getRigsToRent', async () =>{
 		let mrr = new MRRProvider(apikey);
-		let thrown;
-		let hashMh = 500, duration = 3;
+		let hashMh = 10000, duration = 5;
 		try {
 			let rigs = await mrr.getRigsToRent(hashMh, duration);
-			console.log(rigs)
-			// expect(success).toBeTruthy()
+			// console.log(rigs)
+
 			let hashpower = 0;
 			for (let rig of rigs) {
 				hashpower += rig.hashrate
 			}
+			// console.log(hashpower)
 			let enoughHash= false
 			if (hashpower <= hashMh) {
 				enoughHash = true
 			}
 			expect(enoughHash).toBeTruthy()
 		} catch (err) {
-			thrown = false;
-			expect(thrown).toBeFalsy()
+			expect(err).toBeUndefined()
 		}
 	});
 	it('rent rigs', async () => {
@@ -91,6 +90,26 @@ describe("MRRProvider", () => {
 			expect(err).toBeUndefined()
 		}
 	}, 250 * 1000);
+	it('create pool and add it to profile | createPool', async () => {
+		let mrr = new MRRProvider(apikey);
+		let options = {
+			profileName: 'SUPERRYAN',
+			algo: 'scrypt',
+			name: 'RYANSUPER',
+			host: 'yadadadadaa',
+			port: 8080,
+			user: 'Lex Luther',
+			priority: 0,
+			notes: 'ryan wins!'
+		};
+		try {
+			let response = await mrr.createPool(options)
+			console.log(response)
+		} catch (err) {
+			console.log(`Err: \n ${err}`)
+		}
+
+	});
 })
 
 let confirmFn = async (data) => {
