@@ -75,7 +75,7 @@ describe("MRRProvider", () => {
 			expect(thrown).toBeFalsy()
 		}
 	});
-	it('rent rigs', async () => {
+	/*it('rent rigs', async () => {
 		let mrr = new MRRProvider(apikey);
 		let rentalCanceled = false;
 		let rentOptions = {
@@ -90,7 +90,7 @@ describe("MRRProvider", () => {
 			// console.log(`Error: ${err}`)
 			expect(err).toBeUndefined()
 		}
-	}, 250 * 1000);
+	}, 250 * 1000);*/
 })
 
 let confirmFn = async (data) => {
