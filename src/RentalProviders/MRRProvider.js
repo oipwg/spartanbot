@@ -431,7 +431,9 @@ class MRRProvider extends RentalProvider {
 			type: "MiningRigRentals",
 			api_key: this.api_key,
 			api_secret: this.api_secret,
-			uid: this.uid
+			uid: this.uid,
+			pools: this.pools,
+			activePoolID: this.activePoolID
 		}
 	}
 }

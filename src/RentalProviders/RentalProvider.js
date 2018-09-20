@@ -93,7 +93,7 @@ class RentalProvider {
 			api_secret: this.api_secret,
 			uid: this.uid,
 			pools: this.pools,
-			poolID: this.poolID
+			activePoolID: this.activePoolID
 		}
 	}
 }
