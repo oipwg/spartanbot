@@ -176,7 +176,8 @@ class SpartanBot {
 
 		// Save new Provider
 		this.serialize()
-
+		let pools = await new_provider.getPools()
+		
 		// Return info to the user
 		return {
 			success: true,
@@ -184,7 +185,7 @@ class SpartanBot {
 			type: settings.type,
 			name: settings.name,
 			uid: new_provider.uid,
-			pools: await new_provider.getPools(),
+			pools,
 			provider: new_provider
 		}
 	}
