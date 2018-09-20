@@ -79,7 +79,7 @@ class RentalProvider {
 		} else if (typeof setID !== 'number') {
 			return 'Error: ID must be of type string or number'
 		}
-		this.poolID = setID
+		this.activePoolID = setID
 	}
 
 	/**
@@ -87,7 +87,7 @@ class RentalProvider {
 	 * @returns {number}
 	 */
 	getActivePoolID() {
-		return this.poolID
+		return this.activePoolID
 	}
 
 	/**
