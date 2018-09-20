@@ -316,6 +316,11 @@ class MRRProvider extends RentalProvider {
 			throw new Error(`Failed to fetch rigs to rent \n ${err}`)
 		}
 
+		//check cost of rigs against balance
+		if (this.getRentalCost(rigs_to_rent) > balance) {
+			rigs_to_rent = selectBestCombination(rigs_to_rent, balance, rig => rig.btc_price)
+		}
+
 		let warning = {};
 		//confirmation
 		if (options.confirm) {
