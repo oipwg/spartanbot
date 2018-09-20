@@ -1,5 +1,6 @@
 import RentalProvider from './RentalProvider'
 import MiningRigRentals from 'miningrigrentals-api-v2'
+import {selectBestCombination} from "../util";
 
 /**
  * A Rental Provider for MiningRigRentals
@@ -172,6 +173,31 @@ class MRRProvider extends RentalProvider {
 				return (b.rpi - a.rpi)
 			});
 			available_rigs = newRPIrigs.concat(allOtherRigs)
+		}
+
+		if (hashrate <= 10000) {
+			const calculateHashpower = (rigs) => {
+				let total = 0;
+				for (let rig of rigs) {
+					total += rig.hashrate
+				}
+				return total
+			}
+			let filteredRigs = [];
+			for (let rig of available_rigs) {
+				if (calculateHashpower(filteredRigs) <= (1.1 * hashrate)) {
+					filteredRigs.push({
+						rental_info: {
+							rig: parseInt(rig.id),
+							length: duration,
+							profile: parseInt(profileID)
+						},
+						hashrate: rig.hashrate.advertised.hash,
+						btc_price: parseFloat(rig.price.BTC.hour) * duration
+					})
+				} else {break}
+			}
+			return selectBestCombination(filteredRigs, hashrate, rig => rig.hashrate)
 		}
 
 		let rigs_to_rent = [], hashpower = 0;

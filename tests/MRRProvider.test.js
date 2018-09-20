@@ -55,24 +55,21 @@ describe("MRRProvider", () => {
 	});
 	it('should fetch qualified rigs| getRigsToRent', async () =>{
 		let mrr = new MRRProvider(apikey);
-		let hashMh = 10000, duration = 5;
-		try {
-			let rigs = await mrr.getRigsToRent(hashMh, duration);
-			// console.log(rigs)
+		let hashMh = 10001, duration = 5;
+		let rigs = await mrr.getRigsToRent(hashMh, duration);
+		console.log(rigs)
 
-			let hashpower = 0;
-			for (let rig of rigs) {
-				hashpower += rig.hashrate
-			}
-			// console.log(hashpower)
-			let enoughHash= false
-			if (hashpower <= hashMh) {
-				enoughHash = true
-			}
-			expect(enoughHash).toBeTruthy()
-		} catch (err) {
-			expect(err).toBeUndefined()
+		let hashpower = 0;
+		for (let rig of rigs) {
+			hashpower += rig.hashrate
 		}
+		console.log(hashpower)
+		let enoughHash= false
+		if (hashpower <= hashMh) {
+			enoughHash = true
+		}
+		expect(enoughHash).toBeTruthy()
+
 	});
 	it('rent rigs', async () => {
 		let mrr = new MRRProvider(apikey);
