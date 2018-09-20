@@ -52,7 +52,8 @@ class RentalProvider {
 			type: "RentalProvider",
 			api_key: this.api_key,
 			api_secret: this.api_secret,
-			uid: this.uid
+			uid: this.uid,
+			pools: this.pools
 		}
 	}
 }
