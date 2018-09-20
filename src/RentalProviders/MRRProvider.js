@@ -316,12 +316,26 @@ class MRRProvider extends RentalProvider {
 			throw new Error(`Failed to fetch rigs to rent \n ${err}`)
 		}
 
+		let status = {
+			status: 'normal'
+		};
+
 		//check cost of rigs against balance
 		if (this.getRentalCost(rigs_to_rent) > balance) {
+			status.status = 'warning'
+			status.type = "LOW_BALANCE";
+			status.rentalCost = this.getRentalCost(rigs_to_rent);
+			status.currentBalance = balance
+
+			let originalRigsToRentLength = rigs_to_rent.length;
 			rigs_to_rent = selectBestCombination(rigs_to_rent, balance, rig => rig.btc_price)
+			if (rigs_to_rent.length === 0) {
+				status.message = 'Could not find any rigs to rent with available balance.'
+			} else {
+				status.message = `Can only rent ${rigs_to_rent.length}/${originalRigsToRentLength} rigs found with available balance.`
+			}
 		}
 
-		let warning = {};
 		//confirmation
 		if (options.confirm) {
 			try {
@@ -333,23 +347,18 @@ class MRRProvider extends RentalProvider {
 					total_hashrate += rig.hashrate
 				}
 
-				if (btc_total_price > balance) {
-					warning.type = "LOW_BALANCE";
-					warning.cost = btc_total_price;
-					warning.balance = balance
-				}
-
 				let confirmed = await options.confirm({
 					btc_total_price,
 					total_hashrate,
 					rigs: rigs_to_rent,
-					warning
+					status
 				})
 
 				if (!confirmed) {
 					return {
 						success: false,
-						info: "Rental Cancelled"
+						info: "Rental Cancelled",
+						status
 					}
 				}
 			} catch (err) {
@@ -386,7 +395,7 @@ class MRRProvider extends RentalProvider {
 			rented_rigs,
 			btc_total_price: spent_btc_amount,
 			total_hashrate: total_rented_hashrate,
-			warning
+			status
 		}
 	}
 	/**

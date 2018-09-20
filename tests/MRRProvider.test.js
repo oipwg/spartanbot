@@ -10,48 +10,28 @@ const apikey = {
 describe("MRRProvider", () => {
 	it('should authorize MRR API access | testAuthorization', async () => {
 		let mrr = new MRRProvider(apikey);
-		try {
-			let success = await mrr.testAuthorization();
-			expect(success).toBeTruthy()
-		} catch (err) {
-			expect(err).toBeUndefined()
-		}
+		let success = await mrr.testAuthorization();
+		expect(success).toBeTruthy()
 	});
 	it('should get my profile ID | getProfileID', async () => {
 		let mrr = new MRRProvider(apikey);
-		try {
-			let profileID = await mrr.getProfileID();
-			expect(typeof profileID === 'number').toBeTruthy()
-		} catch (err) {
-			expect(err).toBeUndefined()
-		}
+		let profileID = await mrr.getProfileID();
+		expect(typeof profileID === 'number').toBeTruthy()
 	});
 	it('get default account balance (BTC) | getBalance', async () => {
 		let mrr = new MRRProvider(apikey);
-		try {
-			let balance = await mrr.getBalance();
-			expect(typeof balance === 'number').toBeTruthy()
-		} catch (err) {
-			expect(err).toBeUndefined()
-		}
+		let balance = await mrr.getBalance();
+		expect(typeof balance === 'number').toBeTruthy()
 	});
 	it('get account balance for another coin| getBalance', async () => {
 		let mrr = new MRRProvider(apikey);
-		try {
-			let balance = await mrr.getBalance('ltc');
-			expect(typeof balance === 'number').toBeTruthy()
-		} catch (err) {
-			expect(err).toBeUndefined()
-		}
+		let balance = await mrr.getBalance('ltc');
+		expect(typeof balance === 'number').toBeTruthy()
 	});
 	it('get all balances | getBalances', async () => {
 		let mrr = new MRRProvider(apikey);
-		try {
-			let balance = await mrr.getBalances();
-			expect(balance.success === undefined).toBeTruthy()
-		} catch (err) {
-			expect(err).toBeUndefined()
-		}
+		let balance = await mrr.getBalances();
+		expect(balance.success === undefined).toBeTruthy()
 	});
 	it('should fetch qualified rigs| getRigsToRent', async () =>{
 		let mrr = new MRRProvider(apikey);
@@ -79,8 +59,27 @@ describe("MRRProvider", () => {
 			confirm: confirmFn
 		}
 		let rentalConfirmation = await mrr.rent(rentOptions);
-		console.log('rental confirmation: ', rentalConfirmation)
+		let success;
+		if (rentalConfirmation.info === 'Rental Cancelled') {
+			success = true
+		} else if (rentalConfirmation.success) {
+			success = true
+		} else {
+			success = false
+		}
+		expect(success).toBeTruthy()
+		// console.log('rental confirmation: ', rentalConfirmation)
 	}, 250 * 1000);
+	it.skip('rent rigs with insufficient balance (set manually) | rent', async () => {
+		//must set balance manually in rent function to test
+		let mrr = new MRRProvider(apikey);
+		let response = await mrr.rent({
+			hashrate: 5000,
+			duration: 5,
+			confirm: confirmFn
+		})
+		// console.log(response)
+	});
 	it('create pool and add it to profile | createPool', async () => {
 		let mrr = new MRRProvider(apikey);
 		let options = {
@@ -93,13 +92,9 @@ describe("MRRProvider", () => {
 			priority: 0,
 			notes: 'ryan wins!'
 		};
-		try {
-			let response = await mrr.createPool(options)
-			expect(response.success).toBeTruthy()
-			console.log(response)
-		} catch (err) {
-			console.log(`Err: \n ${err}`)
-		}
+		let response = await mrr.createPool(options)
+		expect(response.success).toBeTruthy()
+		// console.log(response)
 	}, 250 * 1000);
 	it('get all pools | getPools', async () => {
 		let mrr = new MRRProvider(apikey);
@@ -110,13 +105,13 @@ describe("MRRProvider", () => {
 		let mrr = new MRRProvider(apikey);
 		let ids = [176897, 176889]
 		let response = await mrr.getPools(ids)
-		console.log(response)
+		// console.log(response)
 		expect(response.success).toBeTruthy()
 	});
 })
 
 let confirmFn = async (data) => {
-	return true
+	return false
 	// setTimeout( () => {
 	// 	Promise.resolve(true)
 	// }, 2000)
