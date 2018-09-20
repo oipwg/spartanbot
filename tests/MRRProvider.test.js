@@ -57,13 +57,13 @@ describe("MRRProvider", () => {
 		let mrr = new MRRProvider(apikey);
 		let hashMh = 10001, duration = 5;
 		let rigs = await mrr.getRigsToRent(hashMh, duration);
-		console.log(rigs)
+		// console.log(rigs)
 
 		let hashpower = 0;
 		for (let rig of rigs) {
 			hashpower += rig.hashrate
 		}
-		console.log(hashpower)
+		// console.log(hashpower)
 		let enoughHash= false
 		if (hashpower <= hashMh) {
 			enoughHash = true

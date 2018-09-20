@@ -206,7 +206,6 @@ class MRRProvider extends RentalProvider {
 			if ((hashpower + rig_hashrate) <= hashrate) {
 				hashpower += rig_hashrate
 
-
 				rigs_to_rent.push({
 					rental_info: {
 						rig: parseInt(rig.id),
@@ -218,7 +217,6 @@ class MRRProvider extends RentalProvider {
 				})
 			}
 		}
-
 		return rigs_to_rent
 	}
 	/**
