@@ -86,10 +86,11 @@ class MRRProvider extends RentalProvider {
 		let pool;
 		let poolParams = {};
 		for (let opt in options) {
-			if (opt !== 'profileName') {
-				if (opt === 'algo') {
-					poolParams.type = options[opt]
-				}
+			if (opt === 'profileName') {
+				poolParams.name = options[opt]
+			} else if (opt === 'algo') {
+				poolParams.type = options[opt]
+			} else {
 				poolParams[opt] = options[opt]
 			}
 		}
