@@ -44,6 +44,21 @@ class RentalProvider {
 	}
 
 	/**
+	 * Set pools to local variable this.pools
+	 * @param pools
+	 */
+	setPools(pools) {
+		this.pools = pools
+	}
+
+	/**
+	 * Fetch this.pools
+	 * @returns {Array<Object>|*}
+	 */
+	getPools() {
+		return this.pools
+	}
+	/**
 	 * Get back a "Serialized" state of the Provider
 	 * @return {Object} Returns a JSON object that contains the current rental provider state
 	 */
