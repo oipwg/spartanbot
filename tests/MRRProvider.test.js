@@ -99,6 +99,7 @@ describe("MRRProvider", () => {
 	it('get all pools | getPools', async () => {
 		let mrr = new MRRProvider(apikey);
 		let response = await mrr.getPools()
+		console.log(response)
 		expect(response.success).toBeTruthy()
 	});
 	it('get pools by ID| getPools', async () => {
@@ -108,6 +109,12 @@ describe("MRRProvider", () => {
 		// console.log(response)
 		expect(response.success).toBeTruthy()
 	});
+	it('get all pool profiles | getPoolProviders', async () => {
+		let mrr = new MRRProvider(apikey);
+		let response = await mrr.getPoolProfiles()
+		console.log(response)
+		expect(response.success).toBeTruthy()
+	})
 })
 
 let confirmFn = async (data) => {

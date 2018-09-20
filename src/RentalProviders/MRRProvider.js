@@ -240,6 +240,28 @@ class MRRProvider extends RentalProvider {
 			}
 		}
 	}
+
+	/**
+	 * Get all pool profiles, a single pool profile by ID, or multiple pool profiles by their IDs
+	 * @param {(number|Array.<number>)} [ids] - can be a single pool id or multiple pool ids. If no ids are passed, will fetch all pools
+	 * @returns {Promise<Object>}
+	 */
+	async getPoolProfiles(ids) {
+		if (!ids) {
+			try {
+				return await this.api.getPoolProfiles()
+			} catch (err) {
+				throw new Error(`Could not fetch pools \n ${err}`)
+			}
+		} else {
+			try {
+				return await this.api.getPoolProfile(ids)
+			} catch (err) {
+				throw new Error(`Could not fetch pools \n ${err}`)
+			}
+		}
+	}
+
 	/**
 	 * Get the confirmed account balance for a specific coin (defaults to BTC)
 	 * @param {string} [coin='BTC'] - The coin you wish to get a balance for [BTC, LTC, ETH, DASH]

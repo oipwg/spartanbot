@@ -176,15 +176,17 @@ class SpartanBot {
 
 		// Save new Provider
 		this.serialize()
-		
+
 		let pools = [];
-		try {
-			let res = await new_provider.getPools()
-			if (res.success) {
-				pools = res.data
+		if (new_provider.getType() === "MiningRigRentals") {
+			try {
+				let res = await new_provider.getPoolProfiles()
+				if (res.success) {
+					pools = res.data
+				}
+			} catch (err) {
+				pools = `Could not fetch pools: \n ${err}`
 			}
-		} catch (err) {
-			pools = `Could not fetch pools: \n ${err}`
 		}
 
 		// Return info to the user
