@@ -1,6 +1,11 @@
 import SpartanBot from '../src/SpartanBot'
-import apikey from './apikey';
+import { config } from 'dotenv'
+config()
 
+const apikey = {
+	api_key: process.env.API_KEY,
+	api_secret: process.env.API_SECRET
+};
 // After all the tests have run, remove the test data :)
 afterAll(() => {
 	require('./rm-test-data.js')
