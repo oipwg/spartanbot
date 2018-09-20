@@ -19,7 +19,8 @@ class RentalProvider {
 		this.api_key = settings.api_key
 		this.api_secret = settings.api_secret
 		this.name = settings.name
-		this.pools = settings.pools
+		this.pools = undefined
+		this.poolID = undefined
 	}
 
 	/**
@@ -58,6 +59,29 @@ class RentalProvider {
 	getPools() {
 		return this.pools
 	}
+
+	/**
+	 * Set pool id (pool profile id for MRR)
+	 * @param {number|string} id - pool id (pool profile id for MRR)
+	 */
+	setPoolID(id) {
+		let setID = id
+		if (typeof setID === 'string') {
+			setID = Number(setID);
+		} else if (typeof setID !== 'number') {
+			return 'Error: ID must be of type string or number'
+		}
+		this.poolID = setID
+	}
+
+	/**
+	 * Get pool id (pool profile id for MRR)
+	 * @returns {number}
+	 */
+	getPoolID() {
+		return this.poolID
+	}
+
 	/**
 	 * Get back a "Serialized" state of the Provider
 	 * @return {Object} Returns a JSON object that contains the current rental provider state
@@ -68,7 +92,8 @@ class RentalProvider {
 			api_key: this.api_key,
 			api_secret: this.api_secret,
 			uid: this.uid,
-			pools: this.pools
+			pools: this.pools,
+			poolID: this.poolID
 		}
 	}
 }

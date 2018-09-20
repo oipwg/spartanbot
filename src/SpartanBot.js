@@ -184,7 +184,6 @@ class SpartanBot {
 				let res = await new_provider.getPoolProfiles()
 				if (res.success) {
 					pools = res.data
-					new_provider.setPools(pools)
 				}
 			} catch (err) {
 				pools = `Could not fetch pools: \n ${err}`
