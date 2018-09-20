@@ -176,8 +176,17 @@ class SpartanBot {
 
 		// Save new Provider
 		this.serialize()
-		let pools = await new_provider.getPools()
 		
+		let pools = [];
+		try {
+			let res = await new_provider.getPools()
+			if (res.success) {
+				pools = res.data
+			}
+		} catch (err) {
+			pools = `Could not fetch pools: \n ${err}`
+		}
+
 		// Return info to the user
 		return {
 			success: true,
