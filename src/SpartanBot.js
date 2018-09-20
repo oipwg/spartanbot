@@ -184,7 +184,7 @@ class SpartanBot {
 			type: settings.type,
 			name: settings.name,
 			uid: new_provider.uid,
-			pools: new_provider.getPools(),
+			pools: await new_provider.getPools(),
 			provider: new_provider
 		}
 	}
