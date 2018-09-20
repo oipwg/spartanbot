@@ -48,7 +48,8 @@ class AutoRenter {
 						let should_continue = await options.confirm({
 							total_cost: (prepurchase_info.btc_total_price * btc_to_usd_rate).toFixed(2),
 							total_hashrate: prepurchase_info.total_hashrate,
-							total_rigs: prepurchase_info.rigs.length
+							total_rigs: prepurchase_info.rigs.length,
+							status: prepurchase_info.status
 						})
 
 						return should_continue
