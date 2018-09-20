@@ -178,8 +178,8 @@ class SpartanBot {
 		this.serialize()
 
 		let pools = [];
+
 		if (settings.type === "MiningRigRentals") {
-			console.log("Provider type: MRR")
 			try {
 				let res = await new_provider.getPoolProfiles()
 				if (res.success) {
