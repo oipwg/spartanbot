@@ -53,6 +53,14 @@ class RentalProvider {
 	}
 
 	/**
+	 * Set pools to local variable this.pools (rewrite the variable)
+	 * @param pools
+	 */
+	setPools(pools) {
+		this.pools = pools
+	}
+
+	/**
 	 * Fetch this.pools
 	 * @returns {Array<Object>|*}
 	 */
