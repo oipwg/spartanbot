@@ -19,8 +19,8 @@ class RentalProvider {
 		this.api_key = settings.api_key
 		this.api_secret = settings.api_secret
 		this.name = settings.name
-		this.pools = undefined
-		this.poolID = undefined
+		this.pools = []
+		this.activePoolID = undefined
 	}
 
 	/**
@@ -45,11 +45,11 @@ class RentalProvider {
 	}
 
 	/**
-	 * Set pools to local variable this.pools
+	 * Add pools to local variable this.pools
 	 * @param pools
 	 */
-	setPools(pools) {
-		this.pools = pools
+	addPools(pools) {
+		this.pools.push(pools)
 	}
 
 	/**
@@ -61,10 +61,10 @@ class RentalProvider {
 	}
 
 	/**
-	 * Set pool id (pool profile id for MRR)
+	 * Set pool id to be the active pool ID for a provider (pool profile id for MRR)
 	 * @param {number|string} id - pool id (pool profile id for MRR)
 	 */
-	setPoolID(id) {
+	setActivePoolID(id) {
 		let setID = id
 		if (typeof setID === 'string') {
 			setID = Number(setID);
@@ -78,7 +78,7 @@ class RentalProvider {
 	 * Get pool id (pool profile id for MRR)
 	 * @returns {number}
 	 */
-	getPoolID() {
+	getActivePoolID() {
 		return this.poolID
 	}
 
