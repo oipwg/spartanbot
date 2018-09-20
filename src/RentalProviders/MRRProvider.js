@@ -11,6 +11,7 @@ class MRRProvider extends RentalProvider {
 	 * @param  {Object} settings - Settings for the RentalProvider
 	 * @param {String} settings.api_key - The API Key for the Rental Provider
 	 * @param {String} settings.api_secret - The API Secret for the Rental Provider
+	 * @param {String} settings.name - Alias/arbitrary name for the provider
 	 * @param {String} [settings.uid] - The unique identifier for this Rental Provider
 	 * @return {MRRProvider}
 	 */

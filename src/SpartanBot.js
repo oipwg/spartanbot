@@ -115,6 +115,7 @@ class SpartanBot {
 	 * @param {String} settings.type - The "type" of the rental provider. Currently only accepts "MiningRigRentals".
 	 * @param {String} settings.api_key - The API Key for the Rental Provider
 	 * @param {String} settings.api_secret - The API Secret for the Rental Provider
+	 * @param {String} settings.name - Alias/arbitrary name for the provider
 	 * @return {Promise<Object>} Returns a promise that will resolve after the rental provider has been setup
 	 */
 	async setupRentalProvider(settings){
@@ -180,7 +181,11 @@ class SpartanBot {
 		return {
 			success: true,
 			message: "Successfully Setup Rental Provider",
-			type: settings.type
+			type: settings.type,
+			name: settings.name,
+			uid: new_provider.uid,
+			pools: new_provider.getPools(),
+			provider: new_provider
 		}
 	}
 
