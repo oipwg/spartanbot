@@ -44,6 +44,31 @@ class MRRProvider extends RentalProvider {
 	}
 
 	/**
+	 * Fetch active rigs (rentals) (called by parent class RentalProvider)
+	 * @returns {Promise<Array.<number>>} - returns an array of rig IDs
+	 * @private
+	 */
+	async _fetchActiveRigs() {
+		try {
+			let response = await this.api.getRentals()
+			if (response.success) {
+				let data = response.data;
+				if (data) {
+					let rentals = data.rentals
+					let rigs = []
+					for (let rental of rentals) {
+						if (rental.rig && rental.rig.id)
+							rigs.push(Number(rental.rig.id))
+					}
+					return rigs
+				}
+			}
+		} catch (err) {
+			throw new Error(`Could not fetch rentals \n ${err}`)
+		}
+	}
+
+	/**
 	 * Get MiningRigRentals Profile ID (needed to rent rigs)
 	 * @returns {Promise<number>} - the id of the first data object
 	 */
@@ -54,9 +79,11 @@ class MRRProvider extends RentalProvider {
 		} catch (err) {
 			throw new Error(`error getting profile data: ${err}`)
 		}
-		if (profile.data) {
+		if (profile.success) {
 			//ToDo: be able to pick a pool profile to use
 			return Number(profile.data[0].id)
+		} else {
+			throw new Error(`Error getting profile data: \n ${JSON.stringify(profile, null, 4)}`)
 		}
 	}
 	/**
@@ -133,94 +160,7 @@ class MRRProvider extends RentalProvider {
 		}
 		return returnObject
 	}
-	/**
-	 * Get the rigs needed to fulfill rental requirements
-	 * @param {number} hashrate - in megahertz(mh)
-	 * @param {number} duration - in hours
-	 * @returns {Promise<Array.<Object>>}
-	 */
-	async getRigsToRent(hashrate, duration) {
-		//get profileID
-		let profileID
-		try {
-			profileID =  await this.getProfileID()
-		} catch (err) {
-			throw new Error(`Could not fetch profile ID \n ${err}`)
-		}
 
-		let rigOpts = {
-			type: 'scrypt',
-			minhours: {
-				max: duration
-			}
-		}
-		let rigsRequest;
-		try {
-			rigsRequest = await this.api.getRigs(rigOpts)
-		} catch (err) {
-			throw new Error(`Could not fetch rig list \n ${err}`)
-		}
-		let available_rigs = [];
-		if (rigsRequest.success && rigsRequest.data) {
-			if (rigsRequest.data.records.length === 0) {
-				throw new Error(`No rigs found`)
-			}
-			let newRPIrigs = [], allOtherRigs = [];
-			for (let rig of rigsRequest.data.records) {
-				if (rig.rpi === 'new') {
-					newRPIrigs.push(rig)
-				} else {allOtherRigs.push(rig)}
-			}
-			allOtherRigs.sort((a,b) => {
-				return (b.rpi - a.rpi)
-			});
-			available_rigs = newRPIrigs.concat(allOtherRigs)
-		}
-
-		if (hashrate <= 10000) {
-			const calculateHashpower = (rigs) => {
-				let total = 0;
-				for (let rig of rigs) {
-					total += rig.hashrate
-				}
-				return total
-			}
-			let filteredRigs = [];
-			for (let rig of available_rigs) {
-				if (calculateHashpower(filteredRigs) <= (1.1 * hashrate)) {
-					filteredRigs.push({
-						rental_info: {
-							rig: parseInt(rig.id),
-							length: duration,
-							profile: parseInt(profileID)
-						},
-						hashrate: rig.hashrate.advertised.hash,
-						btc_price: parseFloat(rig.price.BTC.hour) * duration
-					})
-				} else {break}
-			}
-			return selectBestCombination(filteredRigs, hashrate, rig => rig.hashrate)
-		}
-
-		let rigs_to_rent = [], hashpower = 0;
-		for (let rig of available_rigs) {
-			let rig_hashrate = rig.hashrate.advertised.hash
-			if ((hashpower + rig_hashrate) <= hashrate) {
-				hashpower += rig_hashrate
-
-				rigs_to_rent.push({
-					rental_info: {
-						rig: parseInt(rig.id),
-						length: duration,
-						profile: parseInt(profileID)
-					},
-					hashrate: rig_hashrate,
-					btc_price: parseFloat(rig.price.BTC.hour) * duration
-				})
-			}
-		}
-		return rigs_to_rent
-	}
 	/**
 	 * Get all pools, a single pool by ID, or multiple pools by their IDs
 	 * @param {(number|Array.<number>)} [ids] - can be a single pool id or multiple pool ids. If no ids are passed, will fetch all pools
@@ -314,6 +254,19 @@ class MRRProvider extends RentalProvider {
 		}
 		return cost
 	}
+
+	/**
+	 * Get the total hashpower of an array of rigs to rent in megahash (mh)
+	 * @param {Array.<Object>} rigs_to_rent - See MRRProvider.getRigsToRent()
+	 * @returns {number}
+	 */
+	getTotalHashPower(rigs_to_rent) {
+		let hashpower = 0
+		for (let rig of rigs_to_rent) {
+			hashpower += rig.hashrate
+		}
+		return hashpower
+	}
 	/**
 	 * Rent rigs based on hashrate and time
 	 * @param {Object} options
@@ -324,6 +277,8 @@ class MRRProvider extends RentalProvider {
 	 * @returns {Promise<*>}
 	 */
 	async rent(options) {
+		//should receive just the rigs to rent
+
 		//get balance
 		let balance;
 		try {
@@ -345,7 +300,7 @@ class MRRProvider extends RentalProvider {
 		};
 
 		//check cost of rigs against balance
-		if (this.getRentalCost(rigs_to_rent) > balance) {
+				if (this.getRentalCost(rigs_to_rent) > balance) {
 			status.status = 'warning'
 			status.type = "LOW_BALANCE";
 			status.rentalCost = this.getRentalCost(rigs_to_rent);
@@ -424,28 +379,94 @@ class MRRProvider extends RentalProvider {
 	}
 
 	/**
-	 * Fetch active rigs (rentals) (called by parent class RentalProvider)
-	 * @returns {Promise<Array.<number>>} - returns an array of rig IDs
-	 * @private
+	 * Get the rigs needed to fulfill rental requirements
+	 * @param {number} hashrate - in megahertz(mh)
+	 * @param {number} duration - in hours
+	 * @returns {Promise<Array.<Object>>}
 	 */
-	async _fetchActiveRigs() {
+	async getRigsToRent(hashrate, duration) {
+		//get profileID
+		let profileID
 		try {
-			let response = await this.api.getRentals()
-			if (response.success) {
-				let data = response.data;
-				if (data) {
-					let rentals = data.rentals
-					let rigs = []
-					for (let rental of rentals) {
-						if (rental.rig && rental.rig.id)
-							rigs.push(Number(rental.rig.id))
-					}
-					return rigs
-				}
- 			}
+			profileID =  await this.getProfileID()
 		} catch (err) {
-			throw new Error(`Could not fetch rentals \n ${err}`)
+			throw new Error(`Could not fetch profile ID \n ${err}`)
 		}
+
+		let rigOpts = {
+			type: 'scrypt',
+			minhours: {
+				min: duration
+			}
+		}
+		let rigsRequest;
+		try {
+			rigsRequest = await this.api.getRigs(rigOpts)
+		} catch (err) {
+			throw new Error(`Could not fetch rig list \n ${err}`)
+		}
+		let available_rigs = [];
+		if (rigsRequest.success && rigsRequest.data) {
+			if (rigsRequest.data.records.length === 0) {
+				throw new Error(`No rigs found`)
+			}
+			let newRPIrigs = [], allOtherRigs = [];
+			for (let rig of rigsRequest.data.records) {
+				if (rig.rpi === 'new') {
+					newRPIrigs.push(rig)
+				} else {allOtherRigs.push(rig)}
+			}
+			allOtherRigs.sort((a,b) => {
+				return (b.rpi - a.rpi)
+			});
+			available_rigs = newRPIrigs.concat(allOtherRigs)
+		}
+
+		// if (hashrate >= 2000) {
+		// 	const calculateHashpower = (rigs) => {
+		// 		let total = 0;
+		// 		for (let rig of rigs) {
+		// 			total += rig.hashrate
+		// 		}
+		// 		return total
+		// 	}
+		// 	let filteredRigs = [];
+		// 	for (let rig of available_rigs) {
+		// 		if (filteredRigs.length < 15) {
+		// 			filteredRigs.push({
+		// 				rental_info: {
+		// 					rig: parseInt(rig.id),
+		// 					length: duration,
+		// 					profile: parseInt(profileID)
+		// 				},
+		// 				hashrate: rig.hashrate.advertised.hash,
+		// 				btc_price: parseFloat(rig.price.BTC.hour) * duration
+		// 			})
+		// 		} else {break}
+		// 	}
+		// 	if (calculateHashpower(filteredRigs) > hashrate) {
+		// 		return selectBestCombination(filteredRigs, hashrate, rig => rig.hashrate)
+		// 	}
+		// }
+
+		let rigs_to_rent = [], hashpower = 0;
+		for (let rig of available_rigs) {
+			let rig_hashrate = rig.hashrate.advertised.hash
+			if ((hashpower + rig_hashrate) <= hashrate) {
+				hashpower += rig_hashrate
+
+				rigs_to_rent.push({
+					rental_info: {
+						rig: parseInt(rig.id),
+						length: duration,
+						profile: parseInt(profileID)
+					},
+					hashrate: rig_hashrate,
+					btc_price: parseFloat(rig.price.BTC.hour) * duration
+				})
+			}
+		}
+		return rigs_to_rent
 	}
 
 	/**
