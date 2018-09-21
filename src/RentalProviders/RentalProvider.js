@@ -170,7 +170,7 @@ class RentalProvider {
 			uid: this.uid,
 			pools: this.pools,
 			activePoolID: this.activePoolID,
-			activeRentals: this.activeRentals
+			activeRigs: this.activeRigs
 		}
 	}
 }
