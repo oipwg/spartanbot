@@ -18,19 +18,19 @@ describe("MRRProvider", () => {
 		let profileID = await mrr.getProfileID();
 		expect(typeof profileID === 'number').toBeTruthy()
 	});
-	it('get default account balance (BTC) | getBalance', async () => {
+	it('get default account balance (BTC) | _getBalance', async () => {
 		let mrr = new MRRProvider(apikey);
-		let balance = await mrr.getBalance();
+		let balance = await mrr._getBalance();
 		expect(typeof balance === 'number').toBeTruthy()
 	});
-	it('get account balance for another coin| getBalance', async () => {
+	it('get account balance for another coin| _getBalance', async () => {
 		let mrr = new MRRProvider(apikey);
-		let balance = await mrr.getBalance('ltc');
+		let balance = await mrr._getBalance('ltc');
 		expect(typeof balance === 'number').toBeTruthy()
 	});
-	it('get all balances | getBalances', async () => {
+	it('get all balances | _getBalances', async () => {
 		let mrr = new MRRProvider(apikey);
-		let balance = await mrr.getBalances();
+		let balance = await mrr._getBalances();
 		expect(balance.success === undefined).toBeTruthy()
 	});
 	it('should fetch qualified rigs| getRigsToRent', async () =>{

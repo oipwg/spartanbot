@@ -268,7 +268,7 @@ class MRRProvider extends RentalProvider {
 	 * @param {string} [coin='BTC'] - The coin you wish to get a balance for [BTC, LTC, ETH, DASH]
 	 * @returns {Promise<(number|Object)>} - will return an object if success is false ex. {success: false}
 	 */
-	async getBalance(coin) {
+	async _getBalance(coin) {
 		try {
 			let response = await this.api.getAccountBalance()
 			if (response.success) {
@@ -288,7 +288,7 @@ class MRRProvider extends RentalProvider {
 	 * Get Back balances for all coins, confirmed and unconfirmed
 	 * @returns {Promise<Object>}
 	 */
-	async getBalances() {
+	async _getBalances() {
 		try {
 			let response = await this.api.getAccountBalance()
 			if (response.success) {

@@ -92,6 +92,31 @@ class RentalProvider {
 	}
 
 	/**
+	 * Get current balance
+ 	 * @param {string} [coin] - coin to fetch the balance for
+	 * @returns {Promise<number>}
+	 */
+	async getBalance(coin) {
+		try {
+			return await this._getBalance();
+		} catch (err) {
+			throw new Error(`Error fetching balance \n ${err}`)
+		}
+	}
+
+	/**
+	 * Fetch balance for all available coins
+	 * @returns {Promise<Object>}
+	 */
+	async getBalances() {
+		try {
+			return await this._getBalances();
+		} catch (err) {
+			throw new Error(`Error fetching balances \n ${err}`)
+		}
+	}
+
+	/**
 	 * Add rig(s) to the existing array of active rigs IDs
 	 * @param {Object|Array.<Object>} rigIDs - ID of an active rig
 	 * @returns {<void>|Object} - returns an object with a success failure if the passed in arg is not an Object or an Array
