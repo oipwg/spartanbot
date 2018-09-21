@@ -35,7 +35,7 @@ describe("MRRProvider", () => {
 	});
 	it('should fetch qualified rigs| getRigsToRent', async () =>{
 		let mrr = new MRRProvider(apikey);
-		let hashMh = 10001, duration = 5;
+		let hashMh = 10000, duration = 5;
 		let rigs = await mrr.getRigsToRent(hashMh, duration);
 		// console.log(rigs)
 
@@ -116,7 +116,7 @@ describe("MRRProvider", () => {
 		console.log(response)
 		expect(response.success).toBeTruthy()
 	});
-	it('add active rentals to local vairable', async () => {
+	it('add active rentals to local variable', async () => {
 		let mrr = new MRRProvider(apikey);
 		await mrr.storeActiveRigs()
 		expect(mrr.getActiveRigs() === await mrr.fetchActiveRigs())
