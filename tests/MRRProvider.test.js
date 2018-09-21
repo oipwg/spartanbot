@@ -54,11 +54,12 @@ describe("MRRProvider", () => {
 	it('rent rigs', async () => {
 		let mrr = new MRRProvider(apikey);
 		let rentOptions = {
-			hashrate: 500,
-			duration: 3,
+			hashrate: 1000,
+			duration: 4,
 			confirm: confirmFn
 		}
 		let rentalConfirmation = await mrr.rent(rentOptions);
+		console.log(rentalConfirmation)
 		let success;
 		if (rentalConfirmation.info === 'Rental Cancelled') {
 			success = true
@@ -114,11 +115,16 @@ describe("MRRProvider", () => {
 		let response = await mrr.getPoolProfiles()
 		console.log(response)
 		expect(response.success).toBeTruthy()
+	});
+	it('add active rentals to local vairable', async () => {
+		let mrr = new MRRProvider(apikey);
+		await mrr.storeActiveRigs()
+		expect(mrr.getActiveRigs() === await mrr.fetchActiveRigs())
 	})
 })
 
 let confirmFn = async (data) => {
-	return false
+	return true
 	// setTimeout( () => {
 	// 	Promise.resolve(true)
 	// }, 2000)

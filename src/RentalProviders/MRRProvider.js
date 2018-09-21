@@ -422,6 +422,32 @@ class MRRProvider extends RentalProvider {
 			status
 		}
 	}
+
+	/**
+	 * Fetch active rigs (rentals) (called by parent class RentalProvider)
+	 * @returns {Promise<Array.<number>>} - returns an array of rig IDs
+	 * @private
+	 */
+	async _fetchActiveRigs() {
+		try {
+			let response = await this.api.getRentals()
+			if (response.success) {
+				let data = response.data;
+				if (data) {
+					let rentals = data.rentals
+					let rigs = []
+					for (let rental of rentals) {
+						if (rental.rig && rental.rig.id)
+							rigs.push(Number(rental.rig.id))
+					}
+					return rigs
+				}
+ 			}
+		} catch (err) {
+			throw new Error(`Could not fetch rentals \n ${err}`)
+		}
+	}
+
 	/**
 	 * Get back a "Serialized" state of the Provider
 	 * @return {Object} Returns a JSON object that contains the current rental provider state

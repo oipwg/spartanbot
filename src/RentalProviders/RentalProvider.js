@@ -21,6 +21,7 @@ class RentalProvider {
 		this.name = settings.name
 		this.pools = []
 		this.activePoolID = undefined
+		this.activeRigs = []
 	}
 
 	/**
@@ -91,6 +92,73 @@ class RentalProvider {
 	}
 
 	/**
+	 * Add rig(s) to the existing array of active rigs IDs
+	 * @param {Object|Array.<Object>} rigIDs - ID of an active rig
+	 * @returns {<void>|Object} - returns an object with a success failure if the passed in arg is not an Object or an Array
+	 */
+	addActiveRigs(rigIDs) {
+		if (Array.isArray(rigIDs)) {
+			for (let id of rigIDs) {
+				this.activeRigs.push(id)
+			}
+		} else if (typeof rigIDs === 'object' && rigIDs !== null) {
+			this.activeRigs.push(rigIDs)
+		} else {
+			return {success: false, message: 'Rigs must be an object or an array'}
+		}
+	}
+
+	/**
+	 * Fetch current list of active rigs
+	 * @returns {Array}
+	 */
+	getActiveRigs() {
+		return this.activeRigs
+	}
+
+	/**
+	 * setActiveRigs overwrites the local variable array. Use only on construct.
+	 * @param {Object|Array.<Object>} rigs - A rig object or an array of rig objects (note: rig/rental interchangeable)
+	 * @returns {{success: boolean, message: string}} - Returns an object if the passed in arg is not correct type
+	 */
+	setActiveRigs(rigs) {
+		if (Array.isArray(rigs)) {
+			this.activeRigs = rigs
+		} else if (typeof rigs === 'object' && rigs !== null) {
+			this.activeRigs = [rigs]
+		} else {
+			return {success: false, message: 'Rigs must be an object or an array'}
+		}
+	}
+
+	/**
+	 * Fetch active rigs - calls the child class' _fetchActiveRigs function
+	 * @returns {Promise<Array.<number>>} - returns an array of rig ids
+	 */
+	async fetchActiveRigs() {
+		try {
+			return await this._fetchActiveRigs()
+		} catch (err) {
+			throw new Error(err)
+		}
+	}
+
+	/**
+	 * Fetches active rigs and stores them in the local variable this.activeRigs
+	 * @returns {Promise<boolean>} - returns true if store successful, false if not
+	 */
+	async storeActiveRigs() {
+		let rigs;
+		try {
+			rigs = await this.fetchActiveRigs()
+			this.setActiveRigs(rigs)
+		} catch (err) {
+			throw new Error('Failed to set Current Rentals \n ${err')
+		}
+		return this.activeRigs === rigs;
+	}
+
+	/**
 	 * Get back a "Serialized" state of the Provider
 	 * @return {Object} Returns a JSON object that contains the current rental provider state
 	 */
@@ -101,7 +169,8 @@ class RentalProvider {
 			api_secret: this.api_secret,
 			uid: this.uid,
 			pools: this.pools,
-			activePoolID: this.activePoolID
+			activePoolID: this.activePoolID,
+			activeRentals: this.activeRentals
 		}
 	}
 }
