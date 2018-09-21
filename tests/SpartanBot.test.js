@@ -1,11 +1,17 @@
 import SpartanBot from '../src/SpartanBot'
 import { config } from 'dotenv'
+import AutoRenter from "../src/AutoRenter";
 config()
 
 const apikey = {
 	api_key: process.env.API_KEY,
 	api_secret: process.env.API_SECRET
 };
+
+const apikey2 = {
+	api_key: process.env.API_KEY_2,
+	api_secret: process.env.API_SECRET_2
+}
 // After all the tests have run, remove the test data :)
 afterAll(() => {
 	require('./rm-test-data.js')
@@ -171,5 +177,45 @@ describe("SpartanBot", () => {
 
 			expect(spartan2.getSetting('test')).toBe("setting")
 		})
+	});
+	describe('AutoRenter with mulitple providers', () => {
+		it('preprocess rent', async (done) => {
+			let spartan = new SpartanBot({ memory: true })
+
+			let setup1 = await spartan.setupRentalProvider({
+				type: "MiningRigRentals",
+				api_key: apikey.api_key,
+				api_secret: apikey.api_secret,
+				name: "Ryan"
+			})
+
+			let setup2 = await spartan.setupRentalProvider({
+				type: "MiningRigRentals",
+				api_key: apikey2.api_key,
+				api_secret: apikey2.api_secret,
+				name: "Erik"
+			})
+
+			let autorenter = new AutoRenter({
+				rental_providers: spartan.rental_providers
+			})
+
+			// let m1 = spartan.rental_providers[0]
+			// let m2 = spartan.rental_providers[1]
+			//
+			// console.log("m1: ", await m1.testAuthorization())
+			// console.log("m2: ", await m2.testAuthorization())
+
+			// console.log(autorenter)
+			let rentOptions = {
+				hashrate: 11000,
+				duration: 5
+			}
+
+			let response = await autorenter.manualRentPreprocess(rentOptions)
+			console.log(response)
+
+			done()
+		}, 250 * 100);
 	})
 })
