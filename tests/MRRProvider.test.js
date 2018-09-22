@@ -51,7 +51,7 @@ describe("MRRProvider", () => {
 		expect(enoughHash).toBeTruthy()
 
 	});
-	it('rent rigs', async () => {
+	it.skip('rent rigs', async () => {
 		let mrr = new MRRProvider(apikey);
 		let rentOptions = {
 			hashrate: 1000,

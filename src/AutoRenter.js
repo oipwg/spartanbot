@@ -26,24 +26,24 @@ class AutoRenter {
 	 */
 	async manualRentPreprocess(options) {
 		//preprocess
-		//ToDo: make sure providers profileIDs aren't the same... for testing it's fine though
+		//ToDo: make sure providers profileIDs aren't the same
 
 		//Assuming Provider type === 'MiningRigRentals'
-		// -> get available rigs based on hashpower and duration
+		//get available rigs based on hashpower and duration
 		let rigs_to_rent = [];
 		try {
 			rigs_to_rent = await this.rental_providers[0].getRigsToRent(options.hashrate, options.duration)
 		} catch (err) {
 			throw new Error(`Failed to fetch rigs to rent \n ${err}`)
 		}
-
-		// -> divvy up providers and create Provider object
+		let numOfRigsFound = rigs_to_rent.length
+		//divvy up providers and create Provider object
 		let providers = [], totalBalance = 0;
 		for (let provider of this.rental_providers) {
-			// -> get the balance of each provider
+			//get the balance of each provider
 			let balance = await provider.getBalance();
 			totalBalance += balance
-			// -> get the profile id needed to rent for each provider
+			//get the profile id needed to rent for each provider
 			let profile = await provider.getProfileID();
 			providers.push({
 				uid: provider.uid,
@@ -54,7 +54,7 @@ class AutoRenter {
 			})
 		}
 
-		// -> load up work equally
+		//load up work equally
 		let iterator = 0;
 		let len = providers.length
 		for (let i = 0; i < rigs_to_rent.length; i++) {
@@ -69,12 +69,13 @@ class AutoRenter {
 			iterator += 1
 		}
 
+
 		let extra_rigs = []
 		for (let p of providers) {
 			let rental_cost = p.provider.getRentalCost(p.rigs_to_rent);
 
 			if (p.balance < rental_cost) {
-				while (p.balance < rental_cost) {
+				while (p.balance < rental_cost && p.rigs_to_rent.length) {
 					extra_rigs.push(p.rigs_to_rent.splice(0,1))
 				}
 			}
@@ -92,19 +93,29 @@ class AutoRenter {
 			}
 		}
 
-		let totalRentCost = 0;
-		let totalHashPower = 0;
+		let btc_total_price = 0;
+		let total_hashrate = 0;
+		let total_balance = 0
+		let total_rigs = 0;
+		let rigs = [];
 		for (let p of providers) {
-			totalRentCost += p.provider.getRentalCost(p.rigs_to_rent)
-			p.rentCost = p.provider.getRentalCost(p.rigs_to_rent)
-			totalHashPower += p.provider.getTotalHashPower(p.rigs_to_rent)
-			p.hashPower = p.provider.getTotalHashPower(p.rigs_to_rent)
+			btc_total_price += p.provider.getRentalCost(p.rigs_to_rent)
+			total_hashrate += p.provider.getTotalHashPower(p.rigs_to_rent)
+			total_rigs += p.rigs_to_rent.length
+			total_balance += p.balance
+
+			for (let rig of p.rigs_to_rent) {
+				rigs.push(rig.rental_info)
+			}
 		}
 
 		return {
-			totalRentCost,
-			totalHashPower,
-			providers
+			btc_total_price,
+			total_hashrate,
+			total_balance,
+			total_rigs,
+			numOfRigsFound,
+			rigs
 		}
 	}
 	
@@ -128,37 +139,56 @@ class AutoRenter {
 
 		// tmp convert for MRRProvider
 		let hours = options.duration / 60 / 60
+		options.duration = hours
 
 		//preprocess
-		// ...
-		// calculate the total cost of all provider total hash and $$
-		// -> confirm total
-		// ->rent
+		let prepurchase_info;
+		try {
+			prepurchase_info = await this.manualRentPreprocess(options)
+		} catch (err) {
+			throw new Error(`Failed to get prepurchase_info! \n ${err}`)
+		}
 
-		let rental_info = await this.rental_providers[0].rent({
-			hashrate: options.hashrate,
-			duration: hours,
-			confirm: async (prepurchase_info) => {
-				if (options.confirm){
-					try {
-						let btc_to_usd_rate = await this.exchange.getExchangeRate("bitcoin", "usd")
+		let status = {
+			status: 'normal'
+		}
 
-						let should_continue = await options.confirm({
-							total_cost: (prepurchase_info.btc_total_price * btc_to_usd_rate).toFixed(2),
-							total_hashrate: prepurchase_info.total_hashrate,
-							total_rigs: prepurchase_info.rigs.length,
-							status: prepurchase_info.status
-						})
-
-						return should_continue
-					} catch (e) { 
-						return false 
-					}
-				}
-				return true
+		if (prepurchase_info.total_balance < prepurchase_info.btc_total_price) {
+			status = {
+				status: 'warning',
+				type: 'LOW_BALANCE_WARNING',
+				currentBalance: prepurchase_info.total_balance
 			}
-		})
+			if (prepurchase_info.numOfRigsFound === 0) {
+				status.message = `Could not find any rigs to rent with available balance`
+			} else {
+				status.message = `${prepurchase_info.rigs.length} rigs available to rent with current balance out of ${prepurchase_info.total_rigs} rigs found`
+			}
+		}
 
+		// -> confirm total
+		if (options.confirm){
+			try {
+				let btc_to_usd_rate = await this.exchange.getExchangeRate("bitcoin", "usd")
+
+				let should_continue =  await options.confirm({
+					total_cost: (prepurchase_info.btc_total_price * btc_to_usd_rate).toFixed(2),
+					total_hashrate: prepurchase_info.total_hashrate,
+					total_rigs: prepurchase_info.total_rigs,
+					status: prepurchase_info.status
+				})
+				if (!should_continue) {
+					return false
+				}
+			} catch (e) {
+				return false
+			}
+		}
+
+		//rent
+		let rental_info = await this.rental_providers[0].rent(prepurchase_info.rigs)
+
+		//check rental success
 		if (!rental_info.success)
 			return rental_info
 

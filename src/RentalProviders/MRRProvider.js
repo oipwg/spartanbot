@@ -267,93 +267,23 @@ class MRRProvider extends RentalProvider {
 		}
 		return hashpower
 	}
+
 	/**
-	 * Rent rigs based on hashrate and time
-	 * @param {Object} options
-	 * @param {number} options.hashrate - The hashrate in MH
-	 * @param {number} options.duration - Duration of rent
-	 * @param {Function} [options.confirm] - An async function for confirmation
-	 * @param {string} [options.type='scrypt'] - Type of rig (Scrypt, x11, sha256, etc)
-	 * @returns {Promise<*>}
+	 * Rent rigs
+	 * @param rigs_to_rent
+	 * @returns {Promise<{success: boolean, rented_rigs: Array, btc_total_price: number, total_hashrate: number, status: string}>}
 	 */
-	async rent(options) {
+	async rent(rigs_to_rent) {
 		//should receive just the rigs to rent
-
-		//get balance
-		let balance;
-		try {
-			balance = await this.getBalance()
-		} catch (err) {
-			throw new Error(err)
-		}
-
-		//get rigs
-		let rigs_to_rent = [];
-		try {
-			rigs_to_rent = await this.getRigsToRent(options.hashrate, options.duration)
-		} catch (err) {
-			throw new Error(`Failed to fetch rigs to rent \n ${err}`)
-		}
-
-		let status = {
-			status: 'normal'
-		};
-
-		//check cost of rigs against balance
-				if (this.getRentalCost(rigs_to_rent) > balance) {
-			status.status = 'warning'
-			status.type = "LOW_BALANCE";
-			status.rentalCost = this.getRentalCost(rigs_to_rent);
-			status.currentBalance = balance
-
-			let originalRigsToRentLength = rigs_to_rent.length;
-			rigs_to_rent = selectBestCombination(rigs_to_rent, balance, rig => rig.btc_price)
-			if (rigs_to_rent.length === 0) {
-				status.message = 'Could not find any rigs to rent with available balance.'
-			} else {
-				status.message = `Can only rent ${rigs_to_rent.length}/${originalRigsToRentLength} rigs found with available balance.`
-			}
-		}
-
-		//confirmation
-		if (options.confirm) {
-			try {
-				let btc_total_price = 0
-				let total_hashrate = 0
-
-				for (let rig of rigs_to_rent){
-					btc_total_price += rig.btc_price
-					total_hashrate += rig.hashrate
-				}
-
-				let confirmed = await options.confirm({
-					btc_total_price,
-					total_hashrate,
-					rigs: rigs_to_rent,
-					status
-				})
-
-				if (!confirmed) {
-					return {
-						success: false,
-						info: "Rental Cancelled",
-						status
-					}
-				}
-			} catch (err) {
-				throw new Error(err)
-			}
-		}
-
 		//rent rigs
 		let rentalConfirmation = {};
 		
 		for (let rig of rigs_to_rent) {
 			try {
-				let rental = await this.api.createRental(rig.rental_info)
-				rentalConfirmation[rig.rental_info.rig] = rental
+				let rental = await this.api.createRental(rig)
+				rentalConfirmation[rig.rig] = rental
 			} catch (err) {
-				rentalConfirmation[rig.rental_info.rig] = `Error renting rig: ${err}`
+				rentalConfirmation[rig.rig] = `Error renting rig: ${err}`
 			}
 		}
 
