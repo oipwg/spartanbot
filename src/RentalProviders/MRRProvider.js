@@ -352,32 +352,30 @@ class MRRProvider extends RentalProvider {
 			available_rigs = newRPIrigs.concat(allOtherRigs)
 		}
 
-		// if (hashrate >= 2000) {
-		// 	const calculateHashpower = (rigs) => {
-		// 		let total = 0;
-		// 		for (let rig of rigs) {
-		// 			total += rig.hashrate
-		// 		}
-		// 		return total
-		// 	}
-		// 	let filteredRigs = [];
-		// 	for (let rig of available_rigs) {
-		// 		if (filteredRigs.length < 15) {
-		// 			filteredRigs.push({
-		// 				rental_info: {
-		// 					rig: parseInt(rig.id),
-		// 					length: duration,
-		// 					profile: parseInt(profileID)
-		// 				},
-		// 				hashrate: rig.hashrate.advertised.hash,
-		// 				btc_price: parseFloat(rig.price.BTC.hour) * duration
-		// 			})
-		// 		} else {break}
-		// 	}
-		// 	if (calculateHashpower(filteredRigs) > hashrate) {
-		// 		return selectBestCombination(filteredRigs, hashrate, rig => rig.hashrate)
-		// 	}
-		// }
+		if (hashrate >= 2000 && available_rigs.length < 15) {
+			const calculateHashpower = (rigs) => {
+				let total = 0;
+				for (let rig of rigs) {
+					total += rig.hashrate
+				}
+				return total
+			}
+			let filteredRigs = [];
+			for (let rig of available_rigs) {
+				filteredRigs.push({
+					rental_info: {
+						rig: parseInt(rig.id),
+						length: duration,
+						profile: parseInt(profileID)
+					},
+					hashrate: rig.hashrate.advertised.hash,
+					btc_price: parseFloat(rig.price.BTC.hour) * duration
+				})
+			}
+			if (calculateHashpower(filteredRigs) > hashrate) {
+				return selectBestCombination(filteredRigs, hashrate, rig => rig.hashrate)
+			}
+		}
 
 		let rigs_to_rent = [], hashpower = 0;
 		for (let rig of available_rigs) {
