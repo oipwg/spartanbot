@@ -64,11 +64,7 @@ class AutoRenter {
 			if (i === len || iterator === len) {
 				iterator = 0
 			}
-
-			let tmpRig = rigs_to_rent[i]
-			tmpRig.rental_info.profile = providers[iterator].profile
-
-			providers[iterator].rigs_to_rent.push(tmpRig)
+			providers[iterator].rigs_to_rent.push(rigs_to_rent[i])
 			iterator += 1
 		}
 
@@ -115,6 +111,7 @@ class AutoRenter {
 			total_balance += p.balance
 
 			for (let rig of p.rigs_to_rent) {
+				rig.rental_info.profile = p.profile
 				rigs.push(rig.rental_info)
 			}
 		}
