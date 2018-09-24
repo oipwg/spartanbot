@@ -274,14 +274,13 @@ class MRRProvider extends RentalProvider {
 
 	/**
 	 * Rent rigs
-	 * @param rigs_to_rent
-	 * @returns {Promise<{success: boolean, rented_rigs: Array, btc_total_price: number, total_hashrate: number, status: string}>}
+	 * @param {Array.<Object>} rigs_to_rent - An array of rigs to rent (see AutoRenter.manualRentPreprocess)
+	 * @returns {Promise<Object>}>}
 	 */
 	async rent(rigs_to_rent) {
-		//should receive just the rigs to rent
 		//rent rigs
 		let rentalConfirmation = {};
-		
+		console.log(rigs_to_rent)
 		for (let rig of rigs_to_rent) {
 			try {
 				let rental = await this.api.createRental(rig)
@@ -307,8 +306,7 @@ class MRRProvider extends RentalProvider {
 			success: true,
 			rented_rigs,
 			btc_total_price: spent_btc_amount,
-			total_hashrate: total_rented_hashrate,
-			status
+			total_hashrate: total_rented_hashrate
 		}
 	}
 
@@ -330,7 +328,7 @@ class MRRProvider extends RentalProvider {
 		let rigOpts = {
 			type: 'scrypt',
 			minhours: {
-				min: duration
+				max: duration
 			}
 		}
 		let rigsRequest;

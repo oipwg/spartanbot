@@ -212,14 +212,77 @@ describe("SpartanBot", () => {
 			// console.log("m2: ", await m2.testAuthorization())
 
 			let rentOptions = {
-				hashrate: 5000,
+				hashrate: 20000,
 				duration: 5
 			}
 
 			let response = await autorenter.manualRentPreprocess(rentOptions)
+			console.log(response)
 			expect(response.success).toBeTruthy()
 
 			done()
 		}, 250 * 100);
+		it('rent with multiple providers', async () => {
+			let spartan = new SpartanBot({ memory: true })
+
+			await spartan.setupRentalProvider({
+				type: "MiningRigRentals",
+				api_key: apikey.api_key,
+				api_secret: apikey.api_secret,
+				name: "Master"
+			})
+
+			await spartan.setupRentalProvider({
+				type: "MiningRigRentals",
+				api_key: ryansKey.api_key,
+				api_secret: ryansKey.api_secret,
+				name: "Ryan"
+			})
+
+			// let m1 = spartan.rental_providers[0]
+			// let m2 = spartan.rental_providers[1]
+
+			// console.log("m1: ", await m1.testAuthorization())
+			// console.log("m2: ", await m2.testAuthorization())
+
+			let hashrate = 3000;
+			let duration = 10800;
+			let confirmation = async (preprocess_info) => {
+				// console.log(preprocess_info);
+				return true
+			}
+
+			let response = await spartan.manualRental(hashrate, duration, confirmation)
+			// console.log(response)
+			expect(response.success).toBeTruthy()
+		}, 250 * 100)
+		it('Cancel rent with cofirmation function', async () => {
+			let spartan = new SpartanBot({ memory: true })
+
+			await spartan.setupRentalProvider({
+				type: "MiningRigRentals",
+				api_key: apikey.api_key,
+				api_secret: apikey.api_secret,
+				name: "Master"
+			})
+
+			await spartan.setupRentalProvider({
+				type: "MiningRigRentals",
+				api_key: ryansKey.api_key,
+				api_secret: ryansKey.api_secret,
+				name: "Ryan"
+			})
+
+			let hashrate = 3000;
+			let duration = 10800;
+			let confirmation = async (preprocess_info) => {
+				// console.log(preprocess_info);
+				return false
+			}
+
+			let response = await spartan.manualRental(hashrate, duration, confirmation)
+			console.log(response)
+			expect(response.success).toBeFalsy()
+		}, 50000)
 	})
 })

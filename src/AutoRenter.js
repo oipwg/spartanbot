@@ -22,7 +22,27 @@ class AutoRenter {
 	 * @param {Number} options.duration - The duration (in seconds) that you wish to rent hashrate for
 	 * @returns {Promise<Object>}
 	 * @example
-	 *
+	 *  // return example
+	 *  {
+	 *      //cost of all rigs initially found with given parameters
+	 *      initial_cost,
+	 *      //hashpower of all rigs initially found with given parameters
+	 *      initial_hashpower,
+	 *      //initial_rigs is the initial amount of rigs found that were queried for
+	 *      initial_rigs,
+	 *      //total cost in btc to rent the rigs (total_rigs)
+	 *      btc_total_price,
+	 *      //total balance of all providers in the SpartanBot
+	 *      total_balance,
+	 *      //total hashpower of the rigs found to rent (total_rigs)
+	 *      total_hashrate,
+	 *      //total_rigs is the number of rigs found that can be rent
+	 *      total_rigs,
+	 *      //the actual JSON objects containing the information needed to rent each rig
+	 *      rigs,
+	 *      //success to test against
+	 *      success: true
+	 *  }
 	 */
 	async manualRentPreprocess(options) {
 		//preprocess
@@ -36,7 +56,7 @@ class AutoRenter {
 		} catch (err) {
 			throw new Error(`Failed to fetch rigs to rent \n ${err}`)
 		}
-		let numOfRigsFound = rigs_to_rent.length
+		let initial_rigs = rigs_to_rent.length
 		//divvy up providers and create Provider object
 		let providers = [], totalBalance = 0;
 		for (let provider of this.rental_providers) {
@@ -54,8 +74,12 @@ class AutoRenter {
 			})
 		}
 
-		// console.log("total hashpower: ", providers[0].provider.getTotalHashPower(rigs_to_rent))
-		// console.log("total cost: ", providers[0].provider.getRentalCost(rigs_to_rent))
+		let initial_hashpower = providers[0].provider.getTotalHashPower(rigs_to_rent)
+		let initial_cost = providers[0].provider.getRentalCost(rigs_to_rent)
+
+		// console.log("total hashpower: ", initialHashPower)
+		// console.log("total cost: ", initialCost)
+
 
 		//load up work equally
 		let iterator = 0; //iterator is the index of the provider while, 'i' is the index of the rigs
@@ -120,16 +144,20 @@ class AutoRenter {
 		// console.log(`Total hashrate + hashrate of extra rigs: ${total_hashrate + providers[0].provider.getTotalHashPower(extra_rigs)}`)
 
 		return {
+			//cost of all rigs initially found with given parameters
+			initial_cost,
+			//hashpower of all rigs initially found with given parameters
+			initial_hashpower,
+			//initial_rigs is the initial amount of rigs found that were queried for
+			initial_rigs,
 			//total cost in btc to rent the rigs (total_rigs)
 			btc_total_price,
-			//total hashpower of the rigs found to rent (total_rigs)
-			total_balance,
-			//total_rigs is the number of rigs found that can be rent
-			total_hashrate,
 			//total balance of all providers in the SpartanBot
+			total_balance,
+			//total hashpower of the rigs found to rent (total_rigs)
+			total_hashrate,
+			//total_rigs is the number of rigs found that can be rent
 			total_rigs,
-			//numOfRigsFound is the initial amount of rigs found that were queried for
-			numOfRigsFound,
 			//the actual JSON objects containing the information needed to rent each rig
 			rigs,
 			//success to test against
@@ -141,7 +169,7 @@ class AutoRenter {
 	 * Rent an amount of hashrate for a period of time
 	 * @param {Object} options - The Options for the rental operation
 	 * @param {Number} options.hashrate - The amount of Hashrate you wish to rent
-	 * @param {Number} options.duration - The duration (in seconds) that you wish to rent hashrate for
+	 * @param {Number} options.duration - The duration (IN SECONDS) that you wish to rent hashrate for
 	 * @param {Function} [options.confirm] - This function will be run to decide if the rental should proceed. If it returns `true`, the rental will continue, if false, the rental cancels
 	 * @return {Promise<Object>} Returns a Promise that will resolve to an Object containing info about the rental made
 	 */
@@ -171,16 +199,15 @@ class AutoRenter {
 			status: 'normal'
 		}
 
-		if (prepurchase_info.total_balance < prepurchase_info.btc_total_price) {
-			status = {
-				status: 'warning',
-				type: 'LOW_BALANCE_WARNING',
-				currentBalance: prepurchase_info.total_balance
-			}
+		if (prepurchase_info.total_balance < prepurchase_info.initial_cost) {
+			status.status = 'warning';
+			status.type = 'LOW_BALANCE_WARNING'
+			status.totalBalance = prepurchase_info.btc_total_price
+
 			if (prepurchase_info.numOfRigsFound === 0) {
 				status.message = `Could not find any rigs to rent with available balance`
 			} else {
-				status.message = `${prepurchase_info.rigs.length} rigs available to rent with current balance out of ${prepurchase_info.total_rigs} rigs found`
+				status.message = `${prepurchase_info.total_rigs}/${prepurchase_info.initial_rigs} rigs available to rent with current balance.`
 			}
 		}
 
@@ -189,39 +216,46 @@ class AutoRenter {
 			try {
 				let btc_to_usd_rate = await this.exchange.getExchangeRate("bitcoin", "usd")
 
-				let should_continue =  await options.confirm({
-					total_cost: (prepurchase_info.btc_total_price * btc_to_usd_rate).toFixed(2),
-					total_hashrate: prepurchase_info.total_hashrate,
+				let should_continue = await options.confirm({
+					total_cost: (prepurchase_info.initial_cost * btc_to_usd_rate).toFixed(2),
+					cost_to_rent: (prepurchase_info.btc_total_price * btc_to_usd_rate).toFixed(2),
+					hashrate_to_rent: prepurchase_info.total_hashrate,
 					total_rigs: prepurchase_info.total_rigs,
-					status: prepurchase_info.status
+					status
 				})
+
 				if (!should_continue) {
-					return false
+					return {success: false, message: `Rental Cancelled`}
 				}
 			} catch (e) {
-				return false
+				return {success: false, message: `Rental Cancelled: \n ${e}`}
 			}
 		}
 
-		// //rent
-		// let rental_info = await this.rental_providers[0].rent(prepurchase_info.rigs)
-		//
-		// //check rental success
-		// if (!rental_info.success)
-		// 	return rental_info
-		//
-		// let btc_to_usd_rate = await this.exchange.getExchangeRate("bitcoin", "usd")
-		// let total_rigs = 0
-		//
-		// if (rental_info.rented_rigs)
-		// 	total_rigs = rental_info.rented_rigs.length
-		//
-		// return {
-		// 	success: true,
-		// 	total_rigs_rented: total_rigs,
-		// 	total_cost: (rental_info.btc_total_price * btc_to_usd_rate).toFixed(2),
-		// 	total_hashrate: rental_info.total_hashrate
-		// }
+		//rent
+		let rental_info
+		try {
+			rental_info = await this.rental_providers[0].rent(prepurchase_info.rigs)
+		} catch (err) {
+			throw new Error(`Error renting rigs in AutoRenter: \n ${err}`)
+		}
+
+		//check rental success
+		if (!rental_info.success)
+			return rental_info
+
+		let btc_to_usd_rate = await this.exchange.getExchangeRate("bitcoin", "usd")
+		let total_rigs = 0
+
+		if (rental_info.rented_rigs)
+			total_rigs = rental_info.rented_rigs.length
+
+		return {
+			success: true,
+			total_rigs_rented: total_rigs,
+			total_cost: (rental_info.btc_total_price * btc_to_usd_rate).toFixed(2),
+			total_hashrate: rental_info.total_hashrate
+		}
 	}
 }
 

@@ -278,7 +278,7 @@ class SpartanBot {
 
 			return rental_info
 		} catch (e) {
-			throw new Error("Unable to rent using AutoRenter!\n" + e)
+			throw new Error("Unable to rent using SpartanBot!\n" + e)
 		}
 	}
 
