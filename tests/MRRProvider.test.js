@@ -7,6 +7,11 @@ const apikey = {
 	api_secret: process.env.API_SECRET
 };
 
+const ryansKey = {
+	api_key: process.env.API_KEY_ORPHEUS,
+	api_secret: process.env.API_SECRET_ORPHEUS
+}
+
 describe("MRRProvider", () => {
 	it('should authorize MRR API access | testAuthorization', async () => {
 		let mrr = new MRRProvider(apikey);
@@ -82,7 +87,7 @@ describe("MRRProvider", () => {
 		// console.log(response)
 	});
 	it('create pool and add it to profile | createPool', async () => {
-		let mrr = new MRRProvider(apikey);
+		let mrr = new MRRProvider(ryansKey);
 		let options = {
 			profileName: 'SUPERRYAN',
 			algo: 'scrypt',
