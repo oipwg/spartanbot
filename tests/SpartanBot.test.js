@@ -208,7 +208,7 @@ describe("SpartanBot", () => {
 
 			// console.log(autorenter)
 			let rentOptions = {
-				hashrate: 11000,
+				hashrate: 10000,
 				duration: 5
 			}
 

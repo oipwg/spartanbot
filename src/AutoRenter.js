@@ -54,8 +54,11 @@ class AutoRenter {
 			})
 		}
 
+		// console.log("total hashpower: ", providers[0].provider.getTotalHashPower(rigs_to_rent))
+		// console.log("total cost: ", providers[0].provider.getRentalCost(rigs_to_rent))
+
 		//load up work equally
-		let iterator = 0;
+		let iterator = 0; //iterator is the index of the provider while, 'i' is the index of the rigs
 		let len = providers.length
 		for (let i = 0; i < rigs_to_rent.length; i++) {
 			if (i === len || iterator === len) {
@@ -69,29 +72,47 @@ class AutoRenter {
 			iterator += 1
 		}
 
-
+		//remove from each provider rigs (s)he cannot afford
 		let extra_rigs = []
 		for (let p of providers) {
 			let rental_cost = p.provider.getRentalCost(p.rigs_to_rent);
+			p.rigs_to_rent.sort((a,b) => {return a.btc_price - b.btc_price})
 
 			if (p.balance < rental_cost) {
 				while (p.balance < rental_cost && p.rigs_to_rent.length) {
-					extra_rigs.push(p.rigs_to_rent.splice(0,1))
+					let tmpRig;
+					[tmpRig] = p.rigs_to_rent.splice(0,1)
+					extra_rigs.push(tmpRig)
+
+					rental_cost = p.provider.getRentalCost(p.rigs_to_rent)
 				}
 			}
 		}
 
 		for (let p of providers) {
 			let rental_cost = p.provider.getRentalCost(p.rigs_to_rent);
+			// extra_rigs.sort((a,b) => {return b.btc_price - a.btc_price})
 
 			if (p.balance > rental_cost) {
 				for (let rig of extra_rigs) {
+					// console.log(`rig price plus rental cost: ${rig.btc_price + rental_cost} vs ${p.balance}`)
 					if ((rig.btc_price + rental_cost) <= p.balance) {
 						p.rigs_to_rent.push(rig)
+						extra_rigs.splice(0,1)
+						rental_cost = p.provider.getRentalCost(p.rigs_to_rent);
 					}
 				}
 			}
 		}
+
+		// for (let p of providers) {
+		// 	console.log(`Balance: ${p.balance} -- Cost: ${p.provider.getRentalCost(p.rigs_to_rent)} -- Hash: ${p.provider.getTotalHashPower(p.rigs_to_rent)} -- ${p.balance - p.provider.getRentalCost(p.rigs_to_rent)}`)
+		// }
+		//
+		// console.log(extra_rigs.length)
+		// for (let rig of extra_rigs) {
+		// 	console.log(rig.btc_price)
+		// }
 
 		let btc_total_price = 0;
 		let total_hashrate = 0;
@@ -108,7 +129,7 @@ class AutoRenter {
 				rigs.push(rig.rental_info)
 			}
 		}
-
+		// console.log(`Total hashrate + hashrate of extra rigs: ${total_hashrate + providers[0].provider.getTotalHashPower(extra_rigs)}`)
 		return {
 			btc_total_price,
 			total_hashrate,
@@ -185,25 +206,25 @@ class AutoRenter {
 			}
 		}
 
-		//rent
-		let rental_info = await this.rental_providers[0].rent(prepurchase_info.rigs)
-
-		//check rental success
-		if (!rental_info.success)
-			return rental_info
-
-		let btc_to_usd_rate = await this.exchange.getExchangeRate("bitcoin", "usd")
-		let total_rigs = 0
-
-		if (rental_info.rented_rigs)
-			total_rigs = rental_info.rented_rigs.length
-
-		return {
-			success: true,
-			total_rigs_rented: total_rigs,
-			total_cost: (rental_info.btc_total_price * btc_to_usd_rate).toFixed(2),
-			total_hashrate: rental_info.total_hashrate
-		}
+		// //rent
+		// let rental_info = await this.rental_providers[0].rent(prepurchase_info.rigs)
+		//
+		// //check rental success
+		// if (!rental_info.success)
+		// 	return rental_info
+		//
+		// let btc_to_usd_rate = await this.exchange.getExchangeRate("bitcoin", "usd")
+		// let total_rigs = 0
+		//
+		// if (rental_info.rented_rigs)
+		// 	total_rigs = rental_info.rented_rigs.length
+		//
+		// return {
+		// 	success: true,
+		// 	total_rigs_rented: total_rigs,
+		// 	total_cost: (rental_info.btc_total_price * btc_to_usd_rate).toFixed(2),
+		// 	total_hashrate: rental_info.total_hashrate
+		// }
 	}
 }
 
