@@ -187,41 +187,37 @@ describe("SpartanBot", () => {
 		it('preprocess rent', async (done) => {
 			let spartan = new SpartanBot({ memory: true })
 
-			let setup1 = await spartan.setupRentalProvider({
+			await spartan.setupRentalProvider({
 				type: "MiningRigRentals",
 				api_key: apikey.api_key,
 				api_secret: apikey.api_secret,
 				name: "Master"
 			})
 
-			let setup2 = await spartan.setupRentalProvider({
+			await spartan.setupRentalProvider({
 				type: "MiningRigRentals",
 				api_key: ryansKey.api_key,
 				api_secret: ryansKey.api_secret,
 				name: "Ryan"
 			})
 
-			console.log(setup2)
-
 			let autorenter = new AutoRenter({
 				rental_providers: spartan.rental_providers
 			})
 
+			// let m1 = spartan.rental_providers[0]
+			// let m2 = spartan.rental_providers[1]
 
-			let m1 = spartan.rental_providers[0]
-			let m2 = spartan.rental_providers[1]
+			// console.log("m1: ", await m1.testAuthorization())
+			// console.log("m2: ", await m2.testAuthorization())
 
-			console.log("m1: ", await m1.testAuthorization())
-			console.log("m2: ", await m2.testAuthorization())
+			let rentOptions = {
+				hashrate: 5000,
+				duration: 5
+			}
 
-			// // console.log(autorenter)
-			// let rentOptions = {
-			// 	hashrate: 10000,
-			// 	duration: 5
-			// }
-			//
-			// let response = await autorenter.manualRentPreprocess(rentOptions)
-			// console.log(response)
+			let response = await autorenter.manualRentPreprocess(rentOptions)
+			expect(response.success).toBeTruthy()
 
 			done()
 		}, 250 * 100);
