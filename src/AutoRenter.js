@@ -54,8 +54,8 @@ class AutoRenter {
 			})
 		}
 
-		console.log("total hashpower: ", providers[0].provider.getTotalHashPower(rigs_to_rent))
-		console.log("total cost: ", providers[0].provider.getRentalCost(rigs_to_rent))
+		// console.log("total hashpower: ", providers[0].provider.getTotalHashPower(rigs_to_rent))
+		// console.log("total cost: ", providers[0].provider.getRentalCost(rigs_to_rent))
 
 		//load up work equally
 		let iterator = 0; //iterator is the index of the provider while, 'i' is the index of the rigs
@@ -76,10 +76,10 @@ class AutoRenter {
 		let extra_rigs = []
 		for (let p of providers) {
 			let rental_cost = p.provider.getRentalCost(p.rigs_to_rent);
-			p.rigs_to_rent.sort((a,b) => {return a.btc_price - b.btc_price})
 
 			if (p.balance < rental_cost) {
-				while (p.balance < rental_cost && p.rigs_to_rent.length) {
+				while (p.balance < rental_cost && p.rigs_to_rent.length > 0) {
+					// console.log(`balance: ${p.balance}\nRental cost: ${rental_cost}\nOver Under: ${p.balance-rental_cost}\nAmount substracted -${p.rigs_to_rent[0].btc_price}\nLeft Over: ${rental_cost-p.rigs_to_rent[0].btc_price}`)
 					let tmpRig;
 					[tmpRig] = p.rigs_to_rent.splice(0,1)
 					extra_rigs.push(tmpRig)
@@ -92,11 +92,12 @@ class AutoRenter {
 		for (let p of providers) {
 			let rental_cost = p.provider.getRentalCost(p.rigs_to_rent);
 			if (p.balance > rental_cost) {
-				for (let i = 0; i < extra_rigs.length; i++) {
+				for (let i = extra_rigs.length -1; i >= 0; i--){
 					if ((extra_rigs[i].btc_price + rental_cost) <= p.balance) {
 						let tmpRig;
-						[tmpRig] = extra_rigs.splice(i, 1)
+						[tmpRig] = extra_rigs.splice(i,1);
 						p.rigs_to_rent.push(tmpRig)
+						rental_cost = p.provider.getRentalCost(p.rigs_to_rent);
 					}
 				}
 			}
@@ -119,13 +120,20 @@ class AutoRenter {
 		}
 
 		// rigs.sort((a,b) => {return a.rig - b.rig})
+		// console.log(`Total hashrate + hashrate of extra rigs: ${total_hashrate + providers[0].provider.getTotalHashPower(extra_rigs)}`)
 
 		return {
+			//total cost in btc to rent the rigs (total_rigs)
 			btc_total_price,
-			total_hashrate,
+			//total hashpower of the rigs found to rent (total_rigs)
 			total_balance,
+			//total_rigs is the number of rigs found that can be rent
+			total_hashrate,
+			//total balance of all providers in the SpartanBot
 			total_rigs,
+			//numOfRigsFound is the initial amount of rigs found that were queried for
 			numOfRigsFound,
+			//the actual JSON objects containing the information needed to rent each rig
 			rigs
 		}
 	}
