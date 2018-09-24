@@ -134,7 +134,9 @@ class AutoRenter {
 			//numOfRigsFound is the initial amount of rigs found that were queried for
 			numOfRigsFound,
 			//the actual JSON objects containing the information needed to rent each rig
-			rigs
+			rigs,
+			//success to test against
+			success: true
 		}
 	}
 	
