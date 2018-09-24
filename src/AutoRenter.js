@@ -54,8 +54,8 @@ class AutoRenter {
 			})
 		}
 
-		// console.log("total hashpower: ", providers[0].provider.getTotalHashPower(rigs_to_rent))
-		// console.log("total cost: ", providers[0].provider.getRentalCost(rigs_to_rent))
+		console.log("total hashpower: ", providers[0].provider.getTotalHashPower(rigs_to_rent))
+		console.log("total cost: ", providers[0].provider.getRentalCost(rigs_to_rent))
 
 		//load up work equally
 		let iterator = 0; //iterator is the index of the provider while, 'i' is the index of the rigs
@@ -119,7 +119,6 @@ class AutoRenter {
 		}
 
 		// rigs.sort((a,b) => {return a.rig - b.rig})
-		// console.log(`Total hashrate + hashrate of extra rigs: ${total_hashrate + providers[0].provider.getTotalHashPower(extra_rigs)}`)
 
 		return {
 			btc_total_price,

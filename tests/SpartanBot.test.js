@@ -12,6 +12,11 @@ const apikey2 = {
 	api_key: process.env.API_KEY_2,
 	api_secret: process.env.API_SECRET_2
 }
+
+const ryansKey = {
+	api_key: process.env.API_KEY_ORPHEUS,
+	api_secret: process.env.API_SECRET_ORPHEUS
+}
 // After all the tests have run, remove the test data :)
 afterAll(() => {
 	require('./rm-test-data.js')
@@ -186,34 +191,37 @@ describe("SpartanBot", () => {
 				type: "MiningRigRentals",
 				api_key: apikey.api_key,
 				api_secret: apikey.api_secret,
-				name: "Ryan"
+				name: "Master"
 			})
 
 			let setup2 = await spartan.setupRentalProvider({
 				type: "MiningRigRentals",
-				api_key: apikey2.api_key,
-				api_secret: apikey2.api_secret,
-				name: "Erik"
+				api_key: ryansKey.api_key,
+				api_secret: ryansKey.api_secret,
+				name: "Ryan"
 			})
+
+			console.log(setup2)
 
 			let autorenter = new AutoRenter({
 				rental_providers: spartan.rental_providers
 			})
 
-			// let m1 = spartan.rental_providers[0]
-			// let m2 = spartan.rental_providers[1]
+
+			let m1 = spartan.rental_providers[0]
+			let m2 = spartan.rental_providers[1]
+
+			console.log("m1: ", await m1.testAuthorization())
+			console.log("m2: ", await m2.testAuthorization())
+
+			// // console.log(autorenter)
+			// let rentOptions = {
+			// 	hashrate: 10000,
+			// 	duration: 5
+			// }
 			//
-			// console.log("m1: ", await m1.testAuthorization())
-			// console.log("m2: ", await m2.testAuthorization())
-
-			// console.log(autorenter)
-			let rentOptions = {
-				hashrate: 10000,
-				duration: 5
-			}
-
-			let response = await autorenter.manualRentPreprocess(rentOptions)
-			console.log(response)
+			// let response = await autorenter.manualRentPreprocess(rentOptions)
+			// console.log(response)
 
 			done()
 		}, 250 * 100);
