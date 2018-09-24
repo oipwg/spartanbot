@@ -91,28 +91,16 @@ class AutoRenter {
 
 		for (let p of providers) {
 			let rental_cost = p.provider.getRentalCost(p.rigs_to_rent);
-			// extra_rigs.sort((a,b) => {return b.btc_price - a.btc_price})
-
 			if (p.balance > rental_cost) {
-				for (let rig of extra_rigs) {
-					// console.log(`rig price plus rental cost: ${rig.btc_price + rental_cost} vs ${p.balance}`)
-					if ((rig.btc_price + rental_cost) <= p.balance) {
-						p.rigs_to_rent.push(rig)
-						extra_rigs.splice(0,1)
-						rental_cost = p.provider.getRentalCost(p.rigs_to_rent);
+				for (let i = 0; i < extra_rigs.length; i++) {
+					if ((extra_rigs[i].btc_price + rental_cost) <= p.balance) {
+						let tmpRig;
+						[tmpRig] = extra_rigs.splice(i, 1)
+						p.rigs_to_rent.push(tmpRig)
 					}
 				}
 			}
 		}
-
-		// for (let p of providers) {
-		// 	console.log(`Balance: ${p.balance} -- Cost: ${p.provider.getRentalCost(p.rigs_to_rent)} -- Hash: ${p.provider.getTotalHashPower(p.rigs_to_rent)} -- ${p.balance - p.provider.getRentalCost(p.rigs_to_rent)}`)
-		// }
-		//
-		// console.log(extra_rigs.length)
-		// for (let rig of extra_rigs) {
-		// 	console.log(rig.btc_price)
-		// }
 
 		let btc_total_price = 0;
 		let total_hashrate = 0;
@@ -129,7 +117,10 @@ class AutoRenter {
 				rigs.push(rig.rental_info)
 			}
 		}
+
+		// rigs.sort((a,b) => {return a.rig - b.rig})
 		// console.log(`Total hashrate + hashrate of extra rigs: ${total_hashrate + providers[0].provider.getTotalHashPower(extra_rigs)}`)
+
 		return {
 			btc_total_price,
 			total_hashrate,
