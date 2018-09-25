@@ -119,7 +119,7 @@ class RentalProvider {
 	/**
 	 * Add rig(s) to the existing array of active rigs IDs
 	 * @param {Object|Array.<Object>} rigIDs - ID of an active rig
-	 * @returns {<void>|Object} - returns an object with a success failure if the passed in arg is not an Object or an Array
+	 * @returns {Object} - returns an object with a success failure if the passed in arg is not an Object or an Array
 	 */
 	addActiveRigs(rigIDs) {
 		if (Array.isArray(rigIDs)) {
@@ -131,6 +131,7 @@ class RentalProvider {
 		} else {
 			return {success: false, message: 'Rigs must be an object or an array'}
 		}
+		return {success: true, message: 'successfully added rigs', activeRigs: this.activeRigs}
 	}
 
 	/**
