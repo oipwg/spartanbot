@@ -50,7 +50,12 @@ class RentalProvider {
 	 * @param pools
 	 */
 	addPools(pools) {
-		this.pools.push(pools)
+		if (Array.isArray(pools)) {
+			for (let pool of pools) {
+				this.pools.push(pool)
+			}
+		} else
+			this.pools.push(pools)
 	}
 
 	/**
