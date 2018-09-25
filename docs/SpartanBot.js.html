@@ -119,6 +119,7 @@ class SpartanBot {
 	 * Create a new SpartanBot
 	 * @param  {Object} settings - The settings for the SpartanBot node
 	 * @param {Boolean} [settings.memory=false] - Should SpartanBot only run in Memory and not save anything to disk
+	 * @param {string} [settings.mnemonic] - Pass in a mnemonic to have the SpartanBot load your personal wallet
 	 * @return {SpartanBot}
 	 */
 	constructor(settings){
@@ -130,10 +131,15 @@ class SpartanBot {
 		if (!this.settings.memory){
 
 			this._deserialize = this.deserialize().then(() => {
-				// If we are not memory only, load the wallet using OIP Account
+				//check first to see if a mnemonic was passed in and load the wallet from there
+				if (this.settings.mnemonic) {
+					this.wallet = new Account(settings.mnemonic, undefined, {discover: false})
+					this._wallet_login = this.wallet.login()
 
-				// Check if the oip_account has been created
-				if (this.oip_account){
+					// If we are not memory only, load the wallet using OIP Account
+					// Check if the oip_account has been created
+				} else if (this.oip_account){
+
 					// Login to the wallet
 					this.wallet = new Account(this.oip_account, undefined, {discover: false})
 					this._wallet_login = this.wallet.login()
@@ -411,7 +417,7 @@ class SpartanBot {
 			data_from_storage = JSON.parse(localStorage.getItem('spartanbot-storage'))
 
 		if (data_from_storage.settings)
-			this.settings = Object.assign({}, data_from_storage.settings, this.settings)
+			this.settings = {...data_from_storage.settings, ... this.settings}
 
 		if (data_from_storage.rental_providers){
 			for (let provider of data_from_storage.rental_providers){
