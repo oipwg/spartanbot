@@ -222,7 +222,7 @@ describe("SpartanBot", () => {
 
 			done()
 		}, 250 * 100);
-		it('rent with multiple providers', async () => {
+		it.skip('rent with multiple providers', async () => {
 			let spartan = new SpartanBot({ memory: true })
 
 			await spartan.setupRentalProvider({
