@@ -168,7 +168,7 @@ class MRRProvider extends RentalProvider {
 	/**
 	 * Get all pools, a single pool by ID, or multiple pools by their IDs
 	 * @param {(number|Array.<number>)} [ids] - can be a single pool id or multiple pool ids. If no ids are passed, will fetch all pools
- 	 * @returns {Promise<Object>}
+ 	 * @returrpns {Promise<Object>}
 	 */
 	async getPools(ids) {
 		if (!ids) {
