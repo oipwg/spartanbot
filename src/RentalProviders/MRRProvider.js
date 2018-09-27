@@ -34,7 +34,7 @@ class MRRProvider extends RentalProvider {
 	 * Test to make sure the API key and secret are correct
 	 * @return {Promise} Returns a Promise that will resolve upon success, and reject on failure
 	 */
-	async testAuthorization(){
+	async _testAuthorization(){
 		try {
 			let profile = await this.api.whoami();
 			return !!(profile.success && profile.data && profile.data.authed);
@@ -48,7 +48,7 @@ class MRRProvider extends RentalProvider {
 	 * @returns {Promise<Array.<number>>} - returns an array of rig IDs
 	 * @private
 	 */
-	async _fetchActiveRigs() {
+	async _getActiveRigs() {
 		try {
 			let response = await this.api.getRentals()
 			if (response.success) {

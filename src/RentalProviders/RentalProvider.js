@@ -42,7 +42,7 @@ class RentalProvider {
 	 * @return {Promise} Returns a Promise that will resolve upon success, and reject on failure
 	 */
 	async testAuthorization(){
-		return true
+		return await this._testAuthorization()
 	}
 
 	/**
@@ -70,7 +70,7 @@ class RentalProvider {
 	 * Fetch this.pools
 	 * @returns {Array<Object>|*}
 	 */
-	getPools() {
+	returnPools() {
 		return this.pools
 	}
 
@@ -92,7 +92,7 @@ class RentalProvider {
 	 * Get pool id (pool profile id for MRR)
 	 * @returns {number}
 	 */
-	getActivePoolID() {
+	returnActivePoolID() {
 		return this.activePoolID
 	}
 
@@ -140,10 +140,10 @@ class RentalProvider {
 	}
 
 	/**
-	 * Fetch current list of active rigs
+	 * Returns the active rigs set already in the local vaiable 'this.activeRigs'
 	 * @returns {Array}
 	 */
-	getActiveRigs() {
+	returnActiveRigs() {
 		return this.activeRigs
 	}
 
@@ -166,9 +166,9 @@ class RentalProvider {
 	 * Fetch active rigs - calls the child class' _fetchActiveRigs function
 	 * @returns {Promise<Array.<number>>} - returns an array of rig ids
 	 */
-	async fetchActiveRigs() {
+	async getActiveRigs() {
 		try {
-			return await this._fetchActiveRigs()
+			return await this._getActiveRigs()
 		} catch (err) {
 			throw new Error(err)
 		}
@@ -178,10 +178,10 @@ class RentalProvider {
 	 * Fetches active rigs and stores them in the local variable this.activeRigs
 	 * @returns {Promise<boolean>} - returns true if store successful, false if not
 	 */
-	async storeActiveRigs() {
+	async fetchAndSetActiveRigs() {
 		let rigs;
 		try {
-			rigs = await this.fetchActiveRigs()
+			rigs = await this.getActiveRigs()
 			this.setActiveRigs(rigs)
 		} catch (err) {
 			throw new Error('Failed to set Current Rentals \n ${err')
