@@ -120,7 +120,8 @@ class SpartanBot {
 	 * @param {Object} settings - The settings for the Rental Provider
 	 * @param {String} settings.type - The "type" of the rental provider. Currently only accepts "MiningRigRentals".
 	 * @param {String} settings.api_key - The API Key for the Rental Provider
-	 * @param {String} settings.api_secret - The API Secret for the Rental Provider
+	 * @param {String|Number} [settings.api_id] - The API ID from the Rental Provider
+	 * @param {String} [settings.api_secret] - The API Secret for the Rental Provider
 	 * @param {String} settings.name - Alias/arbitrary name for the provider
 	 * @return {Promise<Object>} Returns a promise that will resolve after the rental provider has been setup
 	 */
@@ -138,10 +139,10 @@ class SpartanBot {
 				message: "settings.api_key is required!"
 			}
 		}
-		if (!settings.api_secret){
+		if (!settings.api_secret || !settings.api_id){
 			return {
 				success: false,
-				message: "settings.api_secret is required!"
+				message: "settings.api_secret ir settings.api_id is required!"
 			}
 		}
 

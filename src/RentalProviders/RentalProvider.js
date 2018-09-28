@@ -8,15 +8,17 @@ class RentalProvider {
 	 * Create a new Rental Provider
 	 * @param  {Object} settings - Settings for the RentalProvider
 	 * @param {String} settings.api_key - The API Key for the Rental Provider
-	 * @param {String} settings.api_secret - The API Secret for the Rental Provider
-	 * @param {String} settings.name - Alias/arbitrary name for the provider
-	 * @param {Array.<Object>} settings.pools - Array of pools (pool profiles for MRR)
+	 * @param {String} [settings.api_id] - The API ID for the Rental Provider
+	 * @param {String} [settings.api_secret] - The API Secret for the Rental Provider
+	 * @param {String} [settings.name] - Alias/arbitrary name for the provider
+	 * @param {Array.<Object>} [settings.pools] - Array of pools (pool profiles for MRR)
 	 * @param {String} [settings.uid] - The unique identifier for this Rental Provider
 	 * @return {RentalProvider} 
 	 */
 	constructor(settings = {}){
 		this.uid = settings.uid || uid()
 		this.api_key = settings.api_key
+		this.api_id = settings.api_id
 		this.api_secret = settings.api_secret
 		this.name = settings.name
 		this.pools = []
