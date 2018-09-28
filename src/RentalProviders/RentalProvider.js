@@ -46,6 +46,36 @@ class RentalProvider {
 	}
 
 	/**
+	 * Get pools
+	 * @param {Array.<number>} [ids] - an array of pool ids
+ 	 */
+	async getPools(ids) {
+		if (typeof ids === 'number' && !Array.isArray(ids)) {
+			return await this.getPool(id)
+		}
+		try {
+			return await this._getPools(ids)
+		} catch (err) {
+			throw new Error(`Failed to get pools: ${err}`)
+		}
+	}
+
+	/**
+	 * Get pool by id
+	 * @param {string|number} id - ID of the pool you want to fetch
+	 */
+	async getPool(id) {
+		if (typeof id !== 'number' || typeof id !== 'string') {
+			throw new Error('Cannot get pool: id must be of type number or string')
+		}
+		try {
+			return await this._getPools(id)
+		} catch (err) {
+			throw new Error(`Failed to fetch pool: ${err}`)
+		}
+	}
+
+	/**
 	 * Add pools to local variable this.pools
 	 * @param pools
 	 */
