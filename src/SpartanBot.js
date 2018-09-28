@@ -262,6 +262,61 @@ class SpartanBot {
 
 		return true
 	}
+
+	/**
+	 * Get pools
+	 * @param {Array.<number>} [ids] - an array of pool ids
+	 */
+	async getPools(ids) {
+		if (this.getRentalProviders().length === 0) {
+			throw new Error('No rental providers. Cannot get pools.')
+		}
+		if (typeof ids === 'number' && !Array.isArray(ids)) {
+			return await this.getPool(ids)
+		} else {
+			let poolIDs = []
+			let pools = [];
+			for (let provider of this.getRentalProviders()) {
+				let tmpPools = []
+				try {
+					tmpPools = await provider.getPools(ids)
+				} catch (err) {
+					throw new Error(`Failed to get pools: ${err}`)
+				}
+				for (let tmp of tmpPools) {
+					if (!poolIDs.includes(tmp.id)) {
+						poolIDs.push(tmp.id)
+						pools.push(tmp)
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Get pool by id
+	 * @param {string|number} id - ID of the pool you want to fetch
+	 */
+	async getPool(id) {
+		if (typeof id !== 'number' || typeof id !== 'string') {
+			throw new Error('Cannot get pool: id must be of type number or string')
+		}
+		let pools = []
+		let poolIDs = []
+		for (let provider of this.getRentalProviders()) {
+			let tmpPool;
+			try {
+				tmpPool = await provider.getPool(id)
+			} catch (err) {
+				throw new Error(`Failed to get pool: ${err}`)
+			}
+			if (!poolIDs.includes(tmpPool.id)) {
+				poolIDs.push(tmpPool.id)
+				pools.push(tmpPool)
+			}
+		}
+		return pools
+	}
 	
 	/**
 	 * Run a Manual Rental instruction
