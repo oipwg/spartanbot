@@ -266,6 +266,7 @@ class SpartanBot {
 	/**
 	 * Get pools
 	 * @param {Array.<number>} [ids] - an array of pool ids
+	 * @return {Array.<Object>} pools
 	 */
 	async getPools(ids) {
 		if (this.getRentalProviders().length === 0) {
@@ -296,6 +297,7 @@ class SpartanBot {
 	/**
 	 * Get pool by id
 	 * @param {string|number} id - ID of the pool you want to fetch
+	 * @return {Object} pool
 	 */
 	async getPool(id) {
 		if (typeof id !== 'number' || typeof id !== 'string') {
