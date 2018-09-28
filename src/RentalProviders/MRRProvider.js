@@ -172,16 +172,28 @@ class MRRProvider extends RentalProvider {
 	 */
 	async _getPools(ids) {
 		if (!ids) {
+			let res;
 			try {
-				return await this.api.getPools()
+				res = await this.api.getPools()
 			} catch (err) {
 				throw new Error(`Could not fetch pools \n ${err}`)
 			}
+			if (res.success) {
+				return res.data
+			} else {
+				throw new Error(`Success: false. ${res.data}`)
+			}
 		} else {
+			let res
 			try {
-				return await this.api.getPoolsByID(ids)
+				res =  await this.api.getPoolsByID(ids)
 			} catch (err) {
 				throw new Error(`Could not fetch pools \n ${err}`)
+			}
+			if (res.success) {
+				return res.data
+			} else {
+				throw new Error(`Success: false. ${res.data}`)
 			}
 		}
 	}
