@@ -180,21 +180,28 @@ class SpartanBot {
 
 		this.rental_providers.push(new_provider)
 
-		// Save new Provider
-		this.serialize()
-
 		let pools = [];
 
 		if (settings.type === "MiningRigRentals") {
 			try {
 				let res = await new_provider.getPoolProfiles()
+				console.log(res)
 				if (res.success) {
 					pools = res.data
 				}
 			} catch (err) {
 				pools = `Could not fetch pools: \n ${err}`
 			}
+			let ids = []
+			for (let pool of pools) {
+				ids.push(pool.id)
+			}
+
+			new_provider.setPools(ids)
 		}
+
+		// Save new Provider
+		this.serialize()
 
 		// Return info to the user
 		return {
