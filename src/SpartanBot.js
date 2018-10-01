@@ -3,7 +3,7 @@ import { Account } from 'oip-account'
 import { MRRProvider, NiceHashProvider } from './RentalProviders'
 import AutoRenter from './AutoRenter'
 
-const SUPPORTED_RENTAL_PROVIDERS = [ MRRProvider ]
+const SUPPORTED_RENTAL_PROVIDERS = [ MRRProvider, NiceHashProvider ]
 
 let localStorage
 

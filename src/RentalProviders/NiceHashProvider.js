@@ -16,6 +16,19 @@ class NiceHashProvider extends RentalProvider {
 	static getType(){
 		return "NiceHash"
 	}
+
+	/**
+	 * Test Authorization
+	 * @async
+	 * @returns {Promise<Boolean>}
+	 */
+	async testAuthorization(){
+		try {
+			return await this.api.testAuthorization()
+		} catch(err) {
+			throw new Error(`Authorization failed: ${err}`)
+		}
+	}
 }
 
 export default NiceHashProvider
