@@ -115,6 +115,13 @@ class SpartanBot {
 			return await this.wallet.wallet.getCoinBalances(["flo"])
 	}
 
+	async withdrawFromWallet(new_address){
+		
+		if (new_address)
+		 return await this.wallet.wallet.sendPayment(new_address)
+		
+	}
+
 	/**
 	 * Setup a new Rental Provider for use
 	 * @param {Object} settings - The settings for the Rental Provider
