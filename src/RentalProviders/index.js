@@ -1,5 +1,7 @@
 import MRRProvider from './MRRProvider.js'
+import NiceHashProvider from './NiceHashProvider'
 
-export {
-	MRRProvider
+module.exports = {
+	MRRProvider,
+	NiceHashProvider
 }

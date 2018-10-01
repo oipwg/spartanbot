@@ -1,6 +1,6 @@
 import { Account } from 'oip-account'
 
-import { MRRProvider } from './RentalProviders'
+import { MRRProvider, NiceHashProvider } from './RentalProviders'
 import AutoRenter from './AutoRenter'
 
 const SUPPORTED_RENTAL_PROVIDERS = [ MRRProvider ]
