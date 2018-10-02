@@ -19,7 +19,7 @@ class MRRProvider extends RentalProvider {
 		super(settings)
 
 		this.api = new MiningRigRentals({key: this.api_key, secret: this.api_secret})
-		this.pool_profiles = []
+		this.poolProfiles = []
 	}
 
 	/**
@@ -225,6 +225,14 @@ class MRRProvider extends RentalProvider {
 				throw new Error(`Success: false. ${res.data}`)
 			}
 		}
+	}
+
+	/**
+	 * Set pool profiles to local variable, this.poolProfiles
+	 * @param {Array.<Object>} profiles - an array of objects with the name and if of the pool profile
+	 */
+	setPoolProfiles(profiles) {
+		this.poolProfiles = profiles
 	}
 
 	/**
@@ -451,6 +459,7 @@ class MRRProvider extends RentalProvider {
 			api_secret: this.api_secret,
 			uid: this.uid,
 			pools: this.pools,
+			poolProfiles: this.poolProfiles,
 			activePoolID: this.activePoolID
 		}
 	}
