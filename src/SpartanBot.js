@@ -114,7 +114,10 @@ class SpartanBot {
 		else
 			return await this.wallet.wallet.getCoinBalances(["flo"])
 	}
-
+	/**
+	 * Withdraw funds from your internal wallet
+	 * @param {String} options - passing of new address connecting to the HDMW sendPayment
+	 */
 	async withdrawFromWallet(){
 		if (!this.wallet)
 		return {
