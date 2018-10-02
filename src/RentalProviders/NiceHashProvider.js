@@ -59,6 +59,7 @@ class NiceHashProvider extends RentalProvider {
 	 * @param {string} options.pool_port - Pool port
 	 * @param {string} options.pool_user - Pool username
 	 * @param {string} options.pool_pass - Pool password
+	 * @param {string} options.name - Name to identify the pool with
 	 * @param {string|number} [options.location=0] - 0 for Europe (NiceHash), 1 for USA (WestHash);
 	 * @return {Object}
 	 */
