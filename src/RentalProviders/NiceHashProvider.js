@@ -6,7 +6,7 @@ class NiceHashProvider extends RentalProvider {
 	constructor(settings) {
 		super(settings)
 
-		this.api = new NiceHash(settings.key, settings.id)
+		this.api = new NiceHash(settings.api_key, settings.api_id)
 	}
 
 	/**
@@ -65,10 +65,11 @@ class NiceHashProvider extends RentalProvider {
 
 	/**
 	 * Get Pools
+	 * @async
 	 * @return {Array.<Object>}
 	 */
-	_getPools() {
-		return this.pools
+	async _getPools() {
+		return await this.pools
 	}
 }
 
