@@ -113,12 +113,16 @@ class MRRProvider extends RentalProvider {
 	 * @returns {Promise<Object>}
 	 */
 	async _createPool(options) {
-		let pool;
+		let pool = {};
 		try {
-			pool = await this.api.createPool(options)
+			let res = await this.api.createPool(options)
+			if (res.success) {
+				pool = res.data
+			}
 		} catch (err) {
 			throw new Error(`Failed to create pool: ${err}`)
 		}
+		pool = {...pool, name: options.name, host: options.host, port: options.port}
 		this.addPools(pool)
 		return pool
 	}
