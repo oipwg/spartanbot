@@ -1,6 +1,5 @@
 import RentalProvider from "./RentalProvider";
 import NiceHash from 'nicehash-api'
-import uid from 'uid'
 
 class NiceHashProvider extends RentalProvider {
 	constructor(settings) {
@@ -60,6 +59,7 @@ class NiceHashProvider extends RentalProvider {
 	 * @param {string} options.pool_user - Pool username
 	 * @param {string} options.pool_pass - Pool password
 	 * @param {string} options.name - Name to identify the pool with
+	 * @param {number} [options.id] - Local ID (an arbitrary id you can give it for more control)
 	 * @param {string|number} [options.location=0] - 0 for Europe (NiceHash), 1 for USA (WestHash);
 	 * @return {Object}
 	 */
@@ -67,9 +67,29 @@ class NiceHashProvider extends RentalProvider {
 		if (!options.pool_host || !options.pool_port || !options.pool_user || !options.pool_pass) {
 			return {success: false, message: 'must provide all of the following: pool_host, pool_port, pool_user, pool_pass'}
 		}
-		let pool = {...options, id: uid()};
+		let pool = {...options};
 		this.addPools(pool)
 		return pool
+	}
+
+	/**
+	 * Delete pool from local variable, this.pools
+	 * @param id
+	 * @returns {Promise<Object>}
+	 * @private
+	 */
+	async _deletePool(id) {
+		for (let pool in this.pools) {
+			if (this.pools[pool].id === id) {
+				this.pools.splice(pool, 1)
+			}
+		}
+		for (let pool of this.pools) {
+			if (pool.id === id) {
+				return {success: false, message: 'failed to remove pool with .splice'}
+			}
+		}
+		return {success: true, message: `Pool: ${id} removed.`}
 	}
 
 	/**
