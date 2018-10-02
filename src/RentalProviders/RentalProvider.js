@@ -24,6 +24,7 @@ class RentalProvider {
 		this.pools = []
 		this.activePoolID = undefined
 		this.activeRigs = []
+		this.poolProfiles = []
 	}
 
 	/**
@@ -33,6 +34,14 @@ class RentalProvider {
 	 */
 	static getType(){
 		return "RentalProvider"
+	}
+
+	/**
+	 * Non static method to get type
+	 * @returns {String}
+	 */
+	getInternalType() {
+		return this._getInternalType()
 	}
 
 	getUID(){
@@ -276,13 +285,15 @@ class RentalProvider {
 	 */
 	serialize(){
 		return {
-			type: "RentalProvider",
+			type: this.getInternalType(),
 			api_key: this.api_key,
+			api_id: this.api_id,
 			api_secret: this.api_secret,
 			uid: this.uid,
 			pools: this.pools,
 			activePoolID: this.activePoolID,
-			activeRigs: this.activeRigs
+			activeRigs: this.activeRigs,
+			poolProfiles: this.poolProfiles,
 		}
 	}
 }

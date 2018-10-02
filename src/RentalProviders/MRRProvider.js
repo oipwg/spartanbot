@@ -19,7 +19,6 @@ class MRRProvider extends RentalProvider {
 		super(settings)
 
 		this.api = new MiningRigRentals({key: this.api_key, secret: this.api_secret})
-		this.poolProfiles = []
 	}
 
 	/**
@@ -28,6 +27,14 @@ class MRRProvider extends RentalProvider {
 	 * @static
 	 */
 	static getType(){
+		return "MiningRigRentals"
+	}
+
+	/**
+	 * Non static method to get type
+	 * @return {String} returns "MiningRigRentals"
+	 */
+	getInternalType() {
 		return "MiningRigRentals"
 	}
 
@@ -452,17 +459,17 @@ class MRRProvider extends RentalProvider {
 	 * Get back a "Serialized" state of the Provider
 	 * @return {Object} Returns a JSON object that contains the current rental provider state
 	 */
-	serialize(){
-		return {
-			type: "MiningRigRentals",
-			api_key: this.api_key,
-			api_secret: this.api_secret,
-			uid: this.uid,
-			pools: this.pools,
-			poolProfiles: this.poolProfiles,
-			activePoolID: this.activePoolID
-		}
-	}
+	// serialize(){
+	// 	return {
+	// 		type: "MiningRigRentals",
+	// 		api_key: this.api_key,
+	// 		api_secret: this.api_secret,
+	// 		uid: this.uid,
+	// 		pools: this.pools,
+	// 		poolProfiles: this.poolProfiles,
+	// 		activePoolID: this.activePoolID
+	// 	}
+	// }
 }
 
 export default MRRProvider

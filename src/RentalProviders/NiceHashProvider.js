@@ -19,6 +19,14 @@ class NiceHashProvider extends RentalProvider {
 	}
 
 	/**
+	 * Non static method to get type
+	 * @return {String} returns "NiceHash"
+	 */
+	getInternalType() {
+		return "NiceHash"
+	}
+
+	/**
 	 * Test Authorization
 	 * @async
 	 * @returns {Promise<Boolean>}
