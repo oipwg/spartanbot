@@ -374,5 +374,43 @@ describe("SpartanBot", () => {
 			expect(match).toBeTruthy()
 			done()
 		})
+		it('create a global pool (2 providers)', async (done) => {
+			let spartan = new SpartanBot({memory: true})
+
+			let nicehash = await spartan.setupRentalProvider({
+				type: "NiceHash",
+				api_key: niceHashAPI.api_key,
+				api_id: niceHashAPI.api_id,
+				name: "NiceHash"
+			})
+
+			let mrr = await spartan.setupRentalProvider({
+				type: "MiningRigRentals",
+				api_key: apikey.api_key,
+				api_secret: apikey.api_secret,
+				name: "MRR"
+			})
+
+			let options = {
+				algo: 'scrypt',
+				host: 'host.test.this',
+				port: 33,
+				user: 'y',
+				pass: 'x',
+				name: 'thunderbird'
+			}
+			await spartan.createPool(options)
+
+			for (let p of spartan.getRentalProviders()) {
+				let match = false
+				for (let pool of p.returnPools()) {
+					if (pool.name === options.name) {
+						match = true
+					}
+				}
+				expect(match).toBeTruthy()
+			}
+			done()
+		})
 	})
 })
