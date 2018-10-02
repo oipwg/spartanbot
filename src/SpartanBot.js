@@ -115,10 +115,10 @@ class SpartanBot {
 			return await this.wallet.wallet.getCoinBalances(["flo"])
 	}
 
-	async withdrawFromWallet(new_address){
-		
-		if (new_address)
-		 return await this.wallet.wallet.sendPayment(new_address)
+	async withdrawFromWallet(){
+
+		if (options)
+		 return await this.wallet.wallet.sendPayment(options)
 		
 	}
 
