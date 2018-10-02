@@ -73,8 +73,9 @@ class RentalProvider {
 	 * @return {Promise}
 	 */
 	async createPool(options) {
+
 		let newOptions = {};
-		if (this.getType() === "NiceHash") {
+		if (this.getInternalType() === "NiceHash") {
 			for (let opt in options) {
 				if (opt === 'host') {
 					newOptions.pool_host = options[opt]
@@ -88,8 +89,9 @@ class RentalProvider {
 					newOptions[opt] = options[opt]
 				}
 			}
+			return this._createPool(newOptions)
 		}
-		if (this.getType() === "MiningRigRentals") {
+		if (this.getInternalType() === "MiningRigRentals") {
 			for (let opt in options) {
 				if (opt === 'algo') {
 					newOptions.type = options[opt]
@@ -97,11 +99,11 @@ class RentalProvider {
 					newOptions[opt] = options[opt]
 				}
 			}
-		}
-		try {
-			return await this._createPool(newOptions);
-		} catch (err) {
-			throw new Error(err)
+			try {
+				return await this._createPool(newOptions);
+			} catch (err) {
+				throw new Error(err)
+			}
 		}
 	}
 
