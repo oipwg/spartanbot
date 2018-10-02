@@ -86,7 +86,7 @@ describe("MRRProvider", () => {
 		})
 		// console.log(response)
 	});
-	it('create pool and add it to profile | createPool', async () => {
+	it('create pool and add it to profile | createPoolProfile', async () => {
 		let mrr = new MRRProvider(ryansKey);
 		let options = {
 			profileName: 'SUPERRYAN',
@@ -98,7 +98,7 @@ describe("MRRProvider", () => {
 			priority: 0,
 			notes: 'ryan wins!'
 		};
-		let response = await mrr.createPool(options)
+		let response = await mrr._createPoolProfile(options)
 		expect(response.success).toBeTruthy()
 		// console.log(response)
 	}, 250 * 1000);
