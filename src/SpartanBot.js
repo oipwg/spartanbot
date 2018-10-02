@@ -122,9 +122,8 @@ class SpartanBot {
 			info: "NO_WALLET",
 			message: "No wallet was found in SpartanBot, may be running in memory mode"
 		}
-
 		if (options)
-		 return await this.wallet.wallet.sendPayment([options])
+		 return await this.wallet.wallet.sendPayment(options)
 	}
 
 	/**
