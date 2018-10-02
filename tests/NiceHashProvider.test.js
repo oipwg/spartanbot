@@ -1,4 +1,4 @@
-import NiceHash from '../src/RentalProviders/NiceHashProvider';
+import NiceHashProvider from '../src/RentalProviders/NiceHashProvider';
 import { config } from 'dotenv'
 config()
 
@@ -10,8 +10,12 @@ const apikey = {
 describe('NiceHashProvider', () => {
 	describe('Setup', () => {
 		it('test authorization', async () => {
-			let api = new NiceHash(apikey.key, apikey.id)
+			let api = new NiceHashProvider(apikey)
 			expect(await api.testAuthorization()).toBeTruthy()
 		})
-	})
+		it('get balance', async () => {
+			let api = new NiceHashProvider(apikey);
+			expect(typeof await api._getBalance() === 'number')
+		})
+	});
 })
