@@ -291,8 +291,8 @@ describe("SpartanBot", () => {
 			expect(response.success).toBeFalsy()
 		}, 50000)
 	})
-	describe('Multi-Provider Setup', () => {
-		it('setup both MRR and NiceHash', async () => {
+	describe('Multiple types of Providers', () => {
+		it('setup both MRR and NiceHash', async (done) => {
 			let spartan = new SpartanBot({memory: true});
 
 			let nicehash = await spartan.setupRentalProvider({
@@ -310,6 +310,38 @@ describe("SpartanBot", () => {
 			})
 			expect(nicehash.success).toBeTruthy()
 			expect(mrr.success).toBeTruthy()
+			done()
+		})
+		it('load multi provider data from storage', async (done) => {
+			let spartan = new SpartanBot({memory: false})
+			await spartan._deserialize
+			await spartan._wallet_create
+
+			let nicehash = await spartan.setupRentalProvider({
+				type: "NiceHash",
+				api_key: niceHashAPI.api_key,
+				api_id: niceHashAPI.api_id,
+				name: "NiceHash"
+			})
+
+			let mrr = await spartan.setupRentalProvider({
+				type: "MiningRigRentals",
+				api_key: apikey.api_key,
+				api_secret: apikey.api_secret,
+				name: "MRR"
+			})
+
+			spartan.serialize()
+
+			let spartan2 = new SpartanBot()
+
+			// Wait for deserialization to finish
+			await spartan2._deserialize
+			await spartan2._wallet_login
+
+			expect(spartan.getRentalProviders()[0].uid).toEqual(spartan2.getRentalProviders()[0].uid)
+
+			done()
 		})
 	})
 })
