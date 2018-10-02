@@ -119,7 +119,7 @@ class SpartanBot {
 	 * Withdraw funds from your internal wallet
 	 * @param {String} options - passing of new address connecting to the HDMW sendPayment
 	 */
-	async withdrawFromWallet(){
+	async withdrawFromWallet(options){
 		if (!this.wallet)
 		return {
 			success: false,
