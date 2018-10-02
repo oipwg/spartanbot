@@ -150,10 +150,10 @@ class SpartanBot {
 				message: "settings.api_key is required!"
 			}
 		}
-		if (!settings.api_secret || !settings.api_id){
+		if (!settings.api_secret && !settings.api_id){
 			return {
 				success: false,
-				message: "settings.api_secret ir settings.api_id is required!"
+				message: "settings.api_secret or settings.api_id is required!"
 			}
 		}
 
@@ -195,21 +195,28 @@ class SpartanBot {
 		let pools = [];
 
 		if (settings.type === "MiningRigRentals") {
+			let profiles = [];
 			try {
 				let res = await new_provider.getPoolProfiles()
-				console.log(res)
 				if (res.success) {
-					pools = res.data
+					profiles = res.data
 				}
 			} catch (err) {
-				pools = `Could not fetch pools: \n ${err}`
-			}
-			let ids = []
-			for (let pool of pools) {
-				ids.push(pool.id)
+				profiles = `Could not fetch pools: \n ${err}`
 			}
 
-			new_provider.setPools(ids)
+			let ids = []
+			for (let profile of profiles) {
+				ids.push({id: profile.id, name: profile.name})
+			}
+
+			new_provider.setPoolProfiles(ids)
+
+			try {
+				pools = await new_provider.getPools();
+			} catch (err) {
+				pools = [{success: false, message: 'pools not found', err}]
+			}
 		}
 
 		// Save new Provider
