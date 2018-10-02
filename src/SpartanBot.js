@@ -217,6 +217,7 @@ class SpartanBot {
 			} catch (err) {
 				pools = [{success: false, message: 'pools not found', err}]
 			}
+			new_provider.setPools(pools)
 		}
 
 		// Save new Provider
@@ -345,6 +346,36 @@ class SpartanBot {
 		}
 		return pools
 	}
+
+	/**
+	 * Set pools to the spartanbot local variable
+	 */
+	_setPools(pools) {
+		this.pools = pools
+	}
+
+	/**
+	 * Gather and Return the pools set in the RentalProvider's local variable, this.pools
+	 * @return {Array.<Object>}
+	 */
+	returnPools() {
+		if (this.getRentalProviders().length === 0) {
+			throw new Error('Cannot get pools: no providers setup')
+		}
+		let pools = []
+		let poolIDs = []
+		for (let provider of this.getRentalProviders()) {
+			let tmpPools = provider.returnPools()
+			for (let pool in tmpPools) {
+				if (!poolIDs.includes(pool.id)) {
+					poolIDs.push(pool.id)
+					pools.push(pool)
+				}
+			}
+		}
+		this._setPools(pools)
+		return pools
+	}
 	
 	/**
 	 * Run a Manual Rental instruction
@@ -374,7 +405,6 @@ class SpartanBot {
 	/**
 	 * Serialize all information about SpartanBot to LocalStorage (save the current state)
 	 * @return {Boolean} Returns true if successful
-	 *
 	 * @private
 	 */
 	serialize(){
@@ -397,7 +427,6 @@ class SpartanBot {
 	/**
 	 * Load all serialized (saved) data from LocalStorage
 	 * @return {Boolean} Returns true on deserialize success
-	 *
 	 * @private
 	 */
 	async deserialize(){
