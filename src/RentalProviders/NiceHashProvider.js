@@ -100,6 +100,15 @@ class NiceHashProvider extends RentalProvider {
 	async _getPools() {
 		return await this.pools
 	}
+
+	/**
+	 * Set pool to active
+	 * poolid
+	 */
+	setActivePool(poolid) {
+		this.activePool = poolid
+	}
+
 }
 
 export default NiceHashProvider
