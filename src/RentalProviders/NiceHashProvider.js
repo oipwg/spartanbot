@@ -22,11 +22,23 @@ class NiceHashProvider extends RentalProvider {
 	 * @async
 	 * @returns {Promise<Boolean>}
 	 */
-	async testAuthorization(){
+	async _testAuthorization(){
 		try {
 			return await this.api.testAuthorization()
 		} catch(err) {
 			throw new Error(`Authorization failed: ${err}`)
+		}
+	}
+
+	/**
+	 * Get Balance
+	 * @async
+	 */
+	async _getBalance() {
+		try {
+			return await this.api.getBalance()
+		} catch (err) {
+			throw new Error(`Failed to get balance: ${err}`)
 		}
 	}
 }
