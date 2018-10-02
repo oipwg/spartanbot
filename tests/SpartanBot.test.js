@@ -17,6 +17,12 @@ const ryansKey = {
 	api_key: process.env.API_KEY_ORPHEUS,
 	api_secret: process.env.API_SECRET_ORPHEUS
 }
+
+const niceHashAPI = {
+	api_id: process.env.NICEHASH_API_ID,
+	api_key: process.env.NICEHASH_API_KEY
+}
+
 // After all the tests have run, remove the test data :)
 afterAll(() => {
 	require('./rm-test-data.js')
@@ -256,7 +262,7 @@ describe("SpartanBot", () => {
 			// console.log(response)
 			expect(response.success).toBeTruthy()
 		}, 250 * 100)
-		it('Cancel rent with cofirmation function', async () => {
+		it('Cancel rent with confirmation function', async () => {
 			let spartan = new SpartanBot({ memory: true })
 
 			await spartan.setupRentalProvider({
@@ -281,8 +287,29 @@ describe("SpartanBot", () => {
 			}
 
 			let response = await spartan.manualRental(hashrate, duration, confirmation)
-			console.log(response)
+			// console.log(response)
 			expect(response.success).toBeFalsy()
 		}, 50000)
+	})
+	describe('Multi-Provider Setup', () => {
+		it('setup both MRR and NiceHash', async () => {
+			let spartan = new SpartanBot({memory: true});
+
+			let nicehash = await spartan.setupRentalProvider({
+				type: "NiceHash",
+				api_key: niceHashAPI.api_key,
+				api_id: niceHashAPI.api_id,
+				name: "NiceHash"
+			})
+
+			let mrr = await spartan.setupRentalProvider({
+				type: "MiningRigRentals",
+				api_key: apikey.api_key,
+				api_secret: apikey.api_secret,
+				name: "MRR"
+			})
+			expect(nicehash.success).toBeTruthy()
+			expect(mrr.success).toBeTruthy()
+		})
 	})
 })
