@@ -158,7 +158,7 @@ class RentalProvider {
 
 	/**
 	 * Fetch this.pools
-	 * @returns {Array<Object>|*}
+	 * @returns {Array<Object>}
 	 */
 	returnPools() {
 		return this.pools
