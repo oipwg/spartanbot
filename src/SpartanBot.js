@@ -348,6 +348,32 @@ class SpartanBot {
 	}
 
 	/**
+	 * Creates a pool that will be added to all providers
+	 * @param {Object} options
+	 * @param {string} options.algo - Algorithm ('scrypt', 'x11', etc)
+	 * @param {string} options.host - Pool host, the part after stratum+tcp://
+	 * @param {number} options.port - Pool port, the part after the : in most pool host strings
+	 * @param {string} options.user - Your workname
+	 * @param {string} [options.pass='x'] - Worker password
+	 * @param {string|number} [options.location=0] - NiceHash var only: 0 for Europe (NiceHash), 1 for USA (WestHash) ;
+	 * @param {string} options.name - Name to identify the pool with
+	 * @param {number} options.priority - MRR var only: 0-4
+	 * @param {string} [options.notes] - MRR var only: Additional notes to help identify the pool for you
+	 * @async
+	 * @return {Promise}
+	 */
+	async createPool(options) {
+		for (let p of this.getRentalProviders()) {
+			try {
+				await p.createPool(options)
+			} catch (err) {
+				throw new Error(`Failed to create pool: ${err}`)
+			}
+		}
+		this.returnPools()
+	}
+
+	/**
 	 * Set pools to the spartanbot local variable
 	 */
 	_setPools(pools) {
@@ -366,7 +392,7 @@ class SpartanBot {
 		let poolIDs = []
 		for (let provider of this.getRentalProviders()) {
 			let tmpPools = provider.returnPools()
-			for (let pool in tmpPools) {
+			for (let pool of tmpPools) {
 				if (!poolIDs.includes(pool.id)) {
 					poolIDs.push(pool.id)
 					pools.push(pool)
