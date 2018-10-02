@@ -1,5 +1,6 @@
 import RentalProvider from "./RentalProvider";
 import NiceHash from 'nicehash-api'
+import uid from 'uid'
 
 class NiceHashProvider extends RentalProvider {
 	constructor(settings) {
@@ -57,7 +58,7 @@ class NiceHashProvider extends RentalProvider {
 		if (!options.pool_host || !options.pool_port || !options.pool_user || !options.pool_pass) {
 			return {success: false, message: 'must provide all of the following: pool_host, pool_port, pool_user, pool_pass'}
 		}
-		let pool = options;
+		let pool = {...options, id: uid()};
 		this.addPools(pool)
 		return pool
 	}
