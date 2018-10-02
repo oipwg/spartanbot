@@ -457,6 +457,6 @@ describe("SpartanBot", () => {
 			expect(res.success).toBeTruthy()
 
 			done()
-		})
+		});
 	})
 })
