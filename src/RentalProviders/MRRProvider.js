@@ -19,6 +19,7 @@ class MRRProvider extends RentalProvider {
 		super(settings)
 
 		this.api = new MiningRigRentals({key: this.api_key, secret: this.api_secret})
+		this.pool_profiles = []
 	}
 
 	/**
@@ -90,6 +91,31 @@ class MRRProvider extends RentalProvider {
 			throw new Error(`Error getting profile data: \n ${JSON.stringify(profile, null, 4)}`)
 		}
 	}
+
+	/**
+	 * Create a pool and add it to local variable
+	 * @param {Object} options
+	 * @param {string} options.type - Pool algo, eg: sha256, scrypt, x11, etc
+	 * @param {string} options.name - Name to identify the pool with
+	 * @param {string} options.host - Pool host, the part after stratum+tcp://
+	 * @param {number} options.port - Pool port, the part after the : in most pool host strings
+	 * @param {string} options.user - Your workname
+	 * @param {string} [options.pass='x'] - Worker password
+	 * @param {string} [options.notes] - Additional notes to help identify the pool for you
+	 * @async
+	 * @returns {Promise<Object>}
+	 */
+	async _createPool(options) {
+		let pool;
+		try {
+			pool = await this.api.createPool(options)
+		} catch (err) {
+			throw new Error(`Failed to create pool: ${err}`)
+		}
+		this.addPools(pool)
+		return pool
+	}
+
 	/**
 	 * Creates a pool and adds it to a newly created pool profile
 	 * @param {Object} options
@@ -104,7 +130,7 @@ class MRRProvider extends RentalProvider {
 	 * @param {string} [options.notes] - Additional notes to help identify the pool for you
 	 * @returns {Promise<Object>} - returns an object with the profileID and poolid on success
 	 */
-	async createPool(options) {
+	async _createPoolProfile(options) {
 		let poolProfile;
 		try {
 			let response = await this.api.createPoolProfile(options.profileName, options.algo)
@@ -133,6 +159,9 @@ class MRRProvider extends RentalProvider {
 		} catch (err) {
 			throw new Error(`Could not create pool \n ${err}`)
 		}
+
+		let poolObject = {pool: poolParams}
+		this.addPools(poolObject)
 
 		let addPoolToProfileOptions = {
 			profileID: poolProfile,
@@ -168,7 +197,7 @@ class MRRProvider extends RentalProvider {
 	/**
 	 * Get all pools, a single pool by ID, or multiple pools by their IDs
 	 * @param {(number|Array.<number>)} [ids] - can be a single pool id or multiple pool ids. If no ids are passed, will fetch all pools
- 	 * @returrpns {Promise<Object>}
+ 	 * @return {Promise<Object>}
 	 */
 	async _getPools(ids) {
 		if (!ids) {
