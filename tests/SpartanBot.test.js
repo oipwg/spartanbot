@@ -344,4 +344,35 @@ describe("SpartanBot", () => {
 			done()
 		})
 	})
+	describe('Pools', () => {
+		it('create a global pool (1 provider)', async (done) => {
+			let spartan = new SpartanBot({memory: true})
+
+			let mrr = await spartan.setupRentalProvider({
+				type: "MiningRigRentals",
+				api_key: apikey.api_key,
+				api_secret: apikey.api_secret,
+				name: "MRR"
+			})
+
+			let options = {
+				algo: 'scrypt',
+				host: 'ryan',
+				port: 33,
+				user: 'y',
+				pass: 'x',
+				name: 'lightsaber'
+			}
+			await spartan.createPool(options)
+
+			let match = false;
+			for (let pool of spartan.pools) {
+				if (pool.name === options.name) {
+					match = true
+				}
+			}
+			expect(match).toBeTruthy()
+			done()
+		})
+	})
 })
