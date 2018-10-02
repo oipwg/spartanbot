@@ -1,4 +1,5 @@
 import { Account } from 'oip-account'
+import uid from 'uid';
 
 import { MRRProvider, NiceHashProvider } from './RentalProviders'
 import AutoRenter from './AutoRenter'
@@ -366,6 +367,7 @@ class SpartanBot {
 	 * @return {Promise}
 	 */
 	async createPool(options) {
+		options.id = uid()
 		for (let p of this.getRentalProviders()) {
 			try {
 				await p.createPool(options)
@@ -374,6 +376,28 @@ class SpartanBot {
 			}
 		}
 		this.returnPools()
+	}
+
+	/**
+	 * Delete a pool
+	 * @param {(number|string)} id - Pool id
+	 * @returns {Promise<*>}
+	 */
+	async deletePool(id) {
+		let poolDelete = []
+		for (let p of this.getRentalProviders()) {
+			try {
+				poolDelete.push(await p.deletePool(id))
+			} catch (err) {
+				throw new Error(err)
+			}
+		}
+		for (let i = 0; i < poolDelete.length; i++) {
+			if (!poolDelete[i].success) {
+				return poolDelete[i]
+			}
+		}
+		return {success: true, id, message: 'Deleted'};
 	}
 
 	/**

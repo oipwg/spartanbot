@@ -69,12 +69,13 @@ class RentalProvider {
 	 * @param {string} options.name - MRR var only: Name to identify the pool with
 	 * @param {number} options.priority - MRR var only: 0-4
 	 * @param {string} [options.notes] - MRR var only: Additional notes to help identify the pool for you
+	 * @param {number} [options.id] - Local ID (NOT MRR/NiceHash/Provider ID)
 	 * @async
 	 * @return {Promise}
 	 */
 	async createPool(options) {
-
 		let newOptions = {};
+
 		if (this.getInternalType() === "NiceHash") {
 			for (let opt in options) {
 				if (opt === 'host') {
@@ -104,6 +105,20 @@ class RentalProvider {
 			} catch (err) {
 				throw new Error(err)
 			}
+		}
+	}
+
+	/**
+	 * Delete pool
+	 * {(number|string)} id - Pool id
+	 * @async
+	 * @return {Promise<Object>}
+	 */
+	async deletePool(id) {
+		try {
+			return await this._deletePool(id)
+		} catch (err) {
+			throw new Error(`failed to delete pool ${err}`)
 		}
 	}
 

@@ -107,6 +107,7 @@ class MRRProvider extends RentalProvider {
 	 * @param {string} options.host - Pool host, the part after stratum+tcp://
 	 * @param {number} options.port - Pool port, the part after the : in most pool host strings
 	 * @param {string} options.user - Your workname
+	 * @param {number} [options.id] - Local ID (NOT MRR ID)
 	 * @param {string} [options.pass='x'] - Worker password
 	 * @param {string} [options.notes] - Additional notes to help identify the pool for you
 	 * @async
@@ -122,9 +123,64 @@ class MRRProvider extends RentalProvider {
 		} catch (err) {
 			throw new Error(`Failed to create pool: ${err}`)
 		}
-		pool = {...pool, name: options.name, host: options.host, port: options.port}
+		pool = {mrrID: pool.id, name: options.name, host: options.host, port: options.port, id: options.id}
 		this.addPools(pool)
 		return pool
+	}
+
+	/**
+	 * Delete pool from local variable, this.pools, and from the MRR website
+	 * @param id
+	 * @returns {Promise<Object>}
+	 * @private
+	 */
+	async _deletePool(id) {
+		let poolID;
+		for (let pool in this.pools) {
+			if (this.pools[pool].id === id) {
+				poolID = this.pools[pool].mrrID
+				this.pools.splice(pool, 1)
+			}
+		}
+
+		try {
+			return await this.api.deletePools(poolID)
+		} catch (err) {
+			throw new Error(`Failed to delete pool: ${err}`)
+		}
+	}
+
+	/**
+	 * Get all pools, a single pool by ID, or multiple pools by their IDs
+	 * @param {(number|Array.<number>)} [ids] - can be a single pool id or multiple pool ids. If no ids are passed, will fetch all pools
+	 * @return {Promise<Object>}
+	 */
+	async _getPools(ids) {
+		if (!ids) {
+			let res;
+			try {
+				res = await this.api.getPools()
+			} catch (err) {
+				throw new Error(`Could not fetch pools \n ${err}`)
+			}
+			if (res.success) {
+				return res.data
+			} else {
+				throw new Error(`Success: false. ${res.data}`)
+			}
+		} else {
+			let res
+			try {
+				res =  await this.api.getPoolsByID(ids)
+			} catch (err) {
+				throw new Error(`Could not fetch pools \n ${err}`)
+			}
+			if (res.success) {
+				return res.data
+			} else {
+				throw new Error(`Success: false. ${res.data}`)
+			}
+		}
 	}
 
 	/**
@@ -203,39 +259,6 @@ class MRRProvider extends RentalProvider {
 			returnObject = success
 		}
 		return returnObject
-	}
-
-	/**
-	 * Get all pools, a single pool by ID, or multiple pools by their IDs
-	 * @param {(number|Array.<number>)} [ids] - can be a single pool id or multiple pool ids. If no ids are passed, will fetch all pools
- 	 * @return {Promise<Object>}
-	 */
-	async _getPools(ids) {
-		if (!ids) {
-			let res;
-			try {
-				res = await this.api.getPools()
-			} catch (err) {
-				throw new Error(`Could not fetch pools \n ${err}`)
-			}
-			if (res.success) {
-				return res.data
-			} else {
-				throw new Error(`Success: false. ${res.data}`)
-			}
-		} else {
-			let res
-			try {
-				res =  await this.api.getPoolsByID(ids)
-			} catch (err) {
-				throw new Error(`Could not fetch pools \n ${err}`)
-			}
-			if (res.success) {
-				return res.data
-			} else {
-				throw new Error(`Success: false. ${res.data}`)
-			}
-		}
 	}
 
 	/**

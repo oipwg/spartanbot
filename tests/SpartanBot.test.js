@@ -1,6 +1,7 @@
 import SpartanBot from '../src/SpartanBot'
+import uid from 'uid'
 import { config } from 'dotenv'
-import AutoRenter from "../src/AutoRenter";
+import AutoRenter from "../src/AutoRenter"
 config()
 
 const apikey = {
@@ -410,6 +411,51 @@ describe("SpartanBot", () => {
 				}
 				expect(match).toBeTruthy()
 			}
+			done()
+		})
+		it('create and then delete pool (2 providers)', async (done) => {
+			let spartan = new SpartanBot({memory: true})
+
+			let nicehash = await spartan.setupRentalProvider({
+				type: "NiceHash",
+				api_key: niceHashAPI.api_key,
+				api_id: niceHashAPI.api_id,
+				name: "NiceHash"
+			})
+
+			let mrr = await spartan.setupRentalProvider({
+				type: "MiningRigRentals",
+				api_key: apikey.api_key,
+				api_secret: apikey.api_secret,
+				name: "MRR"
+			})
+
+			let options = {
+				algo: 'scrypt',
+				host: 'test.test.this',
+				port: 33,
+				user: 'y',
+				pass: 'x',
+				name: uid()
+			}
+			await spartan.createPool(options)
+
+			let id;
+			let results = []
+			let poolsFound = []
+			for (let p of spartan.getRentalProviders()) {
+				for (let pool of p.returnPools()) {
+					if (pool.name === options.name) {
+						id = pool.id
+						results.push(true)
+						poolsFound.push(pool)
+					}
+				}
+			}
+			expect(results.length).toEqual(2)
+			let res = await spartan.deletePool(id)
+			expect(res.success).toBeTruthy()
+
 			done()
 		})
 	})
