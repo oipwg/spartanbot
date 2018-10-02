@@ -33,6 +33,7 @@ class NiceHashProvider extends RentalProvider {
 	/**
 	 * Get Balance
 	 * @async
+	 * @returns {Promise<Number>}
 	 */
 	async _getBalance() {
 		try {
@@ -40,6 +41,33 @@ class NiceHashProvider extends RentalProvider {
 		} catch (err) {
 			throw new Error(`Failed to get balance: ${err}`)
 		}
+	}
+
+	/**
+	 * Create Pool
+	 * @param {string|number} options.algo - Algorithm name or ID
+	 * @param {string} options.pool_host - Pool hostname or IP;
+	 * @param {string} options.pool_port - Pool port
+	 * @param {string} options.pool_user - Pool username
+	 * @param {string} options.pool_pass - Pool password
+	 * @param {string|number} [options.location=0] - 0 for Europe (NiceHash), 1 for USA (WestHash);
+	 * @return {Object}
+	 */
+	_createPool(options) {
+		if (!options.pool_host || !options.pool_port || !options.pool_user || !options.pool_pass) {
+			return {success: false, message: 'must provide all of the following: pool_host, pool_port, pool_user, pool_pass'}
+		}
+		let pool = options;
+		this.addPools(pool)
+		return pool
+	}
+
+	/**
+	 * Get Pools
+	 * @return {Array.<Object>}
+	 */
+	_getPools() {
+		return this.pools
 	}
 }
 
