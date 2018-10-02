@@ -72,7 +72,7 @@ class NiceHashProvider extends RentalProvider {
 	}
 
 	/**
-	 * Get Pools
+	 * Internal function to get Pools
 	 * @async
 	 * @return {Array.<Object>}
 	 */
