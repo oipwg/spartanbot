@@ -22,9 +22,10 @@ class RentalProvider {
 		this.api_secret = settings.api_secret
 		this.name = settings.name
 		this.pools = []
-		this.activePoolID = undefined
-		this.activeRigs = []
+		this.activePool = undefined
 		this.poolProfiles = []
+		this.activePoolProfile = undefined
+		this.activeRigs = []
 	}
 
 	/**
@@ -308,9 +309,10 @@ class RentalProvider {
 			api_secret: this.api_secret,
 			uid: this.uid,
 			pools: this.pools,
-			activePoolID: this.activePoolID,
-			activeRigs: this.activeRigs,
+			activePool: this.activePool,
 			poolProfiles: this.poolProfiles,
+			activePoolProfile: this.activePoolProfile,
+			activeRigs: this.activeRigs,
 		}
 	}
 }
