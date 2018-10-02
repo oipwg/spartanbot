@@ -458,22 +458,6 @@ class MRRProvider extends RentalProvider {
 		}
 		return rigs_to_rent
 	}
-
-	/**
-	 * Get back a "Serialized" state of the Provider
-	 * @return {Object} Returns a JSON object that contains the current rental provider state
-	 */
-	// serialize(){
-	// 	return {
-	// 		type: "MiningRigRentals",
-	// 		api_key: this.api_key,
-	// 		api_secret: this.api_secret,
-	// 		uid: this.uid,
-	// 		pools: this.pools,
-	// 		poolProfiles: this.poolProfiles,
-	// 		activePoolID: this.activePoolID
-	// 	}
-	// }
 }
 
 export default MRRProvider
