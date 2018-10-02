@@ -48,6 +48,55 @@ class RentalProvider {
 	}
 
 	/**
+	 * Create pool and adds it to local variable this.pools
+	 * @param {Object} options
+	 * @param {string} options.algo - Algorithm ('scrypt', 'x11', etc)
+	 * @param {string} options.host - Pool host, the part after stratum+tcp://
+	 * @param {number} options.port - Pool port, the part after the : in most pool host strings
+	 * @param {string} options.user - Your workname
+	 * @param {string} [options.pass='x'] - Worker password
+	 * @param {string|number} [options.location=0] - NiceHash var only: 0 for Europe (NiceHash), 1 for USA (WestHash) ;
+	 * @param {string} options.profileName - MRR var only: Name of the profile
+	 * @param {string} options.name - MRR var only: Name to identify the pool with
+	 * @param {number} options.priority - MRR var only: 0-4
+	 * @param {string} [options.notes] - MRR var only: Additional notes to help identify the pool for you
+	 * @async
+	 * @return {Promise}
+	 */
+	async createPool(options) {
+		let newOptions = {};
+		if (this.getType() === "NiceHash") {
+			for (let opt in options) {
+				if (opt === 'host') {
+					newOptions.pool_host = options[opt]
+				} else if (opt === 'port') {
+					newOptions.pool_port = options[opt]
+				} else if (opt === 'user') {
+					newOptions.pool_user = options[opt]
+				} else if (opt === 'pass') {
+					newOptions.pool_pass = options[opt]
+				} else {
+					newOptions[opt] = options[opt]
+				}
+			}
+		}
+		if (this.getType() === "MiningRigRentals") {
+			for (let opt in options) {
+				if (opt === 'algo') {
+					newOptions.type = options[opt]
+				} else {
+					newOptions[opt] = options[opt]
+				}
+			}
+		}
+		try {
+			return await this._createPool(newOptions);
+		} catch (err) {
+			throw new Error(err)
+		}
+	}
+
+	/**
 	 * Get pools
 	 * @param {Array.<number>} [ids] - an array of pool ids
  	 */
