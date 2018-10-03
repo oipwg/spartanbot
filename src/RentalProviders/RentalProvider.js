@@ -187,21 +187,15 @@ class RentalProvider {
 	 * @param {number|string} id - pool id (pool profile id for MRR)
 	 */
 	setActivePool(id) {
-		let setID = id
-		if (typeof setID === 'string') {
-			setID = Number(setID);
-		} else if (typeof setID !== 'number') {
-			return 'Error: ID must be of type string or number'
-		}
-		this._setActivePool(setID)
+		this._setActivePool(id)
 	}
 
 	/**
 	 * Get pool id (pool profile id for MRR)
 	 * @returns {number}
 	 */
-	returnActivePoolID() {
-		return this.activePoolID
+	returnActivePool() {
+		return this._returnActivePool()
 	}
 
 	/**

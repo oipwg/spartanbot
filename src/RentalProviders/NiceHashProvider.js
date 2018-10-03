@@ -95,6 +95,7 @@ class NiceHashProvider extends RentalProvider {
 	/**
 	 * Internal function to get Pools
 	 * @async
+	 * @private
 	 * @return {Array.<Object>}
 	 */
 	async _getPools() {
@@ -104,9 +105,18 @@ class NiceHashProvider extends RentalProvider {
 	/**
 	 * Set pool to active
 	 * poolid
+	 * @private
 	 */
 	_setActivePool(poolid) {
 		this.activePool = poolid
+	}
+
+	/**
+	 * return active pool
+	 * @private
+	 */
+	_returnActivePool() {
+		return this.activePool
 	}
 
 }
