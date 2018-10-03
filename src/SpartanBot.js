@@ -196,6 +196,16 @@ class SpartanBot {
 
 		this.rental_providers.push(new_provider)
 
+		if (settings.activePool) {
+			new_provider.setActivePool(settings.activePool)
+		}
+		if (settings.activePoolProfile) {
+			new_provider.setActivePoolProfile(settings.activePoolProfile)
+		}
+		if (settings.name) {
+			new_provider.setName(settings.name)
+		}
+
 		let pools = [];
 		let poolProfiles = []
 
@@ -224,6 +234,10 @@ class SpartanBot {
 				pools = [{success: false, message: 'pools not found', err}]
 			}
 			new_provider.setPools(pools)
+		} else if (settings.type === "NiceHash") {
+			if (settings.pools) {
+				new_provider.setPools(settings.pools)
+			}
 		}
 
 		// Save new Provider

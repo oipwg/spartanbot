@@ -45,8 +45,20 @@ class RentalProvider {
 		return this._getInternalType()
 	}
 
+	setUID(id) {
+		this.uid = id
+	}
+
 	getUID(){
 		return this.uid
+	}
+
+	setName(name) {
+		this.name = name
+	}
+
+	getName(name) {
+		return this.name
 	}
 
 	/**
