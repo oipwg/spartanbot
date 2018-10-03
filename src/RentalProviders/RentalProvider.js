@@ -313,6 +313,7 @@ class RentalProvider {
 			poolProfiles: this.poolProfiles,
 			activePoolProfile: this.activePoolProfile,
 			activeRigs: this.activeRigs,
+			name: this.name
 		}
 	}
 }
