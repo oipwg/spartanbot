@@ -197,6 +197,7 @@ class SpartanBot {
 		this.rental_providers.push(new_provider)
 
 		let pools = [];
+		let poolProfiles = []
 
 		if (settings.type === "MiningRigRentals") {
 			let profiles = [];
@@ -213,6 +214,7 @@ class SpartanBot {
 			for (let profile of profiles) {
 				ids.push({id: profile.id, name: profile.name})
 			}
+			poolProfiles = ids.slice(0, ids.length)
 
 			new_provider.setPoolProfiles(ids)
 
@@ -235,6 +237,7 @@ class SpartanBot {
 			name: settings.name,
 			uid: new_provider.uid,
 			pools,
+			poolProfiles,
 			provider: new_provider
 		}
 	}

@@ -197,7 +197,7 @@ class MRRProvider extends RentalProvider {
 	 * @param {string} [options.notes] - Additional notes to help identify the pool for you
 	 * @returns {Promise<Object>} - returns an object with the profileID and poolid on success
 	 */
-	async _createPoolProfile(options) {
+	async createPoolProfile(options) {
 		let poolProfile;
 		try {
 			let response = await this.api.createPoolProfile(options.profileName, options.algo)
