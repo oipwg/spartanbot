@@ -105,7 +105,7 @@ class NiceHashProvider extends RentalProvider {
 	 * Set pool to active
 	 * poolid
 	 */
-	setActivePool(poolid) {
+	_setActivePool(poolid) {
 		this.activePool = poolid
 	}
 

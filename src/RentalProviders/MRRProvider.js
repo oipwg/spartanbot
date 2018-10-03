@@ -262,6 +262,14 @@ class MRRProvider extends RentalProvider {
 	}
 
 	/**
+	 * Set a pool profile to active
+	 * pool profile id
+	 */
+	_setActivePool(profileID) {
+		this.activePoolProfile = profileID
+	}
+
+	/**
 	 * Set pool profiles to local variable, this.poolProfiles
 	 * @param {Array.<Object>} profiles - an array of objects with the name and if of the pool profile
 	 */
