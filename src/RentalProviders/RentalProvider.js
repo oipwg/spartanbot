@@ -69,7 +69,8 @@ class RentalProvider {
 	 * @param {string} options.profileName - MRR var only: Name of the profile
 	 * @param {string} options.name - MRR var only: Name to identify the pool with
 	 * @param {number} options.priority - MRR var only: 0-4
-	 * @param {string} [options.notes] - MRR var only: Additional notes to help identify the pool for you
+	 * @param {string} [options.notes] - Additional notes to help identify the pool for you
+	 * @param {string} [options.notes] - Additional notes to help identify the pool for you
 	 * @param {number} [options.id] - Local ID (NOT MRR/NiceHash/Provider ID)
 	 * @async
 	 * @return {Promise}
@@ -97,6 +98,14 @@ class RentalProvider {
 			for (let opt in options) {
 				if (opt === 'algo') {
 					newOptions.type = options[opt]
+				} else if (opt === 'pool_host') {
+					newOptions.host = options[opt]
+				} else if (opt === 'pool_port') {
+					newOptions.port = options[opt]
+				} else if (opt === 'pool_user') {
+					newOptions.user = options[opt]
+				} else if (opt === 'pool_pass') {
+					newOptions.pass = options[opt]
 				} else {
 					newOptions[opt] = options[opt]
 				}

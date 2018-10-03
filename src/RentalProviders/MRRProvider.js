@@ -262,17 +262,32 @@ class MRRProvider extends RentalProvider {
 	}
 
 	/**
-	 * Set a pool profile to active
+	 * Set a pool to active
 	 * pool profile id
 	 */
 	_setActivePool(profileID) {
+		this.activePool = profileID
+	}
+
+	/**
+	 * Return active pool
+	 */
+	_returnActivePool() {
+		return this.activePool
+	}
+
+	/**
+	 * Set a pool profile to active
+	 * pool profile id
+	 */
+	setActivePoolProfile(profileID) {
 		this.activePoolProfile = profileID
 	}
 
 	/**
 	 * Return active pool profile
 	 */
-	_returnActivePool() {
+	returnActivePoolProfile() {
 		return this.activePoolProfile
 	}
 
