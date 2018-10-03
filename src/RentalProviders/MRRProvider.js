@@ -300,6 +300,43 @@ class MRRProvider extends RentalProvider {
 	}
 
 	/**
+	 * Add one or more pool profiles
+	 * @param {(Object|Array.<Object>)} profiles - An object that contains MRR pool profile data: must have an id
+	 */
+	addPoolProfiles(profiles) {
+		if (Array.isArray(profiles)) {
+			for (let p of profiles) {
+				let match = false;
+				for (let profiles of this.poolProfiles) {
+					if (profiles.id === p.id) {
+						match = true;
+					}
+				}
+				if (!match) {
+					this.poolProfiles.push(p)
+				}
+			}
+		} else {
+			let match = false;
+			for (let p of this.poolProfiles) {
+				if (profiles.id === p.id) {
+					match = true;
+				}
+			}
+			if (!match) {
+				this.poolProfiles.push(profiles)
+			}
+		}
+	}
+
+	/**
+	 * Return the pool profiles stored locally
+	 */
+	returnPoolProfiles() {
+		return this.poolProfiles
+	}
+
+	/**
 	 * Get all pool profiles, a single pool profile by ID, or multiple pool profiles by their IDs
 	 * @param {(number|Array.<number>)} [ids] - can be a single pool id or multiple pool ids. If no ids are passed, will fetch all pools
 	 * @returns {Promise<Object>}
