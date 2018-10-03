@@ -468,7 +468,6 @@ class SpartanBot {
 		serialized.settings = this.settings
 
 		for (let provider of this.rental_providers){
-			console.log('provider getting serialized: ', provider.serialize())
 			serialized.rental_providers.push(provider.serialize())
 		}
 
