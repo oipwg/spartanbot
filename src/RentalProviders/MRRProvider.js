@@ -184,6 +184,38 @@ class MRRProvider extends RentalProvider {
 	}
 
 	/**
+	 * Add a pool to the profile
+	 * @param {Object} options
+	 * @param {number} options.profileID - The profile id you want to add the pool to
+	 * @param {number} options.poolid - Pool ID to add -- see /account/pool
+	 * @param {number} options.priority - 0-4
+	 * @param {string} options.algo - Name of algorithm
+	 * @param {string} options.name - Pool name (doesn't change the pool name... just an MRR requirement)
+	 * @async
+	 * @returns {Promise<Object>}
+	 * @example
+	 * //return example
+	 * {
+	 *   success: true,
+     *   data: { id: '23136', success: true, message: 'Updated' }
+	 * }
+	 */
+	async addPoolToProfile(options) {
+		let newOptions = {}
+		for (let opt in options) {
+			if (opt === 'type') {
+				newOptions['algo'] = options[opt]
+			}
+			newOptions[opt] = options[opt]
+		}
+		try {
+			return await this.api.addPoolToProfile(newOptions)
+		} catch (err) {
+			throw new Error(`Failed to add pool to profile: ${err}`)
+		}
+	}
+
+	/**
 	 * Creates a pool and adds it to a newly created pool profile
 	 * @param {Object} options
 	 * @param {string} options.profileName - Name of the profile
