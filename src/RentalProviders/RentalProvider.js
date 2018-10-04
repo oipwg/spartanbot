@@ -57,7 +57,7 @@ class RentalProvider {
 		this.name = name
 	}
 
-	getName(name) {
+	getName() {
 		return this.name
 	}
 
