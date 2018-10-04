@@ -78,12 +78,10 @@ class RentalProvider {
 	 * @param {string} options.user - Your workname
 	 * @param {string} [options.pass='x'] - Worker password
 	 * @param {string|number} [options.location=0] - NiceHash var only: 0 for Europe (NiceHash), 1 for USA (WestHash) ;
-	 * @param {string} options.profileName - MRR var only: Name of the profile
 	 * @param {string} options.name - MRR var only: Name to identify the pool with
 	 * @param {number} options.priority - MRR var only: 0-4
 	 * @param {string} [options.notes] - Additional notes to help identify the pool for you
-	 * @param {string} [options.notes] - Additional notes to help identify the pool for you
-	 * @param {number} [options.id] - Local ID (NOT MRR/NiceHash/Provider ID)
+	 * @param {number} [options.id] - Local ID (NOT MRR/NiceHash/Provider ID). If using spartanbot.createPool() no need to pass this in
 	 * @async
 	 * @return {Promise}
 	 */
