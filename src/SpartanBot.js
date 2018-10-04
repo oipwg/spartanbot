@@ -35,6 +35,8 @@ class SpartanBot {
 
 		this.rental_providers = []
 
+		this.margin = margin || [5,10,15,20]
+
 		// Try to load state from LocalStorage if we are not memory only
 		if (!this.settings.memory){
 
