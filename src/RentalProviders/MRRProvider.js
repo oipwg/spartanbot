@@ -217,9 +217,12 @@ class MRRProvider extends RentalProvider {
 	async addPoolToProfile(options) {
 		let newOptions = {}
 		for (let opt in options) {
-			if (opt === 'type') {
+			if (opt === 'type')
 				newOptions['algo'] = options[opt]
-			}
+
+			if (opt === 'id')
+				newOptions.pooid = options[opt]
+
 			newOptions[opt] = options[opt]
 		}
 		try {
