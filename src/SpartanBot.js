@@ -446,7 +446,8 @@ class SpartanBot {
 	 */
 	returnPools() {
 		if (this.getRentalProviders().length === 0) {
-			throw new Error('Cannot get pools: no providers setup')
+			this._setPools = []
+			return []
 		}
 		let pools = []
 		let poolIDs = []
