@@ -307,7 +307,7 @@ class MRRProvider extends RentalProvider {
 		} else {
 			returnObject = success
 		}
-		return {success: returnObject, pool: {poolParams, id: pool}}
+		return {success: returnObject, pool: {...poolParams, id: pool}}
 	}
 
 	/**
