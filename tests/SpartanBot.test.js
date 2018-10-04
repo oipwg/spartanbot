@@ -496,5 +496,65 @@ describe("SpartanBot", () => {
 			expect(nh.returnPools().length === 0)
 			expect(mrrP.returnPools().length).toEqual(mrrPoolsLen - 1)
 		})
+		describe('Pool Profiles', () => {
+			it('get pool profiles', async () => {
+				let spartan = new SpartanBot({memory: true})
+
+				let mrr = await spartan.setupRentalProvider({
+					type: "MiningRigRentals",
+					api_key: apikey.api_key,
+					api_secret: apikey.api_secret,
+					name: "MRR"
+				})
+
+				let profs = await spartan.getPoolProfiles()
+				expect(profs.length > 0).toBeTruthy()
+			})
+			it('create and delete a pool profile', async () => {
+				let spartan = new SpartanBot({memory: true})
+
+				let mrr = await spartan.setupRentalProvider({
+					type: "MiningRigRentals",
+					api_key: apikey.api_key,
+					api_secret: apikey.api_secret,
+					name: "MRR"
+				})
+
+				let name = 'Test Profile Name';
+				let algo = 'scrypt'
+
+				let create = await spartan.createPoolProfile(name, algo)
+				let id = create[0].id
+
+				let match = false
+				for (let prof of spartan.returnPoolProfiles()) {
+					if (prof.id === id)
+						match = true
+				}
+				expect(match).toBeTruthy()
+
+				let del = await spartan.deletePoolProfile(id)
+				expect(del.success).toBeTruthy()
+				match = false
+				for (let prof of spartan.returnPoolProfiles()) {
+					if (prof.id === id)
+						match = true
+				}
+				expect(match).toBeFalsy()
+			})
+			it('return pool profiles', async () => {
+				let spartan = new SpartanBot({memory: true})
+
+				let mrr = await spartan.setupRentalProvider({
+					type: "MiningRigRentals",
+					api_key: apikey.api_key,
+					api_secret: apikey.api_secret,
+					name: "MRR"
+				})
+
+				let p = spartan.returnPoolProfiles()
+				expect(p.length > 0).toBeTruthy()
+			})
+		})
 	})
 })
