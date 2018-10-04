@@ -177,6 +177,7 @@ class RentalProvider {
 	 * @param pools
 	 */
 	addPools(pools) {
+		//ToDO: make sure the pool(s) don't already exist
 		if (Array.isArray(pools)) {
 			for (let pool of pools) {
 				this.pools.push(pool)
