@@ -130,7 +130,7 @@ class RentalProvider {
 
 	/**
 	 * Delete pool
-	 * {(number|string)} id - Pool id
+	 * @param {(number|string)} id - Pool id
 	 * @async
 	 * @return {Promise<Object>}
 	 */
