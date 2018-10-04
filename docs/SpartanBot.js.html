@@ -486,8 +486,6 @@ class SpartanBot {
 		options.id = uid()
 		let poolsCreated = []
 		for (let p of this.getRentalProviders()) {
-			let type = p.getInternalType();
-			let name = p.getName()
 			let pool;
 			try {
 				pool = await p.createPool(options)
@@ -499,7 +497,6 @@ class SpartanBot {
 
 		}
 		return poolsCreated
-		// this.returnPools()
 	}
 
 	/**
