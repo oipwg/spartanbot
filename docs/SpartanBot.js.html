@@ -327,6 +327,12 @@ class SpartanBot {
 				pools = [{success: false, message: 'pools not found', err}]
 			}
 			new_provider.setPools(pools)
+
+			//if no active pool profile set, set it to the first one retrieved from the api
+			if (!new_provider.returnActivePoolProfile()) {
+				if (ids.length !== 0)
+					new_provider.setActivePoolProfile(ids[0].id)
+			}
 		} else if (settings.type === "NiceHash") {
 			if (settings.pools) {
 				new_provider.setPools(settings.pools)
