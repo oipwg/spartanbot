@@ -123,7 +123,16 @@ class MRRProvider extends RentalProvider {
 		} catch (err) {
 			throw new Error(`Failed to create pool: ${err}`)
 		}
-		pool = {mrrID: pool.id, name: options.name, host: options.host, port: options.port, id: options.id}
+		pool = {
+			mrrID: pool.id,
+			name: options.name,
+			host: options.host,
+			port: options.port,
+			id: options.id,
+			user: options.user,
+			pass: options.pass,
+			providerUID: this.getUID(),
+			market: this.getInternalType()}
 		this.addPools(pool)
 		return pool
 	}
@@ -138,7 +147,11 @@ class MRRProvider extends RentalProvider {
 		let poolID;
 		for (let pool in this.pools) {
 			if (this.pools[pool].id === id) {
-				poolID = this.pools[pool].mrrID
+				if (this.pools[pool].mrrID) {
+					poolID = this.pools[pool].mrrID
+				} else {
+					poolID = this.pools[pool].id
+				}
 				this.pools.splice(pool, 1)
 			}
 		}
