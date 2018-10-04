@@ -276,6 +276,7 @@ class MRRProvider extends RentalProvider {
 			throw new Error(`Could not create pool \n ${err}`)
 		}
 
+
 		this.addPools({...poolParams, id: pool})
 
 		let addPoolToProfileOptions = {
@@ -306,7 +307,7 @@ class MRRProvider extends RentalProvider {
 		} else {
 			returnObject = success
 		}
-		return returnObject
+		return {success: returnObject, pool: {poolParams, id: pool}}
 	}
 
 	/**
