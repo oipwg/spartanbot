@@ -35,8 +35,6 @@ class SpartanBot {
 
 		this.rental_providers = []
 
-		this.margin = margin || [5,10,15,20]
-
 		// Try to load state from LocalStorage if we are not memory only
 		if (!this.settings.memory){
 
@@ -393,14 +391,19 @@ class SpartanBot {
 	 */
 	async createPool(options) {
 		options.id = uid()
+		let poolsCreated = []
 		for (let p of this.getRentalProviders()) {
+			let pool;
 			try {
-				await p.createPool(options)
+				pool = await p.createPool(options)
 			} catch (err) {
 				throw new Error(`Failed to create pool: ${err}`)
 			}
+			if (pool)
+				poolsCreated.push(pool)
+
 		}
-		this.returnPools()
+		return poolsCreated
 	}
 
 	/**
@@ -411,10 +414,15 @@ class SpartanBot {
 	async deletePool(id) {
 		let poolDelete = []
 		for (let p of this.getRentalProviders()) {
-			try {
-				poolDelete.push(await p.deletePool(id))
-			} catch (err) {
-				throw new Error(err)
+			let pools = p.returnPools();
+			for (let pool of pools) {
+				if (pool.id === id || pool.mrrID === id) {
+					try {
+						poolDelete.push(await p.deletePool(id))
+					} catch (err) {
+						throw new Error(err)
+					}
+				}
 			}
 		}
 		for (let i = 0; i < poolDelete.length; i++) {
