@@ -34,6 +34,8 @@ class SpartanBot {
 		this.settings = settings || {}
 
 		this.rental_providers = []
+		this.pool = []
+		this.poolProfiles = []
 
 		// Try to load state from LocalStorage if we are not memory only
 		if (!this.settings.memory){
@@ -463,6 +465,134 @@ class SpartanBot {
 		this._setPools(pools)
 		return pools
 	}
+
+	/**
+	 * Create a pool profile
+	 * @param {string} name - Name of the profile
+	 * @param {string} algo - Algo (x11, scrypt, sha256)
+	 * @async
+	 * @returns {Promise<Object>}
+	 */
+	async createPoolProfile(name, algo) {
+		let profiles = []
+		for (let p of this.getRentalProviders()) {
+			if (p.getInternalType() === "MiningRigRentals") {
+				let res;
+				try {
+					res = await p.createPoolProfile(name, algo)
+				} catch (err) {
+					throw new Error(`Failed to create pool profile: ${err}`)
+				}
+				if (res.success) {
+					let modifiedProfile = {...res.data, uid: p.getUID()}
+					profiles.push(modifiedProfile)
+					p.addPoolProfiles(modifiedProfile)
+				}
+			}
+		}
+		this.returnPoolProfiles()
+		return profiles
+	}
+
+	/**
+	 * Delete a pool profile
+	 * @param id
+	 * @returns {Promise<Object>}
+	 */
+	async deletePoolProfile(id) {
+		if (this.getRentalProviders().length === 0) {
+			return {success: false, message: 'No providers'}
+		}
+
+		for (let p of this.getRentalProviders()) {
+			if (p.getInternalType() === "MiningRigRentals") {
+				let profiles = p.returnPoolProfiles()
+				for (let i in profiles) {
+					if (profiles[i].id === id) {
+						let res;
+						try {
+							res = await p.deletePoolProfile(id)
+						} catch (err) {
+							throw new Error(err)
+						}
+						if (res.success) {
+							p.poolProfiles.splice(i, 1)
+						}
+					}
+				}
+			}
+		}
+		return {success: true, message: 'profile deleted'}
+	}
+
+	/**
+	 * Get Pool Profiles for all MRR Providers attached via the MRR API
+	 * @async
+	 * @return {Array.<Object>}
+	 */
+	async getPoolProfiles() {
+		if (this.getRentalProviders().length === 0) {
+			this._setPools = []
+			return []
+		}
+
+		let profiles = []
+		let profileIDs = []
+		for (let provider of this.getRentalProviders()) {
+			if (provider.getInternalType() === "MiningRigRentals") {
+				let res = await provider.getPoolProfiles()
+				let tmpProfiles = [];
+				if (res.success) {
+					tmpProfiles = res.data
+				}
+				for (let profile of tmpProfiles) {
+					if (!profileIDs.includes(profile.id)) {
+						profileIDs.push(profile.id)
+						profiles.push(profile)
+					}
+				}
+			}
+		}
+
+		this._setPoolProfiles(profiles)
+		return profiles
+	}
+
+	/**
+	 * Return the pool profiles stored locally for all MRR providers
+	 * @return {Array.<Object>}
+	 */
+	returnPoolProfiles() {
+		if (this.getRentalProviders().length === 0) {
+			this._setPoolProfiles = []
+			return []
+		}
+
+		let returnProfiles = []
+		let profileIDs = []
+		for (let provider of this.getRentalProviders()) {
+			if (provider.getInternalType() === "MiningRigRentals") {
+				let profiles = provider.returnPoolProfiles()
+				for (let profile of profiles) {
+					if (!profileIDs.includes(profile.id)) {
+						profileIDs.push(profile.id)
+						returnProfiles.push(profile)
+					}
+				}
+			}
+		}
+		this._setPoolProfiles(returnProfiles)
+		return returnProfiles
+	}
+
+	/**
+	 * Set pool profiles to local variable
+	 * @private
+	 */
+	_setPoolProfiles(profiles) {
+		this.poolProfiles = profiles
+	}
+
 	
 	/**
 	 * Run a Manual Rental instruction
@@ -500,6 +630,8 @@ class SpartanBot {
 		}
 
 		serialized.settings = this.settings
+		serialized.pools = this.pools
+		serialized.poolProfiles = this.poolProfiles
 
 		for (let provider of this.rental_providers){
 			serialized.rental_providers.push(provider.serialize())
@@ -529,6 +661,14 @@ class SpartanBot {
 			for (let provider of data_from_storage.rental_providers){
 				await this.setupRentalProvider(provider)
 			}
+		}
+
+		if (data_from_storage.pools){
+			this.pools = data_from_storage.pools
+		}
+
+		if (data_from_storage.poolProfiles){
+			this.oip_account = data_from_storage.poolProfiles
 		}
 
 		if (data_from_storage.oip_account){
