@@ -246,7 +246,7 @@ class MRRProvider extends RentalProvider {
 	 * @param {string} [options.notes] - Additional notes to help identify the pool for you
 	 * @returns {Promise<Object>} - returns an object with the profileID and poolid on success
 	 */
-	async createPoolProfile(options) {
+	async createPoolAndProfile(options) {
 		let poolProfile;
 		try {
 			let response = await this.api.createPoolProfile(options.profileName, options.algo)
@@ -308,6 +308,39 @@ class MRRProvider extends RentalProvider {
 			returnObject = success
 		}
 		return {success: returnObject, pool: {...poolParams, id: pool}}
+	}
+
+	/**
+	 * Create a pool profile
+	 * @param {string} name - Name of the profile
+	 * @param {string} algo - Algo of the profile -> see /info/algos
+	 * @async
+	 * @returns {Promise<Object>}
+	 */
+	async createPoolProfile(name, algo) {
+		let res;
+		try {
+			res =  await this.api.createPoolProfile(name, algo)
+		} catch (err) {
+			throw new Error(`Failed to create pool profile: ${err}`)
+		}
+		if (res.success)
+			this.setActivePoolProfile(res.data.id)
+		return res
+	}
+
+	/**
+	 * Delete a specific pool profile
+	 * @param {number} id - Pool Profile ID
+	 * @async
+	 * @returns {Promise<Object>}
+	 */
+	async deletePoolProfile(id) {
+		try {
+			return await this.api.deletePoolProfile(id)
+		} catch (err) {
+			throw new Error(`Failed to delete pool profile: ${err}`)
+		}
 	}
 
 	/**
