@@ -458,5 +458,43 @@ describe("SpartanBot", () => {
 
 			done()
 		});
+		it('delete a pool that only one provider has', async () => {
+			let spartan = new SpartanBot({memory: true})
+
+			let nicehash = await spartan.setupRentalProvider({
+				type: "NiceHash",
+				api_key: niceHashAPI.api_key,
+				api_id: niceHashAPI.api_id,
+				name: "NiceHash"
+			})
+
+			let mrr = await spartan.setupRentalProvider({
+				type: "MiningRigRentals",
+				api_key: apikey.api_key,
+				api_secret: apikey.api_secret,
+				name: "MRR"
+			})
+
+			let options = {
+				algo: 'scrypt',
+				host: 'test.DELETE.test.DELETE.test.DELETE.',
+				port: 33,
+				user: 'y',
+				pass: 'x',
+				name: uid()
+			}
+			let poolsCreated = await spartan.createPool(options)
+			let nh = spartan.getRentalProviders()[0]
+			expect(nh.returnPools().length === 1)
+
+			let mrrP = spartan.getRentalProviders()[1]
+			let mrrPoolsLen = mrrP.returnPools().length
+
+			let idToDelete = poolsCreated[0].id
+			await spartan.deletePool(idToDelete)
+
+			expect(nh.returnPools().length === 0)
+			expect(mrrP.returnPools().length).toEqual(mrrPoolsLen - 1)
+		})
 	})
 })
