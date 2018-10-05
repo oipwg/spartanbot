@@ -233,6 +233,27 @@ class MRRProvider extends RentalProvider {
 	}
 
 	/**
+	 * Update or replace a pool to a profile... **Poor MRR Documentation
+	 * @param {Object} options
+	 * @param {number} options.profileID - Pool Profile ID
+	 * @param {number} options.poolid - Pool ID
+	 * @param {number} options.priority - 0-4
+	 * @param {string} options.algo - Name of algorithm
+	 * @param {string} options.name - Pool name (doesn't change the pool name... just an MRR requirement)
+	 * @async
+	 * @returns {Promise<Object>}
+	 */
+	async updatePoolOnProfile(options) {
+		let res;
+		try {
+			res = await this.api.updatePoolOnProfile(options)
+		} catch (err) {
+			throw new Error(`Failed to update pool on profile: ${options.profileID}`)
+		}
+		return res
+	}
+
+	/**
 	 * Creates a pool and adds it to a newly created pool profile
 	 * @param {Object} options
 	 * @param {string} options.profileName - Name of the profile

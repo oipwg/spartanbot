@@ -1,6 +1,6 @@
 {
   "name": "spartanbot",
-  "version": "0.6.20",
+  "version": "0.6.21",
   "description": "Defend the Network",
   "main": "lib/index.js",
   "directories": {
