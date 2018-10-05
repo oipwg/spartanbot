@@ -423,17 +423,25 @@ class MRRProvider extends RentalProvider {
 	}
 
 	/**
-	 * Delete a specific pool profile
+	 * Delete a specific pool profile from MRR and locally at this.poolProfiles
 	 * @param {number} id - Pool Profile ID
 	 * @async
 	 * @returns {Promise&lt;Object>}
 	 */
 	async deletePoolProfile(id) {
+		let res;
 		try {
-			return await this.api.deletePoolProfile(id)
+			res = await this.api.deletePoolProfile(id)
 		} catch (err) {
 			throw new Error(`Failed to delete pool profile: ${err}`)
 		}
+		if (res.success) {
+			for (let i in this.poolProfiles) {
+				if (this.poolProfiles[i].id === id)
+					this.poolProfiles.splice(i, 1)
+			}
+		}
+		return res
 	}
 
 	/**
