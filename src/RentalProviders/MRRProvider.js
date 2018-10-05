@@ -220,7 +220,9 @@ class MRRProvider extends RentalProvider {
 			if (opt === 'type')
 				newOptions['algo'] = options[opt]
 
-			if (opt === 'id')
+			if (opt === 'mrrID')
+				newOptions.poolid = options[opt]
+			else if (opt === 'id')
 				newOptions.poolid = options[opt]
 
 			newOptions[opt] = options[opt]
