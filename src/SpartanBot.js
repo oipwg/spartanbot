@@ -347,6 +347,7 @@ class SpartanBot {
 					}
 				}
 			}
+			return pools
 		}
 	}
 
