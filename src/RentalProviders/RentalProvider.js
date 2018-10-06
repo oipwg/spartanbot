@@ -148,7 +148,11 @@ class RentalProvider {
  	 */
 	async getPools(ids) {
 		if (typeof ids === 'number' && !Array.isArray(ids)) {
-			return await this.getPool(id)
+			try {
+				return await this.getPool(id)
+			} catch (err) {
+				throw new Error(err)
+			}
 		}
 		try {
 			return await this._getPools(ids)
