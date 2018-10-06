@@ -496,6 +496,68 @@ describe("SpartanBot", () => {
 			expect(nh.returnPools().length === 0)
 			expect(mrrP.returnPools().length).toEqual(mrrPoolsLen - 1)
 		})
+		it('create, update, and delete a pool', async (done) => {
+			let spartan = new SpartanBot({memory: true})
+
+			let nh = await spartan.setupRentalProvider({
+				type: "NiceHash",
+				api_key: niceHashAPI.api_key,
+				api_id: niceHashAPI.api_id,
+				name: "NiceHash"
+			})
+
+			let mrr = await spartan.setupRentalProvider({
+				type: "MiningRigRentals",
+				api_key: apikey.api_key,
+				api_secret: apikey.api_secret,
+				name: "MRR"
+			})
+
+			let options = {
+				algo: 'scrypt',
+				host: 'AAAAAAAAAAAAAAAAAAAAAAAAAA',
+				port: 333,
+				user: 'AAAAAAAAAAAAAAAAAAAAAAAAAA',
+				pass: 'AAAAAAAAAAAAAAAAAAAAAAAAAA',
+				name: 'AAAAAAAAAAAAAAAAAAAAAAAAAA'
+			}
+			let poolsCreated = await spartan.createPool(options)
+			let id = poolsCreated[0].mrrID || poolsCreated[0].id
+
+			for (let provider of spartan.getRentalProviders()) {
+				let checkFn = (id, name, provider) => {
+					for (let pool of provider.returnPools()) {
+						if (pool.id === id)
+							expect(pool.name === name)
+					}
+				}
+				checkFn(id, options.name, provider)
+			}
+
+			let newOptions = {
+				algo: 'x11',
+				host: 'BBBBBBBBBBBBBBBBBBBBBBBBBBB',
+				port: 555,
+				user: 'BBBBBBBBBBBBBBBBBBBBBBBBBBB',
+				pass: 'BBBBBBBBBBBBBBBBBBBBBBBBBBB',
+				name: 'BBBBBBBBBBBBBBBBBBBBBBBBBBB'
+			}
+
+			await spartan.updatePool(id, newOptions)
+
+			for (let provider of spartan.getRentalProviders()) {
+				let checkFn = (id, name, provider) => {
+					for (let pool of provider.returnPools()) {
+						if (pool.id === id)
+							expect(pool.name === name)
+					}
+				}
+				checkFn(id, newOptions.name, provider)
+			}
+			await spartan.deletePool(id)
+
+			done()
+		})
 		describe('Pool Profiles', () => {
 			it('get pool profiles', async () => {
 				let spartan = new SpartanBot({memory: true})
