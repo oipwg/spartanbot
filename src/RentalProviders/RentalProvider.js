@@ -20,7 +20,7 @@ class RentalProvider {
 		this.api_key = settings.api_key
 		this.api_id = settings.api_id
 		this.api_secret = settings.api_secret
-		this.name = settings.name
+		this.name = settings.name || this.uid
 		this.pools = []
 		this.activePool = undefined
 		this.poolProfiles = []
@@ -204,6 +204,29 @@ class RentalProvider {
 	 */
 	returnPools() {
 		return this.pools
+	}
+
+	/**
+	 * Update a pool
+	 * @param {(number|Array.<number>)} poolIDs - IDs of the pools you wish to update
+	 * @param {string|number} id - pool id
+	 * @param {Object} [options]
+	 * @param {string} [options.type] - Pool algo, eg: sha256, scrypt, x11, etc
+	 * @param {string} [options.name] - Name to identify the pool with
+	 * @param {string} [options.host] - Pool host, the part after stratum+tcp://
+	 * @param {number} [options.port] - Pool port, the part after the : in most pool host strings
+	 * @param {string} [options.user] - Your workname
+	 * @param {string} [options.pass] - Worker password
+	 * @param {string} [options.notes] - Additional notes to help identify the pool for you
+	 * @async
+	 * @returns {Promise<Object>}
+	 */
+	async updatePool(id, options) {
+		try {
+			return await this._updatePool(id, options)
+		} catch (err) {
+			throw new Error(`Failed to update pool on RentalProvider.js: ${err}`)
+		}
 	}
 
 	/**

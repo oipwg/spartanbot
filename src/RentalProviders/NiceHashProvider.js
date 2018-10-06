@@ -93,6 +93,46 @@ class NiceHashProvider extends RentalProvider {
 	}
 
 	/**
+	 * Update a pool
+	 * @param {(number|Array.<number>)} poolIDs - IDs of the pools you wish to update
+	 * @param {string|number} id - pool id
+	 * @param {Object} [options]
+	 * @param {string} [options.type] - Pool algo, eg: sha256, scrypt, x11, etc
+	 * @param {string} [options.name] - Name to identify the pool with
+	 * @param {string} [options.host] - Pool host, the part after stratum+tcp://
+	 * @param {number} [options.port] - Pool port, the part after the : in most pool host strings
+	 * @param {string} [options.user] - Your workname
+	 * @param {string} [options.pass] - Worker password
+	 * @param {string} [options.notes] - Additional notes to help identify the pool for you
+	 * @async
+	 * @returns {Promise<Object>}
+	 */
+	async _updatePool(id, options) {
+		for (let pool of this.pools) {
+			if (pool.id === id || pool.mrrID === id) {
+				for (let opt in pool) {
+					for (let _opt in options) {
+						if (_opt === 'host' && opt === 'pool_host')
+							pool[opt] = options[_opt]
+						if (_opt === 'port' && opt === 'pool_port')
+							pool[opt] = options[_opt]
+						if (_opt === 'user' && opt === 'pool_user')
+							pool[opt] = options[_opt]
+						if (_opt === 'pass' && opt === 'pool_pass')
+							pool[opt] = options[_opt]
+						if (_opt === 'type' && opt === 'algo')
+							pool[opt] = options[_opt]
+						if (opt === _opt) {
+							pool[opt] = options[_opt]
+						}
+					}
+				}
+			}
+		}
+		return {success: true,  data: { id, success: true, message: 'Updated' }}
+	}
+
+	/**
 	 * Internal function to get Pools
 	 * @async
 	 * @private

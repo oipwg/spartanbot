@@ -165,6 +165,51 @@ class MRRProvider extends RentalProvider {
 	}
 
 	/**
+	 * Update a pool
+	 * @param {(number|Array.<number>)} poolIDs - IDs of the pools you wish to update
+	 * @param {string|number} id - pool id
+	 * @param {Object} [options]
+	 * @param {string} [options.type] - Pool algo, eg: sha256, scrypt, x11, etc
+	 * @param {string} [options.name] - Name to identify the pool with
+	 * @param {string} [options.host] - Pool host, the part after stratum+tcp://
+	 * @param {number} [options.port] - Pool port, the part after the : in most pool host strings
+	 * @param {string} [options.user] - Your workname
+	 * @param {string} [options.pass] - Worker password
+	 * @param {string} [options.notes] - Additional notes to help identify the pool for you
+	 * @async
+	 * @returns {Promise<Object>}
+	 */
+	async _updatePool(id, options) {
+		for (let pool of this.pools) {
+			if (pool.id === id)
+				if (pool.mrrID)
+					id = pool.mrrID
+ 		}
+		let res;
+		try {
+			res = await this.api.updatePools(id, options)
+		} catch (err) {
+			throw new Error(`Failed to update pool at MRRProvider.js: ${err}`)
+		}
+		if (res.success) {
+			for (let pool of this.pools) {
+				if (pool.id === id || pool.mrrID === id) {
+					for (let opt in pool) {
+						for (let _opt in options) {
+							if (opt === _opt) {
+								pool[opt] = options[_opt]
+							}
+						}
+					}
+				}
+			}
+			return res
+		} else {
+			return res
+		}
+	}
+
+	/**
 	 * Get all pools, a single pool by ID, or multiple pools by their IDs
 	 * @param {(number|Array.<number>)} [ids] - can be a single pool id or multiple pool ids. If no ids are passed, will fetch all pools
 	 * @return {Promise<Object>} - returns the data and not a success object

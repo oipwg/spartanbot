@@ -437,6 +437,39 @@ class SpartanBot {
 	}
 
 	/**
+	 * Update a pool
+	 * @param {(number|Array.<number>)} poolIDs - IDs of the pools you wish to update
+	 * @param {string|number} id - pool id
+	 * @param {Object} [options]
+	 * @param {string} [options.type] - Pool algo, eg: sha256, scrypt, x11, etc
+	 * @param {string} [options.name] - Name to identify the pool with
+	 * @param {string} [options.host] - Pool host, the part after stratum+tcp://
+	 * @param {number} [options.port] - Pool port, the part after the : in most pool host strings
+	 * @param {string} [options.user] - Your workname
+	 * @param {string} [options.pass] - Worker password
+	 * @param {string} [options.notes] - Additional notes to help identify the pool for you
+	 * @async
+	 * @returns {Promise<Array.<Object>>}
+	 */
+	async updatePool(id, options) {
+		let updatedPools = []
+		for (let provider of this.getRentalProviders()) {
+			let res;
+			try {
+				res = await provider.updatePool(id, options)
+			} catch (err) {
+				throw new Error(`Failed to update pool on RentalProvider.js: ${err}`)
+			}
+			let tmpObj = {}
+			tmpObj.name = provider.getName()
+			tmpObj.providerUID = provider.getUID()
+			tmpObj.message = res.data ? res.data : res
+			updatedPools.push(tmpObj)
+		}
+		return updatedPools
+	}
+
+	/**
 	 * Set pools to the spartanbot local variable
 	 */
 	_setPools(pools) {
