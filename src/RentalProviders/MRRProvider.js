@@ -145,23 +145,25 @@ class MRRProvider extends RentalProvider {
 	 * @private
 	 */
 	async _deletePool(id) {
-		let poolID;
-		for (let pool in this.pools) {
-			if (this.pools[pool].id === id) {
-				if (this.pools[pool].mrrID) {
-					poolID = this.pools[pool].mrrID
-				} else {
-					poolID = this.pools[pool].id
-				}
-				this.pools.splice(pool, 1)
+		let poolID = id;
+		let index;
+		for (let i = 0; i < this.pools.length; i++) {
+			if (this.pools[i].id === id || this.pools[i].mrrID === id) {
+				poolID = this.pools[i].mrrID ? this.pools[i].mrrID : this.pools[i].id
+				index = i
 			}
 		}
 
+		let res;
 		try {
-			return await this.api.deletePools(poolID)
+			res =  await this.api.deletePools(poolID)
 		} catch (err) {
 			throw new Error(`Failed to delete pool: ${err}`)
 		}
+		if (res.success) {
+			this.pools.splice(index, 1)
+			return res
+		} else {return res}
 	}
 
 	/**
