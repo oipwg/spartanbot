@@ -289,64 +289,95 @@ class AutoRenter {
 			}
 		}
 
-		//get provider balances and create provider objects
-		let providers = {}
+		//get balances and create provider objects
+		let providers = []
 		for (let provider of this.rental_providers) {
-			providers[provider.getUID()] = {
+			providers.push({
 				type: provider.getInternalType(),
 				balance: await provider.getBalance(),
 				name: provider.getName(),
 				uid: provider.getUID(),
 				provider
-			}
-		}
-
-		let capableProviders = []
-		let incapableProviders = []
-
-		//check NH providers for necessary funds
-		for (let uid in providers) {
-			if (providers[uid].type === "NiceHash" && providers[uid].balance < .005) {
-				incapableProviders.push({...providers[uid], message: 'Insufficient funds. Balance must be >= .005 BTC'})
-			} else {
-				capableProviders.push(providers[uid])
-			}
-		}
-
-		//add up balances
-		let mrrBalance = 0;
-		let nhBalance = 0;
-
-		for (let provider of capableProviders) {
-			if (provider.type === NiceHash) {
-				nhBalance += provider.balance
-			}
-			if (provider.type === MiningRigRentals) {
-				mrrBalance += provider.balance
-			}
+			})
 		}
 
 		//check how much it would cost to rent from MRR
 		let mrrPreprocess = {};
-		for (let provider of capableProviders) {
+		let mrrExists = false
+		for (let provider of providers) {
 			if (provider.type === MiningRigRentals) {
+				mrrExists = true
 				mrrPreprocess = await this.mrrRentPreprocess(options)
 				break
 			}
 		}
+		let capableProviders = []
+		let incapableProviders = []
 
-		const mrrCostToRent = mrrPreprocess.btc_total_price
-		const mrrHashPowerToRent = mrrPreprocess.total_hashrate
+		if (!mrrExists) {
+			//check NH providers for necessary funds
+			for (let provider of providers) {
+				if (providers.balance < .005) {
+					incapableProviders.push({...provider, message: 'Insufficient funds. Balance must be >= .005 BTC'})
+				} else {
+					capableProviders.push(provider)
+				}
+			}
+			if (capableProviders.length === 0)
+				return {success: false, message: "Insufficient Funds", providers}
 
-		let amount = mrrCostToRent
+			let NiceHashRentOptions = []
+			for (let provider of capableProviders) {
+				let limit = options.hashrate / 1000 / 1000
+				let duration = options.hashrate
+				let amount = provider.balance
+				let price = (amount / limit / duration) * 24
+				NiceHashRentOptions.push({uid: provider.uid, price, limit, amount})
+			}
+			return NiceHashRentOptions
+		}
+
+		//btc amount to rent rigs from mrr
+		let amount = mrrPreprocess.btc_total_price
+
+		//remove all NiceHash providers that can't afford the MRR price
+		for (let i = capableProviders.length - 1; i >= 0 ; i--) {
+			if (capableProviders[i].type === NiceHash) {
+				if (capableProviders[i].balance < amount) {
+					incapableProviders.push(capableProviders[i])
+					capableProviders.splice(i, 1)
+				}
+			}
+		}
+
+		//now we're theoretically left with at least one mrr provider and any possible nicehash providers with enough funds
+
+		// check to see if one or many of the MRR providers can afford the cost
+		let mrrBalance = 0;
+		for (let provider of capableProviders) {
+			if (provider.type === MiningRigRentals) {
+				mrrBalance += provider.balance
+			}
+		}
+		if (mrrBalance < amount)
+			return {success: false, message: 'MiningRigRentals providers have an insufficient balance'}
+
+		if (capableProviders.length === 0) {
+			return {
+				success: false,
+				message: 'Insufficient funds',
+				providers: incapableProviders
+			}
+		}
+
+		let mrrHashPowerToRent = mrrPreprocess.total_hashrate
 		let limit = mrrHashPowerToRent / 1000 / 1000
-
 		let duration = options.duration
-		let price = (mrrCostToRent / limit / duration) * 24
+		let price = (amount / limit / duration) * 24 // btc/th/day
 
-		console.log(amount, limit, duration, price)
+		//just needs to add the balance as the 'amount' var from the actual provider
+		let nhRentOptions = {limit, duration, price}
 
-		//.97BTC.TH.DAY
 
 	}
 }
