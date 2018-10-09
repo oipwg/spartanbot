@@ -87,6 +87,9 @@ class RentalProvider {
 	 */
 	async createPool(options) {
 		let newOptions = {};
+		if (!options.id) {
+			options.id = uid()
+		}
 
 		if (this.getInternalType() === "NiceHash") {
 			for (let opt in options) {
