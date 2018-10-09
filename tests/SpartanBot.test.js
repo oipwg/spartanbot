@@ -190,7 +190,7 @@ describe("SpartanBot", () => {
 			expect(spartan2.getSetting('test')).toBe("setting")
 		})
 	});
-	describe('AutoRenter with mulitple providers', () => {
+	describe('Rent / Preprocess', () => {
 		it('preprocess rent', async (done) => {
 			let spartan = new SpartanBot({ memory: true })
 
@@ -223,9 +223,39 @@ describe("SpartanBot", () => {
 				duration: 5
 			}
 
-			let response = await autorenter.rentPreprocess(rentOptions)
+			let response = await autorenter.mrrRentPreprocess(rentOptions)
 			console.log(response)
 			expect(response.success).toBeTruthy()
+
+			done()
+		}, 250 * 100);
+		it('new manual rent', async (done) => {
+			let spartan = new SpartanBot({ memory: true })
+
+			await spartan.setupRentalProvider({
+				type: "MiningRigRentals",
+				api_key: apikey.api_key,
+				api_secret: apikey.api_secret,
+				name: "Master"
+			})
+
+			await spartan.setupRentalProvider({
+				type: "NiceHash",
+				api_key: niceHashAPI.api_key,
+				api_id: niceHashAPI.api_id,
+				name: "Ryan"
+			})
+
+			let autorenter = new AutoRenter({
+				rental_providers: spartan.rental_providers
+			})
+
+			let rentOptions = {
+				hashrate: 20000,
+				duration: 5
+			}
+
+			await autorenter.manualRentPreprocess(rentOptions)
 
 			done()
 		}, 250 * 100);
