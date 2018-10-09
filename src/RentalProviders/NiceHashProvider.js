@@ -5,7 +5,10 @@ class NiceHashProvider extends RentalProvider {
 	constructor(settings) {
 		super(settings)
 
-		this.api = new NiceHash(settings.api_key, settings.api_id)
+		this.key = settings.api_key || settings.key;
+		this.id = settings.api_id || settings.id
+
+		this.api = new NiceHash(this.key, this.id)
 	}
 
 	/**
@@ -69,6 +72,9 @@ class NiceHashProvider extends RentalProvider {
 		}
 		let pool = {...options, market: this.getInternalType(), providerUID: this.getUID()};
 		this.addPools(pool)
+
+		if (!this._returnActivePool())
+			this._setActivePool(pool.id)
 		return pool
 	}
 
@@ -158,6 +164,58 @@ class NiceHashProvider extends RentalProvider {
 	_returnActivePool() {
 		return this.activePool
 	}
+
+	/**
+	 * Create new order. Only standard orders can be created with use of API.
+	 * @param options
+	 * @param {string|number} options.amount - Pay amount in BTC;
+	 * @param {string|number} options.price - Price in BTC/GH/day or BTC/TH/day;
+	 * @param {string|number} [options.algo='scrypt'] - Algorithm name or ID
+	 * @param {string|number} [options.limit=0] - Speed limit in GH/s or TH/s (0 for no limit);
+	 * @param {string|number} [options.location=1] - 0 for Europe (NiceHash), 1 for USA (WestHash);
+	 * @param {string} [options.pool_host] - Pool hostname or IP;
+	 * @param {string} [options.pool_port] - Pool port
+	 * @param {string} [options.pool_user] - Pool username
+	 * @param {string} [options.pool_pass] - Pool password
+	 * @param {string|number} [options.code] - This parameter is optional. You have to provide it if you have 2FA enabled. You can use NiceHash2FA Java application to generate codes.
+	 * @async
+	 * @returns {Promise<Object>}
+	 */
+	async manualRent(options) {
+		if (!this.id || !this.key)
+			throw new Error('Must provide api key and api id on initialize')
+
+		if (options.amount < 0.005)
+			throw new Error(`The minimum amount to pay is 0.005 BTC`)
+
+		if (options.limit && options.limit < 0.01) {
+			throw new Error(`The minimum limit is 0.01`)
+		}
+
+		let poolID = this._returnActivePool();
+		let _pool = {};
+		for (let pool of this.pools) {
+			if (pool.id === poolID)
+				_pool = pool
+		}
+		options.algo = options.algo || 'scrypt'
+		options.limit = options.limit || '0';
+		options.location = options.location || '1'
+
+		let rentOptions = {};
+		for (let opt in options) {
+			rentOptions[opt] = options[opt]
+		}
+		rentOptions = {...rentOptions, ..._pool}
+
+		try {
+			return await this.api.createOrder(rentOptions)
+		} catch (err) {
+			throw new Error(`Error creating NiceHash order: ${err}`)
+		}
+	}
+
+
 
 }
 
