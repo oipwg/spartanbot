@@ -590,7 +590,7 @@ class MRRProvider extends RentalProvider {
 	async rent(rigs_to_rent) {
 		//rent rigs
 		let rentalConfirmation = {};
-		console.log(rigs_to_rent)
+
 		for (let rig of rigs_to_rent) {
 			try {
 				let rental = await this.api.createRental(rig)

@@ -44,7 +44,7 @@ class AutoRenter {
 	 *      success: true
 	 *  }
 	 */
-	async manualRentPreprocess(options) {
+	async rentPreprocess(options) {
 		//preprocess
 		//ToDo: make sure providers profileIDs aren't the same
 
@@ -190,7 +190,7 @@ class AutoRenter {
 		//preprocess
 		let prepurchase_info;
 		try {
-			prepurchase_info = await this.manualRentPreprocess(options)
+			prepurchase_info = await this.rentPreprocess(options)
 		} catch (err) {
 			throw new Error(`Failed to get prepurchase_info! \n ${err}`)
 		}

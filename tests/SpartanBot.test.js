@@ -223,7 +223,7 @@ describe("SpartanBot", () => {
 				duration: 5
 			}
 
-			let response = await autorenter.manualRentPreprocess(rentOptions)
+			let response = await autorenter.rentPreprocess(rentOptions)
 			console.log(response)
 			expect(response.success).toBeTruthy()
 
