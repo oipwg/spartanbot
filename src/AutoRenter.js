@@ -1,5 +1,7 @@
 import Exchange from 'oip-exchange-rate';
 
+const NiceHash = "NiceHash"
+const MiningRigRentals = "MiningRigRentals"
 /**
  * Manages Rentals of Miners from multiple API's
  */
@@ -44,29 +46,41 @@ class AutoRenter {
 	 *      success: true
 	 *  }
 	 */
-	async rentPreprocess(options) {
+	async mrrRentPreprocess(options) {
 		//preprocess
 		//ToDo: make sure providers profileIDs aren't the same
 
 		//Assuming Provider type === 'MiningRigRentals'
 		//get available rigs based on hashpower and duration
+		let _provider;
+		let mrr_providers = []
+		for (let provider of this.rental_providers) {
+			if (provider.getInternalType() === "MiningRigRentals") {
+				_provider = provider
+				mrr_providers.push(provider)
+			}
+		}
+		if (!_provider)
+			return {success: false, message: 'No MRR Providers to fetch rigs'}
+
+
 		let rigs_to_rent = [];
 		try {
-			rigs_to_rent = await this.rental_providers[0].getRigsToRent(options.hashrate, options.duration)
+			rigs_to_rent = await _provider.getRigsToRent(options.hashrate, options.duration)
 		} catch (err) {
 			throw new Error(`Failed to fetch rigs to rent \n ${err}`)
 		}
 		let initial_rigs = rigs_to_rent.length
 		//divvy up providers and create Provider object
 		let providers = [], totalBalance = 0;
-		for (let provider of this.rental_providers) {
+		for (let provider of mrr_providers) {
 			//get the balance of each provider
 			let balance = await provider.getBalance();
 			totalBalance += balance
 			//get the profile id needed to rent for each provider
 			let profile = await provider.getProfileID();
 			providers.push({
-				uid: provider.uid,
+				uid: provider.getUID(),
 				balance,
 				profile,
 				rigs_to_rent: [],
@@ -204,7 +218,7 @@ class AutoRenter {
 			status.type = 'LOW_BALANCE_WARNING'
 			status.totalBalance = prepurchase_info.btc_total_price
 
-			if (prepurchase_info.numOfRigsFound === 0) {
+			if (prepurchase_info.initial_rigs === 0) {
 				status.message = `Could not find any rigs to rent with available balance`
 			} else {
 				status.message = `${prepurchase_info.total_rigs}/${prepurchase_info.initial_rigs} rigs available to rent with current balance.`
@@ -256,6 +270,84 @@ class AutoRenter {
 			total_cost: (rental_info.btc_total_price * btc_to_usd_rate).toFixed(2),
 			total_hashrate: rental_info.total_hashrate
 		}
+	}
+
+	/**
+	 * Rent an amount of hashrate for a period of time
+	 * @param {Object} options - The Options for the rental operation
+	 * @param {Number} options.hashrate - The amount of Hashrate you wish to rent
+	 * @param {Number} options.duration - The duration (IN SECONDS) that you wish to rent hashrate for
+	 * @param {Function} [options.confirm] - This function will be run to decide if the rental should proceed. If it returns `true`, the rental will continue, if false, the rental cancels
+	 * @return {Promise<Object>} Returns a Promise that will resolve to an Object containing info about the rental made
+	 */
+	async manualRentPreprocess(options) {
+		if (!(this.rental_providers.length >= 1)){
+			return {
+				success: false,
+				type: "NO_RENTAL_PROVIDERS",
+				message: "Rent Cancelled, no RentalProviders found to rent from"
+			}
+		}
+
+		//get provider balances and create provider objects
+		let providers = {}
+		for (let provider of this.rental_providers) {
+			providers[provider.getUID()] = {
+				type: provider.getInternalType(),
+				balance: await provider.getBalance(),
+				name: provider.getName(),
+				uid: provider.getUID(),
+				provider
+			}
+		}
+
+		let capableProviders = []
+		let incapableProviders = []
+
+		//check NH providers for necessary funds
+		for (let uid in providers) {
+			if (providers[uid].type === "NiceHash" && providers[uid].balance < .005) {
+				incapableProviders.push({...providers[uid], message: 'Insufficient funds. Balance must be >= .005 BTC'})
+			} else {
+				capableProviders.push(providers[uid])
+			}
+		}
+
+		//add up balances
+		let mrrBalance = 0;
+		let nhBalance = 0;
+
+		for (let provider of capableProviders) {
+			if (provider.type === NiceHash) {
+				nhBalance += provider.balance
+			}
+			if (provider.type === MiningRigRentals) {
+				mrrBalance += provider.balance
+			}
+		}
+
+		//check how much it would cost to rent from MRR
+		let mrrPreprocess = {};
+		for (let provider of capableProviders) {
+			if (provider.type === MiningRigRentals) {
+				mrrPreprocess = await this.mrrRentPreprocess(options)
+				break
+			}
+		}
+
+		const mrrCostToRent = mrrPreprocess.btc_total_price
+		const mrrHashPowerToRent = mrrPreprocess.total_hashrate
+
+		let amount = mrrCostToRent
+		let limit = mrrHashPowerToRent / 1000 / 1000
+
+		let duration = options.duration
+		let price = (mrrCostToRent / limit / duration) * 24
+
+		console.log(amount, limit, duration, price)
+
+		//.97BTC.TH.DAY
+
 	}
 }
 
