@@ -170,8 +170,8 @@ class NiceHashProvider extends RentalProvider {
 	 * @param options
 	 * @param {string|number} options.amount - Pay amount in BTC;
 	 * @param {string|number} options.price - Price in BTC/GH/day or BTC/TH/day;
+	 * @param {string|number} [options.limit=0.01] - Speed limit in GH/s or TH/s (0 for no limit);
 	 * @param {string|number} [options.algo='scrypt'] - Algorithm name or ID
-	 * @param {string|number} [options.limit=0] - Speed limit in GH/s or TH/s (0 for no limit);
 	 * @param {string|number} [options.location=1] - 0 for Europe (NiceHash), 1 for USA (WestHash);
 	 * @param {string} [options.pool_host] - Pool hostname or IP;
 	 * @param {string} [options.pool_port] - Pool port
@@ -192,6 +192,14 @@ class NiceHashProvider extends RentalProvider {
 			throw new Error(`The minimum limit is 0.01`)
 		}
 
+		if (!this.returnPools()) {
+			return {success: false, message: `No pool found`}
+		}
+
+		if (!this._returnActivePool()) {
+			return {success: false, message: `No active pool set`}
+		}
+
 		let poolID = this._returnActivePool();
 		let _pool = {};
 		for (let pool of this.pools) {
@@ -199,7 +207,7 @@ class NiceHashProvider extends RentalProvider {
 				_pool = pool
 		}
 		options.algo = options.algo || 'scrypt'
-		options.limit = options.limit || '0';
+		options.limit = options.limit || '0.01';
 		options.location = options.location || '1'
 
 		let rentOptions = {};
