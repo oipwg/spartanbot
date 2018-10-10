@@ -150,7 +150,7 @@ class AutoRenter {
 			for (let rig of p.rigs_to_rent) {
 				rig.rental_info.profile = p.profile
 				p.provider.setActivePoolProfile(p.profile)
-				rigs.push(rig.rental_info)
+				rigs.push({...rig.rental_info, providerUID: p.provider.getUID()})
 			}
 		}
 
@@ -275,14 +275,14 @@ class AutoRenter {
 	}
 
 	/**
-	 * Rent an amount of hashrate for a period of time
+	 * Manual rent based an amount of hashrate for a period of time
 	 * @param {Object} options - The Options for the rental operation
 	 * @param {Number} options.hashrate - The amount of Hashrate you wish to rent
-	 * @param {Number} options.duration - The duration (IN SECONDS) that you wish to rent hashrate for
+	 * @param {Number} options.duration - The duration (IN HOURS) that you wish to rent hashrate for
 	 * @param {Function} [options.confirm] - This function will be run to decide if the rental should proceed. If it returns `true`, the rental will continue, if false, the rental cancels
 	 * @return {Promise<Object>} Returns a Promise that will resolve to an Object containing info about the rental made
 	 */
-	async manualRentPreprocess(options) {
+	async manualRent(options) {
 		if (!(this.rental_providers.length >= 1)){
 			return {
 				success: false,
@@ -291,6 +291,27 @@ class AutoRenter {
 			}
 		}
 
+		//preprocess
+		let prepurchase_info;
+		try {
+			prepurchase_info = await this.manualRentPreprocess(options)
+		} catch (err) {
+			throw new Error(`Failed to get prepurchase_info! \n ${err}`)
+		}
+
+
+
+
+	}
+
+	/**
+	 * Rent an amount of hashrate for a period of time
+	 * @param {Object} options - The Options for the rental operation
+	 * @param {Number} options.hashrate - The amount of Hashrate you wish to rent
+	 * @param {Number} options.duration - The duration (IN SECONDS) that you wish to rent hashrate for
+	 * @return {Promise<Object>} Returns a Promise that will resolve to an Object containing info about the rental made
+	 */
+	async manualRentPreprocess(options) {
 		//get balances and create provider objects
 		let providers = []
 		for (let provider of this.rental_providers) {
@@ -327,7 +348,6 @@ class AutoRenter {
 			if (provider.type === MiningRigRentals) {
 				mrrExists = true
 				mrrPreprocess = await this.mrrRentPreprocess(options)
-				console.log(mrrPreprocess)
 				break
 			}
 		}
@@ -395,7 +415,7 @@ class AutoRenter {
 		if (mrrPreprocess.hashrate_to_rent < mrrPreprocess.hashpower_found) {
 			let margin = price * 0.10
 			if (mrrPrice < (price - margin)) {
-				return mrrPreprocess
+				return {...mrrPreprocess, status: "LOW FUNDS", message: "REFILL WALLET"}
 			} else {
 				for (let provider of capableProviders) {
 					if (provider.type === NiceHash) {
