@@ -78,7 +78,7 @@ class AutoRenter {
 			let balance = await provider.getBalance();
 			totalBalance += balance
 			//get the profile id needed to rent for each provider
-			let profile = await provider.getProfileID();
+			let profile = provider.returnActivePoolProfile() || await provider.getProfileID();
 			providers.push({
 				uid: provider.getUID(),
 				balance,
@@ -149,6 +149,7 @@ class AutoRenter {
 
 			for (let rig of p.rigs_to_rent) {
 				rig.rental_info.profile = p.profile
+				p.provider.setActivePoolProfile(p.profile)
 				rigs.push(rig.rental_info)
 			}
 		}
@@ -305,76 +306,105 @@ class AutoRenter {
 
 		//filter NiceHash providers if their balance is below 0.005 (NH min) or the hashrate desired is below .01TH (10GH or 10000MH) which is the NiceHash minimum
 		for (let i = providers.length - 1; i >= 0; i--) {
-			if (providers[i].type === NiceHash) {
-				if (providers[i].balance < 0.005 || options.hashrate < 10000) {
-					incapableProviders.push({...providers[i], message: 'Balance must be >= .005BTC && desired hashrate must be >= 10Gh'})
-					providers.splice(i, 1)
-				}
+			if (providers[i].type === NiceHash && (providers[i].balance < 0.005 || options.hashrate < 10000)) {
+				incapableProviders.push({...providers[i], message: 'Balance must be >= .005BTC && desired hashrate must be >= 10Gh'})
+				providers.splice(i, 1)
 			} else {
 				capableProviders.push(providers[i])
 			}
 		}
 
+		//if only NiceHash and with insufficient funds return
+		if (capableProviders.length === 0)
+			return {success: false, message: "Insufficient Funds", incapableProviders}
+
 		//check how much it would cost to rent from MRR
 		let mrrPreprocess = {};
 		let mrrExists = false
-		for (let provider of providers) {
+		for (let provider of capableProviders) {
 			if (provider.type === MiningRigRentals) {
 				mrrExists = true
 				mrrPreprocess = await this.mrrRentPreprocess(options)
+				console.log('preprocess: ', mrrPreprocess)
 				break
 			}
 		}
 
+		//if there's no MRR and we're here, there's at least 1 NiceHash with funds
 		if (!mrrExists) {
-			//if no MRR and no NH, return
-			if (capableProviders.length === 0)
-				return {success: false, message: "Insufficient Funds", incapableProviders}
-			//else calculate NH rent options and return
+			//calculate NH rent options and return
 			let NiceHashRentOptions = []
 			for (let provider of capableProviders) {
+				let amount = 0.005
 				let limit = options.hashrate / 1000 / 1000
 				let duration = options.hashrate
-				let amount = provider.balance
 				let price = (amount / limit / duration) * 24
 				NiceHashRentOptions.push({uid: provider.uid, price, limit, amount, provider})
 			}
 			return NiceHashRentOptions
 		}
 
-		//at least one MRR provider from here on out, unknown amount of NiceHash provider
+		//if the cost to rent rigs is less than the NiceHash minimum amount, remove the NiceHash providers
+		if (mrrPreprocess.cost_found < 0.05) {
+			for (let i = providers.length - 1; i >= 0; i--) {
+				if (providers[i].type === NiceHash) {
+					incapableProviders.push({...providers[i], message: 'The cost of the rigs on MRR is less than .005, the NiceHash minimum amount.'})
+					providers.splice(i, 1)
+				}
+			}
+		}
 
-		//btc amount to rent rigs from mrr
-		let amount = mrrPreprocess.btc_total_price
-		console.log('preprocess: ', mrrPreprocess)
-
-		// check to see if one or many of the MRR providers can afford the cost
-		let mrrBalance = 0;
+		//if we're here at least one MRR provider from here on out; check for NH providers
+		let niceHashExist = false
 		for (let provider of capableProviders) {
-			if (provider.type === MiningRigRentals) {
-				mrrBalance += provider.balance
-			}
-		}
-		if (mrrBalance < amount)
-			return {success: false, message: 'MiningRigRentals providers have an insufficient balance'}
-
-		if (capableProviders.length === 0) {
-			return {
-				success: false,
-				message: 'Insufficient funds',
-				providers: incapableProviders
-			}
+			if (provider.type === NiceHash)
+				niceHashExist = true
 		}
 
-		let mrrHashPowerToRent = mrrPreprocess.total_hashrate
-		let limit = mrrHashPowerToRent / 1000 / 1000
-		let duration = options.duration
-		let price = (amount / limit / duration) * 24 // btc/th/day
+		if (!niceHashExist) { //then we only have MRR providers
+			return mrrPreprocess
+		}
 
-		//just needs to add the balance as the 'amount' var from the actual provider
-		let nhRentOptions = {limit, duration, price}
+		//if we're here, at least one MRR and NiceHash provider exist
+		let amount = mrrPreprocess.btc_cost_to_rent // cost to rent rigs from MRR
 
+		//check if the cost to rent from MRR is cheaper than it would be for NiceHash
+		let rentWithNiceHash = amount > 0.005
 
+		//Calculate NH Price per TH per day
+		let hashrateMH = options.hashrate
+		let limit = hashrateMH / 1000 / 1000 //convert to TeraHash
+		let price = (0.005 / limit / options.duration) * 24 // btc/th/day
+
+		if (rentWithNiceHash) {
+			for (let provider of capableProviders) {
+				if (provider.type === NiceHash) {
+					return {limit, price, amount: 0.005, provider}
+				}
+			}
+		}
+
+		//Calculate MRR Price per TH per day
+		let cost = mrrPreprocess.btc_cost_to_rent
+		let hash = mrrPreprocess.hashrate_to_rent / 1000 / 1000 //convert to TeraHash
+		let mrrPrice = (cost / hash / options.duration) * 24 // btc/th/day
+
+		//if MRR funds are low and can't rent everything, if that cost compared to NH is greater than 10% cheaper, rent with MRR
+		if (mrrPreprocess.hashrate_to_rent < mrrPreprocess.hashpower_found) {
+			let margin = price * 0.10
+			if (mrrPrice < (price - margin)) {
+				return mrrPreprocess
+			} else {
+				for (let provider of capableProviders) {
+					if (provider.type === NiceHash) {
+						return {limit, price, amount: 0.005, provider}
+					}
+				}
+			}
+		}
+
+		// if price is lower than 0.005, then rent with MiningRigRentals
+		return mrrPreprocess
 	}
 }
 
