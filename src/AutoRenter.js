@@ -70,7 +70,7 @@ class AutoRenter {
 		} catch (err) {
 			throw new Error(`Failed to fetch rigs to rent \n ${err}`)
 		}
-		let initial_rigs = rigs_to_rent.length
+		let rigs_found = rigs_to_rent.length
 		//divvy up providers and create Provider object
 		let providers = [], totalBalance = 0;
 		for (let provider of mrr_providers) {
@@ -88,14 +88,13 @@ class AutoRenter {
 			})
 		}
 
-		let initial_hashpower = providers[0].provider.getTotalHashPower(rigs_to_rent)
-		let initial_cost = providers[0].provider.getRentalCost(rigs_to_rent)
+		let hashpower_found = _provider.getTotalHashPower(rigs_to_rent)
+		let cost_found = _provider.getRentalCost(rigs_to_rent)
 
-		// console.log("total hashpower: ", initialHashPower)
-		// console.log("total cost: ", initialCost)
+		// console.log("total hashpower: ", hashpower_found)
+		// console.log("total cost: ", cost_found)
 
-
-		//load up work equally
+		//load up work equally between providers. 1 and 1 and 1 and 1, etc
 		let iterator = 0; //iterator is the index of the provider while, 'i' is the index of the rigs
 		let len = providers.length
 		for (let i = 0; i < rigs_to_rent.length; i++) {
@@ -109,7 +108,7 @@ class AutoRenter {
 		//remove from each provider rigs (s)he cannot afford
 		let extra_rigs = []
 		for (let p of providers) {
-			let rental_cost = p.provider.getRentalCost(p.rigs_to_rent);
+			let rental_cost = _provider.getRentalCost(p.rigs_to_rent);
 
 			if (p.balance < rental_cost) {
 				while (p.balance < rental_cost && p.rigs_to_rent.length > 0) {
@@ -118,34 +117,34 @@ class AutoRenter {
 					[tmpRig] = p.rigs_to_rent.splice(0,1)
 					extra_rigs.push(tmpRig)
 
-					rental_cost = p.provider.getRentalCost(p.rigs_to_rent)
+					rental_cost = _provider.getRentalCost(p.rigs_to_rent)
 				}
 			}
 		}
 
 		for (let p of providers) {
-			let rental_cost = p.provider.getRentalCost(p.rigs_to_rent);
+			let rental_cost = _provider.getRentalCost(p.rigs_to_rent);
 			if (p.balance > rental_cost) {
 				for (let i = extra_rigs.length -1; i >= 0; i--){
 					if ((extra_rigs[i].btc_price + rental_cost) <= p.balance) {
 						let tmpRig;
 						[tmpRig] = extra_rigs.splice(i,1);
 						p.rigs_to_rent.push(tmpRig)
-						rental_cost = p.provider.getRentalCost(p.rigs_to_rent);
+						rental_cost = _provider.getRentalCost(p.rigs_to_rent);
 					}
 				}
 			}
 		}
 
-		let btc_total_price = 0;
-		let total_hashrate = 0;
+		let btc_cost_to_rent = 0;
+		let hashrate_to_rent = 0;
 		let total_balance = 0
-		let total_rigs = 0;
 		let rigs = [];
+		let rigs_length = 0;
 		for (let p of providers) {
-			btc_total_price += p.provider.getRentalCost(p.rigs_to_rent)
-			total_hashrate += p.provider.getTotalHashPower(p.rigs_to_rent)
-			total_rigs += p.rigs_to_rent.length
+			btc_cost_to_rent += p.provider.getRentalCost(p.rigs_to_rent)
+			hashrate_to_rent += p.provider.getTotalHashPower(p.rigs_to_rent)
+			rigs_length += p.rigs_to_rent.length
 			total_balance += p.balance
 
 			for (let rig of p.rigs_to_rent) {
@@ -159,19 +158,19 @@ class AutoRenter {
 
 		return {
 			//cost of all rigs initially found with given parameters
-			initial_cost,
+			cost_found,
 			//hashpower of all rigs initially found with given parameters
-			initial_hashpower,
+			hashpower_found,
 			//initial_rigs is the initial amount of rigs found that were queried for
-			initial_rigs,
+			rigs_found,
 			//total cost in btc to rent the rigs (total_rigs)
-			btc_total_price,
+			btc_cost_to_rent,
 			//total balance of all providers in the SpartanBot
 			total_balance,
 			//total hashpower of the rigs found to rent (total_rigs)
-			total_hashrate,
+			hashrate_to_rent,
 			//total_rigs is the number of rigs found that can be rent
-			total_rigs,
+			rigs_length,
 			//the actual JSON objects containing the information needed to rent each rig
 			rigs,
 			//success to test against
@@ -301,6 +300,21 @@ class AutoRenter {
 			})
 		}
 
+		let capableProviders = []
+		let incapableProviders = []
+
+		//filter NiceHash providers if their balance is below 0.005 (NH min) or the hashrate desired is below .01TH (10GH or 10000MH) which is the NiceHash minimum
+		for (let i = providers.length - 1; i >= 0; i--) {
+			if (providers[i].type === NiceHash) {
+				if (providers[i].balance < 0.005 || options.hashrate < 10000) {
+					incapableProviders.push({...providers[i], message: 'Balance must be >= .005BTC && desired hashrate must be >= 10Gh'})
+					providers.splice(i, 1)
+				}
+			} else {
+				capableProviders.push(providers[i])
+			}
+		}
+
 		//check how much it would cost to rent from MRR
 		let mrrPreprocess = {};
 		let mrrExists = false
@@ -311,46 +325,28 @@ class AutoRenter {
 				break
 			}
 		}
-		let capableProviders = []
-		let incapableProviders = []
 
 		if (!mrrExists) {
-			//check NH providers for necessary funds
-			for (let provider of providers) {
-				if (providers.balance < .005) {
-					incapableProviders.push({...provider, message: 'Insufficient funds. Balance must be >= .005 BTC'})
-				} else {
-					capableProviders.push(provider)
-				}
-			}
+			//if no MRR and no NH, return
 			if (capableProviders.length === 0)
-				return {success: false, message: "Insufficient Funds", providers}
-
+				return {success: false, message: "Insufficient Funds", incapableProviders}
+			//else calculate NH rent options and return
 			let NiceHashRentOptions = []
 			for (let provider of capableProviders) {
 				let limit = options.hashrate / 1000 / 1000
 				let duration = options.hashrate
 				let amount = provider.balance
 				let price = (amount / limit / duration) * 24
-				NiceHashRentOptions.push({uid: provider.uid, price, limit, amount})
+				NiceHashRentOptions.push({uid: provider.uid, price, limit, amount, provider})
 			}
 			return NiceHashRentOptions
 		}
 
+		//at least one MRR provider from here on out, unknown amount of NiceHash provider
+
 		//btc amount to rent rigs from mrr
 		let amount = mrrPreprocess.btc_total_price
-
-		//remove all NiceHash providers that can't afford the MRR price
-		for (let i = capableProviders.length - 1; i >= 0 ; i--) {
-			if (capableProviders[i].type === NiceHash) {
-				if (capableProviders[i].balance < amount) {
-					incapableProviders.push(capableProviders[i])
-					capableProviders.splice(i, 1)
-				}
-			}
-		}
-
-		//now we're theoretically left with at least one mrr provider and any possible nicehash providers with enough funds
+		console.log('preprocess: ', mrrPreprocess)
 
 		// check to see if one or many of the MRR providers can afford the cost
 		let mrrBalance = 0;
