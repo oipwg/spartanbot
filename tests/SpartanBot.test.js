@@ -29,6 +29,30 @@ afterAll(() => {
 	require('./rm-test-data.js')
 })
 
+let spartan, autorenter;
+
+const setupProviders = async () => {
+	spartan = new SpartanBot({ memory: true })
+
+	await spartan.setupRentalProvider({
+		type: "MiningRigRentals",
+		api_key: apikey.api_key,
+		api_secret: apikey.api_secret,
+		name: "Master"
+	})
+
+	await spartan.setupRentalProvider({
+		type: "NiceHash",
+		api_key: niceHashAPI.api_key,
+		api_id: niceHashAPI.api_id,
+		name: "Ryan"
+	})
+
+	autorenter = new AutoRenter({
+		rental_providers: spartan.rental_providers
+	})
+}
+
 describe("SpartanBot", () => {
 	describe("Settings", () => {
 		it("Should be able to set a setting", () => {
@@ -191,32 +215,8 @@ describe("SpartanBot", () => {
 		})
 	});
 	describe('Rent / Preprocess', () => {
-		it('preprocess rent', async (done) => {
-			let spartan = new SpartanBot({ memory: true })
-
-			await spartan.setupRentalProvider({
-				type: "MiningRigRentals",
-				api_key: apikey.api_key,
-				api_secret: apikey.api_secret,
-				name: "Master"
-			})
-
-			await spartan.setupRentalProvider({
-				type: "MiningRigRentals",
-				api_key: ryansKey.api_key,
-				api_secret: ryansKey.api_secret,
-				name: "Ryan"
-			})
-
-			let autorenter = new AutoRenter({
-				rental_providers: spartan.rental_providers
-			})
-
-			// let m1 = spartan.rental_providers[0]
-			// let m2 = spartan.rental_providers[1]
-
-			// console.log("m1: ", await m1.testAuthorization())
-			// console.log("m2: ", await m2.testAuthorization())
+		it('preprocess mrr rent | mrrPreprocessRent', async (done) => {
+			await setupProviders()
 
 			let rentOptions = {
 				hashrate: 20000,
@@ -224,105 +224,35 @@ describe("SpartanBot", () => {
 			}
 
 			let response = await autorenter.mrrRentPreprocess(rentOptions)
-			console.log(response)
 			expect(response.success).toBeTruthy()
 
 			done()
 		}, 250 * 100);
-		it('new manual rent', async (done) => {
-			let spartan = new SpartanBot({ memory: true })
-
-			await spartan.setupRentalProvider({
-				type: "MiningRigRentals",
-				api_key: apikey.api_key,
-				api_secret: apikey.api_secret,
-				name: "Master"
-			})
-
-			await spartan.setupRentalProvider({
-				type: "NiceHash",
-				api_key: niceHashAPI.api_key,
-				api_id: niceHashAPI.api_id,
-				name: "Ryan"
-			})
-
-			let autorenter = new AutoRenter({
-				rental_providers: spartan.rental_providers
-			})
+		it('manual preprocess rent | manualRentPreprocess', async (done) => {
+			await setupProviders()
 
 			let rentOptions = {
-				hashrate: 10000,
+				hashrate: 30000,
 				duration: 3
 			}
 
-			await autorenter.manualRentPreprocess(rentOptions)
+			let preprocess = await autorenter.manualRentPreprocess(rentOptions)
+			expect(preprocess.market === "MiningRigRentals" || preprocess.market === "NiceHash").toBeTruthy()
 
 			done()
 		}, 250 * 100);
-		it.skip('rent with multiple providers', async () => {
-			let spartan = new SpartanBot({ memory: true })
-
-			await spartan.setupRentalProvider({
-				type: "MiningRigRentals",
-				api_key: apikey.api_key,
-				api_secret: apikey.api_secret,
-				name: "Master"
-			})
-
-			await spartan.setupRentalProvider({
-				type: "MiningRigRentals",
-				api_key: ryansKey.api_key,
-				api_secret: ryansKey.api_secret,
-				name: "Ryan"
-			})
-
-			// let m1 = spartan.rental_providers[0]
-			// let m2 = spartan.rental_providers[1]
-
-			// console.log("m1: ", await m1.testAuthorization())
-			// console.log("m2: ", await m2.testAuthorization())
-
-			let hashrate = 3000;
-			let duration = 10800;
-			let confirmation = async (preprocess_info) => {
-				// console.log(preprocess_info);
-				return true
+		it('manual rent (new) | manualRent', async () => {
+			await setupProviders()
+			let rentOptions = {
+				hashrate: 30000,
+				duration: 3
 			}
 
-			let response = await spartan.manualRental(hashrate, duration, confirmation)
-			// console.log(response)
-			expect(response.success).toBeTruthy()
-		}, 250 * 100)
-		it('Cancel rent with confirmation function', async () => {
-			let spartan = new SpartanBot({ memory: true })
+			let preprocess = await autorenter.manualRent(rentOptions)
 
-			await spartan.setupRentalProvider({
-				type: "MiningRigRentals",
-				api_key: apikey.api_key,
-				api_secret: apikey.api_secret,
-				name: "Master"
-			})
-
-			await spartan.setupRentalProvider({
-				type: "MiningRigRentals",
-				api_key: ryansKey.api_key,
-				api_secret: ryansKey.api_secret,
-				name: "Ryan"
-			})
-
-			let hashrate = 3000;
-			let duration = 10800;
-			let confirmation = async (preprocess_info) => {
-				// console.log(preprocess_info);
-				return false
-			}
-
-			let response = await spartan.manualRental(hashrate, duration, confirmation)
-			// console.log(response)
-			expect(response.success).toBeFalsy()
-		}, 50000)
+		});
 	})
-	describe('Multiple types of Providers', () => {
+	describe('Setup multile providers of different types', () => {
 		it('setup both MRR and NiceHash', async (done) => {
 			let spartan = new SpartanBot({memory: true});
 
