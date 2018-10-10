@@ -88,7 +88,7 @@ class AutoRenter {
 			})
 		}
 
-		let hashpower_found = _provider.getTotalHashPower(rigs_to_rent)
+		let hashrate_found = _provider.getTotalHashPower(rigs_to_rent)
 		let cost_found = _provider.getRentalCost(rigs_to_rent)
 
 		// console.log("total hashpower: ", hashpower_found)
@@ -158,21 +158,23 @@ class AutoRenter {
 		// console.log(`Total hashrate + hashrate of extra rigs: ${total_hashrate + providers[0].provider.getTotalHashPower(extra_rigs)}`)
 
 		return {
+			//clarify the market for easy workings
+			market: MiningRigRentals,
 			//cost of all rigs initially found with given parameters
 			cost_found,
 			//hashpower of all rigs initially found with given parameters
-			hashpower_found,
+			hashrate_found,
 			//initial_rigs is the initial amount of rigs found that were queried for
 			rigs_found,
 			//total cost in btc to rent the rigs (total_rigs)
 			btc_cost_to_rent,
 			//total balance of all providers in the SpartanBot
-			total_balance,
-			//total hashpower of the rigs found to rent (total_rigs)
 			hashrate_to_rent,
 			//total_rigs is the number of rigs found that can be rent
 			rigs_length,
 			//the actual JSON objects containing the information needed to rent each rig
+			total_balance,
+			//total hashpower of the rigs found to rent (total_rigs)
 			rigs,
 			//success to test against
 			success: true
@@ -325,7 +327,7 @@ class AutoRenter {
 			if (provider.type === MiningRigRentals) {
 				mrrExists = true
 				mrrPreprocess = await this.mrrRentPreprocess(options)
-				console.log('preprocess: ', mrrPreprocess)
+				console.log(mrrPreprocess)
 				break
 			}
 		}
@@ -379,7 +381,7 @@ class AutoRenter {
 		if (rentWithNiceHash) {
 			for (let provider of capableProviders) {
 				if (provider.type === NiceHash) {
-					return {limit, price, amount: 0.005, provider}
+					return {limit, price, amount: 0.005, provider, market: NiceHash}
 				}
 			}
 		}
@@ -389,7 +391,7 @@ class AutoRenter {
 		let hash = mrrPreprocess.hashrate_to_rent / 1000 / 1000 //convert to TeraHash
 		let mrrPrice = (cost / hash / options.duration) * 24 // btc/th/day
 
-		//if MRR funds are low and can't rent everything, if that cost compared to NH is greater than 10% cheaper, rent with MRR
+		//if MRR funds are low and we can't rent everything, if that cost compared to NH is greater than 10% cheaper, rent with MRR
 		if (mrrPreprocess.hashrate_to_rent < mrrPreprocess.hashpower_found) {
 			let margin = price * 0.10
 			if (mrrPrice < (price - margin)) {
@@ -397,13 +399,13 @@ class AutoRenter {
 			} else {
 				for (let provider of capableProviders) {
 					if (provider.type === NiceHash) {
-						return {limit, price, amount: 0.005, provider}
+						return {limit, price, amount: 0.005, provider, market: NiceHash}
 					}
 				}
 			}
 		}
 
-		// if price is lower than 0.005, then rent with MiningRigRentals
+		// else if price is lower than 0.005, then rent with MiningRigRentals
 		return mrrPreprocess
 	}
 }
