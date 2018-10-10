@@ -92,7 +92,7 @@ class MRRProvider extends RentalProvider {
 			if (profile.data.length === 0) {
 				throw new Error(`No profile data. Consider creating a pool/profile`)
 			} else {
-				return Number(profile.data[0].id)
+				return profile.data[0].id
 			}
 		} else {
 			throw new Error(`Error getting profile data: \n ${JSON.stringify(profile, null, 4)}`)
