@@ -251,8 +251,8 @@ describe("SpartanBot", () => {
 			})
 
 			let rentOptions = {
-				hashrate: 20000,
-				duration: 5
+				hashrate: 10000,
+				duration: 3
 			}
 
 			await autorenter.manualRentPreprocess(rentOptions)
