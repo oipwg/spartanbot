@@ -9,6 +9,10 @@ const toNiceHashPrice = (amount, hash, time) => {
 const toMRRAmount = (price, time, hash) => {
 	return ((price/24)*time)*hash
 }
+const getLimit = (price, amount, time) => {
+	return (amount/(price/24))/time
+}
+
 
 /**
  * Manages Rentals of Miners from multiple API's
