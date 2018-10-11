@@ -239,10 +239,6 @@ class AutoRenter {
 		//NORMAL - can rent all required
 
 
-	async niceHashRentPreprocess(provider, hashrate, duration) {
-		//gets funds
-		//checks available funds
-	}
 	/**
 	 * Rent an amount of hashrate for a period of time
 	 * @param {Object} options - The Options for the rental operation
