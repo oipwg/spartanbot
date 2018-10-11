@@ -390,7 +390,20 @@ class AutoRenter {
 
 		//Do Stuff like rent and what not
 		if (market === NiceHash) {
-
+			let _provider;
+			for (let provider of this.rental_providers) {
+				if (provider.getUID() === prepurchase_info.uid) {
+					_provider = provider
+				}
+			}
+			let res;
+			try {
+				res = await _provider.rent({limit: prepurchase_info.limit, amount: prepurchase_info.amount, price: prepurchase_info.price})
+			} catch (err) {
+				throw new Error(`Failed to rent from NiceHash provider ${_provider.getUID}: ${err}`)
+			}
+			// ToDO: standardize the return variable for rent function
+			return res
 		}
 
 		if (market === MiningRigRentals) {
