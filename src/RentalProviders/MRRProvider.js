@@ -1,6 +1,6 @@
 import RentalProvider from './RentalProvider'
 import MiningRigRentals from 'miningrigrentals-api-v2'
-import {selectBestCombination} from "../util";
+import {selectBestCombination, toNiceHashPrice} from "../util";
 
 /**
  * A Rental Provider for MiningRigRentals
@@ -614,11 +614,13 @@ class MRRProvider extends RentalProvider {
 			}
 		}
 
+		let duration = rigs_to_rent[0].length
 		return {
-			rented_rigs,
+			rentals: rented_rigs,
 			failed_rentals, // can check if failed_rentals is 0
-			btc_total_price: spent_btc_amount,
-			total_hashrate: total_rented_hashrate
+			amount: spent_btc_amount,
+			limit: total_rented_hashrate/1000/1000, //convert to TH from MH,
+			price: toNiceHashPrice(spent_btc_amount, total_rented_hashrate, duration)
 		}
 	}
 
