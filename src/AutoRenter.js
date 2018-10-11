@@ -226,7 +226,7 @@ class AutoRenter {
 
 		//check for successful preprocess
 		if (normal_badges.length === 1) {
-			return normal_badges[0]
+			return {status: NORMAL, badges: normal_badges[0]}
 		} else if (normal_badges.length > 1) {
 			let best_badge = {};
 			for (let badge of normal_badges) {
@@ -234,9 +234,8 @@ class AutoRenter {
 					best_badge = badge
 				}
 			}
-			return best_badge
+			return {status: NORMAL, badges: best_badge}
 		}
-		
 
 
 	}
