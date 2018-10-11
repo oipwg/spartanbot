@@ -237,6 +237,28 @@ class AutoRenter {
 			return {status: NORMAL, badges: best_badge}
 		}
 
+		//check for low balance preprocess
+		if (low_balance_badges.length > 0 ) {
+			let teraHash = options.hashrate/1000/1000
+			let totalTeraHash = 0;
+			for (let badge of low_balance_badges) {
+				totalTeraHash += badge.limit
+			}
+			if (totalTeraHash <= teraHash) {
+				return {status: LOW_BALANCE, badges: low_balance_badges}
+			} else {
+				let badges = []
+				totalTeraHash = 0;
+				low_balance_badges.sort((a,b) => {return a.amount - b.amount})
+				for (let badge of low_balance_badges) {
+					if ((totalTeraHash + Number(badge.limit)) <= teraHash) {
+						totalTeraHash += Number(badge.limit)
+						badges.push(badge)
+					}
+				}
+				return {status: LOW_BALANCE, badges}
+			}
+		}
 
 	}
 
