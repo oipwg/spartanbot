@@ -596,7 +596,7 @@ class MRRProvider extends RentalProvider {
 				let rental = await this.api.createRental(rig)
 				rentalConfirmation[rig.rig] = rental
 			} catch (err) {
-				rentalConfirmation[rig.rig] = `Error renting rig: ${err}`
+				rentalConfirmation[rig.rig] = {success: false, message: `Error renting rig`, error: err}
 			}
 		}
 
