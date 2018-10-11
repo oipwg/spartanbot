@@ -1,5 +1,7 @@
 import uid from 'uid'
 
+const NiceHash = "NiceHash"
+const MiningRigRentals = "MiningRigRentals"
 /**
  * A Single Rental Provider API wrapper (to standardize between multiple providers)
  */
@@ -339,6 +341,28 @@ class RentalProvider {
 			throw new Error('Failed to set Current Rentals \n ${err')
 		}
 		return this.activeRigs === rigs;
+	}
+
+	/**
+	 * Manual rent parent function that calls the private manualRent funcs of the extended classes
+	 * @param {Object} options - see return value from AutoRenter -> manualRentPreprocess
+	 * @returns {Promise<Object>}
+	 */
+	async manualRent(options) {
+
+		return
+		if (options.market === MiningRigRentals) {
+			console.log('rent from miningrigrentals')
+			let rigs_to_rent = []
+			for (let rig of options.rigs) {
+				rigs_to_rent.push(rig.rental_info)
+			}
+			return await this._rent(rigs_to_rent)
+		}
+		if (options.market === NiceHash) {
+			console.log('rent from nicehash')
+			return await this._rent(options)
+		}
 	}
 
 	/**
