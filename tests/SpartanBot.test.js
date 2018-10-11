@@ -232,12 +232,22 @@ describe("SpartanBot", () => {
 			await setupProviders()
 
 			let rentOptions = {
-				hashrate: 30000,
+				hashrate: 10000,
 				duration: 3
 			}
 
 			let preprocess = await autorenter.manualRentPreprocess(rentOptions)
-			expect(preprocess.market === "MiningRigRentals" || preprocess.market === "NiceHash").toBeTruthy()
+			let statusCheck = false;
+			switch (preprocess.status) {
+				case 'NORMAL':
+				case 'LOW_BALANCE':
+				case 'ERROR':
+					statusCheck = true
+					break
+				default:
+					break
+			}
+			expect(statusCheck).toBeTruthy()
 
 			done()
 		}, 250 * 100);
