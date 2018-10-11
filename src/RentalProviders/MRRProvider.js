@@ -601,6 +601,7 @@ class MRRProvider extends RentalProvider {
 		}
 
 		let rented_rigs = []
+		let failed_rentals = []
 		let spent_btc_amount = 0
 		let total_rented_hashrate = 0
 
@@ -609,12 +610,14 @@ class MRRProvider extends RentalProvider {
 				rented_rigs.push(rentalConfirmation[rig].data)
 				spent_btc_amount += parseFloat(rentalConfirmation[rig].data.price.paid)
 				total_rented_hashrate += rentalConfirmation[rig].data.hashrate.advertised.hash
+			} else {
+				failed_rentals.push(rentalConfirmation[rig])
 			}
 		}
 
 		return {
-			success: true,
 			rented_rigs,
+			failed_rentals, // can check if failed_rentals is 0
 			btc_total_price: spent_btc_amount,
 			total_hashrate: total_rented_hashrate
 		}
