@@ -363,7 +363,7 @@ class AutoRenter {
 
 	}
 
-
+	//this is now to use just as reference until later date
 	/**
 	 * Rent an amount of hashrate for a period of time
 	 * @param {Object} options - The Options for the rental operation
