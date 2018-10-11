@@ -321,107 +321,23 @@ class AutoRenter {
 		}
 
 		//preprocess
-		let prepurchase_info;
+		let preprocess;
 		try {
-			prepurchase_info = await this.manualRentPreprocess(options)
+			preprocess = await this.manualRentPreprocess(options)
 		} catch (err) {
 			throw new Error(`Failed to get prepurchase_info! \n ${err}`)
 		}
 
-		let market, cost, hash, pricePerThPerDay, duration = options.duration;
-
-		if (prepurchase_info.market === NiceHash) {
-			market = NiceHash;
-			cost = prepurchase_info.amount
-			hash = prepurchase_info.limit
-			pricePerThPerDay = prepurchase_info.price
+		if (preprocess.status === ERROR) {
+			return {success: false, message: 'No providers are capable of renting with set options', preprocess}
 		}
 
-		let status = {
-			status: 'normal'
+		if (options.confirm) {
+			let proceed = await this.confirmPreprocess(preprocess, options.confirm)
+			if (!proceed)
+				return {success: false, message: `Rental Cancelled`}
 		}
 
-		if (prepurchase_info.market === MiningRigRentals) {
-			if (prepurchase_info.total_balance < prepurchase_info.cost_found) {
-				status.status = 'warning';
-				status.type = 'LOW_BALANCE_WARNING'
-				status.totalBalance = prepurchase_info.total_balance
-				status.total_cost = prepurchase_info.cost_found
-
-				if (prepurchase_info.rigs_found === 0) {
-					status.message = `Could not find any rigs to rent with available balance`
-				} else {
-					status.message = `${prepurchase_info.rigs_length}/${prepurchase_info.rigs_found} rigs available to rent with current balance.`
-				}
-			}
-			market = MiningRigRentals
-			cost = prepurchase_info.btc_cost_to_rent
-			hash = prepurchase_info.hashrate_to_rent
-			pricePerThPerDay = ((prepurchase_info.btc_cost_to_rent / (prepurchase_info.hashrate_to_rent / 1000000) / options.duration) * 24)
-		}
-
-		// -> confirm total
-		if (options.confirm){
-			try {
-				let should_continue = await options.confirm({
-					market,
-					cost: cost.toFixed(6),
-					pricePerThPerDay: pricePerThPerDay.toFixed(6),
-					hash,
-					duration,
-					status,
-				})
-
-				if (!should_continue) {
-					return {success: false, message: `Rental Cancelled`}
-				}
-			} catch (e) {
-				return {success: false, message: `Rental Cancelled: \n ${e}`}
-			}
-		}
-
-		//Do Stuff like rent and what not
-		if (market === NiceHash) {
-			let _provider;
-			for (let provider of this.rental_providers) {
-				if (provider.getUID() === prepurchase_info.uid) {
-					_provider = provider
-				}
-			}
-			let res;
-			try {
-				res = await _provider.rent({limit: prepurchase_info.limit, amount: prepurchase_info.amount, price: prepurchase_info.price})
-			} catch (err) {
-				throw new Error(`Failed to rent from NiceHash provider ${_provider.getUID}: ${err}`)
-			}
-			// ToDO: standardize the return variable for rent function
-			return res
-		}
-
-		if (market === MiningRigRentals) {
-			let rental_info
-			try {
-				rental_info = await this.rental_providers[0].rent(prepurchase_info.rigs)
-			} catch (err) {
-				throw new Error(`Error renting rigs in AutoRenter: \n ${err}`)
-			}
-
-			//check rental success
-			if (!rental_info.success)
-				return rental_info
-
-			let total_rigs = 0
-
-			if (rental_info.rented_rigs)
-				total_rigs = rental_info.rented_rigs.length
-
-			return {
-				success: true,
-				total_rigs_rented: total_rigs,
-				total_cost: rental_info.btc_total_price,
-				total_hashrate: rental_info.total_hashrate
-			}
-		}
 
 	}
 
