@@ -341,6 +341,10 @@ class RentalProvider {
 		return this.activeRigs === rigs;
 	}
 
+	async manualRentPreprocess(hashrate, duration) {
+		return await this._manualRentPreprocess(hashrate, duration)
+	}
+
 	/**
 	 * Get back a "Serialized" state of the Provider
 	 * @return {Object} Returns a JSON object that contains the current rental provider state
