@@ -1,5 +1,10 @@
 import RentalProvider from "./RentalProvider";
 import NiceHash from 'nicehash-api'
+import {getLimit, toMRRAmount, toNiceHashPrice} from "../util";
+
+const ERROR = 'ERROR'
+const NORMAL = 'NORMAL'
+const LOW_BALANCE = 'LOW_BALANCE'
 
 class NiceHashProvider extends RentalProvider {
 	constructor(settings) {
@@ -163,6 +168,68 @@ class NiceHashProvider extends RentalProvider {
 	 */
 	_returnActivePool() {
 		return this.activePool
+	}
+
+	async _manualRentPreprocess(hashrate, duration) {
+		let status = {status: NORMAL}
+		let balance;
+		try {
+			balance = await this.getBalance()
+		} catch (err) {
+			status.status = ERROR
+			return {success: false, message: 'failed to get balance', status}
+		}
+
+		if (balance < 0.005 || hashrate < 0.01) {
+			status.status = ERROR
+			return {success: false, message: `Balance must be >= 0.005 and hashrate must be >= 0.01 TH`, status}
+		}
+
+		const minimumAmount = 0.005
+		const minimumPrice = 0.5
+
+		let limit = hashrate / 1000 / 1000 //ALWAYS CONVERT MH TO TH
+		let amount = minimumAmount
+		let price = toNiceHashPrice(amount, limit, duration)
+
+		if (price < 0.5) {
+			let stats;
+			let httpError;
+			try {
+				stats = await this.api.getCurrentGlobalStats24h()
+			} catch (err) {
+				httpError = new Error(`Failed to get current global nice hash stats: ${err}`)
+			}
+			if (!httpError) {
+				for (let stat of stats) {
+					if (stat.algo === "Scrypt") {
+						price = stat.price
+						break
+					}
+				}
+			} else {
+				price = minimumPrice
+			}
+
+			amount = toMRRAmount(price, duration, hashrate)
+			if (amount > balance) {
+				status.status = LOW_BALANCE
+				amount = balance
+				limit = getLimit(price, amount, duration)
+			}
+		}
+
+		return {
+			balance,
+			limit,
+			price,
+			amount,
+			duration,
+			status,
+			uid: this.getUID(),
+			provider: this,
+		}
+
 	}
 
 	/**
