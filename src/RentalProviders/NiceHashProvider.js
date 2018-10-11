@@ -185,8 +185,9 @@ class NiceHashProvider extends RentalProvider {
 			return {success: false, message: `Balance must be >= 0.005 and hashrate must be >= 0.01 TH`, status}
 		}
 
+		const defaultPrice = 0.5
 		const minimumAmount = 0.005
-		const minimumPrice = 0.5
+		const minimumLimit = .01
 
 		let limit = hashrate / 1000 / 1000 //ALWAYS CONVERT MH TO TH
 		let amount = minimumAmount
@@ -208,7 +209,7 @@ class NiceHashProvider extends RentalProvider {
 					}
 				}
 			} else {
-				price = minimumPrice
+				price = defaultPrice
 			}
 
 			amount = toMRRAmount(price, duration, hashrate)
