@@ -398,6 +398,16 @@ class AutoRenter {
 				return {success: false, message: `Rental Cancelled`}
 		}
 
+		let badges = preprocess.badges
+		// console.log('badges: ', badges)
+		let rentals = []
+		if (Array.isArray(badges)) {
+			for (let badge of badges) {
+				rentals.push(await badge.provider.manualRent(badge))
+			}
+		} else {
+			rentals.push(await badges.provider.manualRent(badges))
+		}
 
 	}
 
