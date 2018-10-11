@@ -278,7 +278,7 @@ class AutoRenter {
 		//Calculate NH Price per TH per day
 		let hashrateMH = options.hashrate
 		let limit = hashrateMH / 1000 / 1000 //convert to TeraHash
-		let price = (0.005 / limit / options.duration) * 24 // btc/th/day
+		let price = toNiceHashPrice(0.005, limit, options.duration) // btc/th/day
 
 		if (rentWithNiceHash) {
 			for (let provider of capableProviders) {
@@ -291,7 +291,7 @@ class AutoRenter {
 		//Calculate MRR Price per TH per day
 		let cost = mrrPreprocess.btc_cost_to_rent
 		let hash = mrrPreprocess.hashrate_to_rent / 1000 / 1000 //convert to TeraHash
-		let mrrPrice = (cost / hash / options.duration) * 24 // btc/th/day
+		let mrrPrice = toNiceHashPrice(cost, hash, options.duration) // btc/th/day
 
 		//if MRR funds are low and we can't rent everything, if that cost compared to NH is greater than 10% cheaper, rent with MRR
 		if (mrrPreprocess.hashrate_to_rent < mrrPreprocess.hashrate_found) {
