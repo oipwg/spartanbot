@@ -185,7 +185,12 @@ class AutoRenter {
 				success: true
 			})
 		}
-		return providerBadges
+		if (providerBadges.length === 1) {
+			return providerBadges[0]
+		} else {
+			return providerBadges
+		}
+	}
 
 	//multiple providers
 	//hashrate and duration
