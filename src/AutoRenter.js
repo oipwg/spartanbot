@@ -228,9 +228,11 @@ class AutoRenter {
 		if (normal_badges.length === 1) {
 			return {status: NORMAL, badges: normal_badges[0]}
 		} else if (normal_badges.length > 1) {
-			let best_badge = {};
+			let amount = 10000; //begin with an arbitrarily large number
+			let best_badge;
 			for (let badge of normal_badges) {
-				if (badge.amount < best_badge.amount) {
+				if (Number(badge.amount) < amount) {
+					amount = Number(badge.amount)
 					best_badge = badge
 				}
 			}
