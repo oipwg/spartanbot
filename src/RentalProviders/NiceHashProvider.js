@@ -217,6 +217,10 @@ class NiceHashProvider extends RentalProvider {
 				status.status = LOW_BALANCE
 				amount = balance
 				limit = getLimit(price, amount, duration)
+				if (limit < minimumLimit) {
+					status.status = ERROR
+					status.message = 'Cannot rent limit based on minimum price and balance'
+				}
 			}
 		}
 
