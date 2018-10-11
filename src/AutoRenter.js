@@ -2,6 +2,14 @@ import Exchange from 'oip-exchange-rate';
 
 const NiceHash = "NiceHash"
 const MiningRigRentals = "MiningRigRentals"
+
+const toNiceHashPrice = (amount, hash, time) => {
+	return (amount / hash / time) * 24
+}
+const toMRRAmount = (price, time, hash) => {
+	return ((price/24)*time)*hash
+}
+
 /**
  * Manages Rentals of Miners from multiple API's
  */
@@ -386,7 +394,28 @@ class AutoRenter {
 		}
 
 		if (market === MiningRigRentals) {
+			let rental_info
+			try {
+				rental_info = await this.rental_providers[0].rent(prepurchase_info.rigs)
+			} catch (err) {
+				throw new Error(`Error renting rigs in AutoRenter: \n ${err}`)
+			}
 
+			//check rental success
+			if (!rental_info.success)
+				return rental_info
+
+			let total_rigs = 0
+
+			if (rental_info.rented_rigs)
+				total_rigs = rental_info.rented_rigs.length
+
+			return {
+				success: true,
+				total_rigs_rented: total_rigs,
+				total_cost: rental_info.btc_total_price,
+				total_hashrate: rental_info.total_hashrate
+			}
 		}
 
 	}
@@ -400,7 +429,7 @@ class AutoRenter {
 	 * @param {Function} [options.confirm] - This function will be run to decide if the rental should proceed. If it returns `true`, the rental will continue, if false, the rental cancels
 	 * @return {Promise<Object>} Returns a Promise that will resolve to an Object containing info about the rental made
 	 */
-	async rent(options){
+	async rent(options) {
 		// Make sure we have some Rental Providers, if not, return failure
 		if (!(this.rental_providers.length >= 1)){
 			return {
