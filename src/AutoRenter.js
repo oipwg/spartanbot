@@ -305,7 +305,7 @@ class AutoRenter {
 			let nh = market.includes(NiceHash)
 			let mrr = market.includes(MiningRigRentals)
 			if (nh && mrr) {
-				market = 'MIXED'
+				market = MIXED
 			} else if (nh) {
 				market = NiceHash
 			} else {
@@ -323,6 +323,7 @@ class AutoRenter {
 		}
 
 		return await confirmFn({
+			market,
 			limit,
 			amount,
 			price,
