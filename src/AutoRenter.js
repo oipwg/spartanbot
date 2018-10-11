@@ -234,13 +234,42 @@ class AutoRenter {
 		} else if (normal_badges.length > 1) {
 			let amount = 10000; //begin with an arbitrarily large number
 			let best_badge;
+		if (normal_badges.length > 0) {
+			let status = NORMAL
+
+			let amount = 10000
+			let bestPick = {}
 			for (let badge of normal_badges) {
-				if (Number(badge.amount) < amount) {
-					amount = Number(badge.amount)
-					best_badge = badge
+				if (badge.amount < amount) {
+					amount = badge.amount
+					bestPick = badge
 				}
 			}
-			return {status: NORMAL, badges: best_badge}
+
+			let bestPicks = [bestPick]
+
+			if (bestPick.limit < hashLimit) {
+				for (let badge of normal_badges) {
+					if (Number(badge.limit) + bestPick.limit <= hashLimit) {
+						bestPicks.push(badge)
+					}
+				}
+			}
+			let currentTotalHash = 0;
+			for (let badge of bestPicks) {
+				currentTotalHash += Number(badge.limit)
+			}
+			if (currentTotalHash < hashLimit) {
+				if (low_balance_badges.length > 0) {
+					for (let badge of low_balance_badges) {
+						if (Number(badge.limit) + bestPick.limit <= hashLimit) {
+							status = MIXED
+							bestPicks.push(badge)
+						}
+					}
+				}
+			}
+			return {status, badges: bestPicks}
 		}
 
 
