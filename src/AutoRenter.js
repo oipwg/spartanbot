@@ -25,33 +25,12 @@ class AutoRenter {
 		this.exchange = new Exchange();
 	}
 
-	/** Preprocess rent
+	/**
+	 * Preprocess Rent for MiningRigRental Providers
 	 * @param {Object} options - The Options for the rental operation
 	 * @param {Number} options.hashrate - The amount of Hashrate you wish to rent
 	 * @param {Number} options.duration - The duration (in seconds) that you wish to rent hashrate for
-	 * @returns {Promise<Object>}
-	 * @example
-	 *  // return example
-	 *  {
-	 *      //cost of all rigs initially found with given parameters
-	 *      initial_cost,
-	 *      //hashpower of all rigs initially found with given parameters
-	 *      initial_hashpower,
-	 *      //initial_rigs is the initial amount of rigs found that were queried for
-	 *      initial_rigs,
-	 *      //total cost in btc to rent the rigs (total_rigs)
-	 *      btc_total_price,
-	 *      //total balance of all providers in the SpartanBot
-	 *      total_balance,
-	 *      //total hashpower of the rigs found to rent (total_rigs)
-	 *      total_hashrate,
-	 *      //total_rigs is the number of rigs found that can be rent
-	 *      total_rigs,
-	 *      //the actual JSON objects containing the information needed to rent each rig
-	 *      rigs,
-	 *      //success to test against
-	 *      success: true
-	 *  }
+	 * @returns {Promise<Object|Array.<Object>>}
 	 */
 	async mrrRentPreprocess(options) {
 		//ToDo: make sure providers profileIDs aren't the same
