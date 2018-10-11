@@ -5,6 +5,10 @@ const MiningRigRentals = "MiningRigRentals"
 
 import {toNiceHashPrice} from "./util";
 
+const ERROR = 'ERROR'
+const NORMAL = 'NORMAL'
+const LOW_BALANCE = 'LOW_BALANCE'
+
 /**
  * Manages Rentals of Miners from multiple API's
  */
@@ -50,10 +54,10 @@ class AutoRenter {
 	 *  }
 	 */
 	async mrrRentPreprocess(options) {
-		//preprocess
 		//ToDo: make sure providers profileIDs aren't the same
 
-		//Assuming Provider type === 'MiningRigRentals'
+		let status = {status: NORMAL}
+
 		//get available rigs based on hashpower and duration
 		let _provider;
 		let mrr_providers = []
@@ -64,16 +68,16 @@ class AutoRenter {
 			}
 		}
 		if (!_provider)
-			return {success: false, message: 'No MRR Providers to fetch rigs'}
-
+			return {success: false, message: 'No MRR Providers'}
 
 		let rigs_to_rent = [];
 		try {
 			rigs_to_rent = await _provider.getRigsToRent(options.hashrate, options.duration)
 		} catch (err) {
-			throw new Error(`Failed to fetch rigs to rent \n ${err}`)
+			status.status = ERROR
+			return {status, market: MiningRigRentals, message: 'failed to fetch rigs', err}
 		}
-		let rigs_found = rigs_to_rent.length
+
 		//divvy up providers and create Provider object
 		let providers = [], totalBalance = 0;
 		for (let provider of mrr_providers) {
@@ -83,10 +87,10 @@ class AutoRenter {
 			//get the profile id needed to rent for each provider
 			let profile = provider.returnActivePoolProfile() || await provider.getProfileID();
 			providers.push({
-				uid: provider.getUID(),
 				balance,
 				profile,
 				rigs_to_rent: [],
+				uid: provider.getUID(),
 				provider
 			})
 		}
@@ -97,6 +101,7 @@ class AutoRenter {
 		// console.log("total hashpower: ", hashpower_found)
 		// console.log("total cost: ", cost_found)
 
+		// ToDo: Consider not splitting the work up evenly and fill each to his balance first come first serve
 		//load up work equally between providers. 1 and 1 and 1 and 1, etc
 		let iterator = 0; //iterator is the index of the provider while, 'i' is the index of the rigs
 		let len = providers.length
@@ -125,6 +130,7 @@ class AutoRenter {
 			}
 		}
 
+		//add up any additional rigs that a provider may have room for
 		for (let p of providers) {
 			let rental_cost = _provider.getRentalCost(p.rigs_to_rent);
 			if (p.balance > rental_cost) {
@@ -139,51 +145,47 @@ class AutoRenter {
 			}
 		}
 
-		let btc_cost_to_rent = 0;
-		let hashrate_to_rent = 0;
-		let total_balance = 0
-		let rigs = [];
-		let rigs_length = 0;
+		let providerBadges = []
 		for (let p of providers) {
-			btc_cost_to_rent += p.provider.getRentalCost(p.rigs_to_rent)
-			hashrate_to_rent += p.provider.getTotalHashPower(p.rigs_to_rent)
-			rigs_length += p.rigs_to_rent.length
-			total_balance += p.balance
+			status.status = NORMAL
 
+			p.provider.setActivePoolProfile(p.profile)
 			for (let rig of p.rigs_to_rent) {
 				rig.rental_info.profile = p.profile
-				p.provider.setActivePoolProfile(p.profile)
-				rigs.push({...rig.rental_info, providerUID: p.provider.getUID()})
 			}
+
+			let price = 0, limit = 0, amount = 0, duration = options.duration;
+			amount += p.provider.getRentalCost(p.rigs_to_rent)
+			limit += (p.provider.getTotalHashPower(p.rigs_to_rent) / 1000 / 1000)
+			price = toNiceHashPrice(amount, limit, duration)
+			let market = MiningRigRentals
+			let balance = p.balance
+
+			if (cost_found > balance) {
+				status.status = LOW_BALANCE
+			} else if (p.rigs_to_rent.length === 0) {
+				status.status = ERROR
+			}
+
+			providerBadges.push({
+				balance,
+				limit,
+				price,
+				amount,
+				duration,
+				status,
+				market,
+				query: {
+					hashrate_found,
+					cost_found
+				},
+				rigs: p.rigs_to_rent,
+				uid: p.uid,
+				provider: p.provider,
+				success: true
+			})
 		}
-
-		// rigs.sort((a,b) => {return a.rig - b.rig})
-		// console.log(`Total hashrate + hashrate of extra rigs: ${total_hashrate + providers[0].provider.getTotalHashPower(extra_rigs)}`)
-
-		return {
-			//clarify the market for easy workings
-			market: MiningRigRentals,
-			//cost of all rigs initially found with given parameters
-			cost_found,
-			//hashpower of all rigs initially found with given parameters
-			hashrate_found,
-			//initial_rigs is the initial amount of rigs found that were queried for
-			rigs_found,
-			//total cost in btc to rent the rigs (total_rigs)
-			btc_cost_to_rent,
-			//total balance of all providers in the SpartanBot
-			hashrate_to_rent,
-			//total_rigs is the number of rigs found that can be rent
-			rigs_length,
-			//the actual JSON objects containing the information needed to rent each rig
-			total_balance,
-			//total hashpower of the rigs found to rent (total_rigs)
-			rigs,
-			//success to test against
-			success: true
-		}
-	}
-
+		return providerBadges
 
 	//multiple providers
 	//hashrate and duration
