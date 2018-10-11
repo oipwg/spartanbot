@@ -38,3 +38,14 @@ export function selectBestCombination(original_array, target_value, object_value
 
 	return best_match;
 }
+const fixedLength = 6;
+
+export const toNiceHashPrice = (amount, hash, time) => {
+	return ((amount / hash / time) * 24).toFixed(fixedLength)
+}
+export const toMRRAmount = (price, time, hash) => {
+	return (((price/24)*time)*hash).toFixed(fixedLength)
+}
+export const getLimit = (price, amount, time) => {
+	return ((amount/(price/24))/time).toFixed(fixedLength)
+}
