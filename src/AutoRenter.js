@@ -193,7 +193,6 @@ class AutoRenter {
 
 		let badges = []
 
-					providers.splice(i, 1)
 		if (mrrProviders.length >= 1) {
 			let mrrPreprocess = await this.mrrRentPreprocess(options)
 			if (Array.isArray(mrrPreprocess)) {
