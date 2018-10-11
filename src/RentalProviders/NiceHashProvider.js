@@ -170,7 +170,7 @@ class NiceHashProvider extends RentalProvider {
 		return this.activePool
 	}
 
-	async _manualRentPreprocess(hashrate, duration) {
+	async manualRentPreprocess(hashrate, duration) {
 		let status = {status: NORMAL}
 		let balance;
 		try {
@@ -226,6 +226,7 @@ class NiceHashProvider extends RentalProvider {
 			amount,
 			duration,
 			status,
+			market: "NiceHash",
 			uid: this.getUID(),
 			provider: this,
 		}
