@@ -268,6 +268,42 @@ class AutoRenter {
 	}
 
 	/**
+	 * Confirms the preprocess returned information (this function merely organizes the preprocess data FOR the confirmFn)
+	 * @param {Object} preprocess - the returned object from manualRentPreprocess()
+	 * @param {Function} confirmFn - an async function to confirm the preprocess
+	 * @returns {Promise<Boolean>}
+	 */
+	async confirmPreprocess(preprocess, confirmFn) {
+		let badges = preprocess.badges
+		let limit = 0, amount = 0, price = 0, balance = 0, duration
+
+		if (Array.isArray(badges)) {
+			for (let badge of badges) {
+				limit += Number(badge.limit)
+				amount += Number(badge.amount)
+				price += Number(badge.price)
+				balance += Number(badge.balance)
+				duration = badge.duration
+			}
+		} else {
+			limit += Number(badges.limit)
+			amount += Number(badges.amount)
+			price += Number(badges.price)
+			balance += Number(badges.balance)
+			duration = badges.duration
+		}
+
+		return await confirmFn({
+			limit,
+			amount,
+			price,
+			duration,
+			balance,
+			status: preprocess.status
+		})
+	}
+
+	/**
 	 * Manual rent based an amount of hashrate for a period of time
 	 * @param {Object} options - The Options for the rental operation
 	 * @param {Number} options.hashrate - The amount of Hashrate you wish to rent
