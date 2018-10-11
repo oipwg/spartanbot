@@ -277,6 +277,7 @@ class AutoRenter {
 		let badges = preprocess.badges
 		let limit = 0, amount = 0, price = 0, balance = 0, duration
 
+		let market = []
 		if (Array.isArray(badges)) {
 			for (let badge of badges) {
 				limit += Number(badge.limit)
@@ -284,13 +285,25 @@ class AutoRenter {
 				price += Number(badge.price)
 				balance += Number(badge.balance)
 				duration = badge.duration
+
+			let nh = market.includes(NiceHash)
+			let mrr = market.includes(MiningRigRentals)
+			if (nh && mrr) {
+				market = 'MIXED'
+			} else if (nh) {
+				market = NiceHash
+			} else {
+				if (mrr)
+					market = MiningRigRentals
 			}
+
 		} else {
 			limit += Number(badges.limit)
 			amount += Number(badges.amount)
 			price += Number(badges.price)
 			balance += Number(badges.balance)
 			duration = badges.duration
+			market = badges.market
 		}
 
 		return await confirmFn({
@@ -299,6 +312,7 @@ class AutoRenter {
 			price,
 			duration,
 			balance,
+			market,
 			status: preprocess.status
 		})
 	}
