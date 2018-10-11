@@ -260,6 +260,9 @@ class AutoRenter {
 			}
 		}
 
+		if (error_badges > 0) {
+			return {status: ERROR, badges: error_badges}
+		}
 	}
 
 	/**
