@@ -183,6 +183,12 @@ class NiceHashProvider extends RentalProvider {
 		if (balance < 0.005 || hashrate/1000/1000 < 0.01) {
 			status.status = ERROR
 			return {success: false, message: `Balance must be >= 0.005 and hashrate must be >= 0.01 TH`, status}
+			let message;
+			if (balance < 0.005)
+				message = `Balance must be >= 0.005`
+			if (hashrate/1000/1000 < 0.01)
+				message = `Hashrate/limit must be >= 0.01 TH (10,000 MH)`
+			return {success: false, message, status}
 		}
 
 		const defaultPrice = 0.5
