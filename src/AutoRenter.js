@@ -193,6 +193,49 @@ class AutoRenter {
 		}
 	}
 
+
+	//multiple providers
+	//hashrate and duration
+	//how does each provider talk to eachother?
+	//if I ask for a small amount of hash, what happens.
+	// ----individual preprocessing. Each provider preprocesses itself with the given information----- make this a RentalProvider parent method
+	//get balance
+	//they each check to see if they can fulfill that request and the best price is chosen
+	//if they can't fulfill it, they'll tell you how much they can
+	//each returns an object with the needed details of what they can do along with a copy/link to themselves to be acted upon if needed
+	// ---- end of individual preprocess
+	//the actual preprocess pushes these returned objects into an array it will analyze
+	// figure out this part... return the providers it will be renting from
+	//confirmation function
+	//for each provider picked, use its link to rent with the information it gave us back from the preprocess
+
+	//returned preprocess should be: {provider, balance, price, limit, duration, amount, [rigs_to_rent], {preprocessMRR}}
+			//for mrr providers this can be done with one function for all of them due to the nature of possibly renting the same rigs
+			//for nicehash, orders don't happen via rig, so each provider can get processed individually and return the same object)
+		//the preprocess function will check
+			//MRR
+				//that the limit returned will equal limit given
+
+			//NH Preprocess
+				//Check balance against .005
+				//check limit against hashrate given
+				//calculate price
+
+				//if price is < .5, then set price to .5 and calculate amount
+				//if amount is greater than balance, status => LOW_BALANCE
+				//set amount to max balance and calculate new limit based on price, amount, and duration
+				//else write new amount (cost)
+
+	//STATUS MESSAGES
+		//ERROR - cannot rent
+		//LOW_BALANCE - can rent partially
+		//NORMAL - can rent all required
+
+
+	async niceHashRentPreprocess(provider, hashrate, duration) {
+		//gets funds
+		//checks available funds
+	}
 	/**
 	 * Rent an amount of hashrate for a period of time
 	 * @param {Object} options - The Options for the rental operation
