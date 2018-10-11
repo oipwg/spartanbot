@@ -269,11 +269,11 @@ class AutoRenter {
 			}
 		}
 
-		//if only NiceHash and with insufficient funds return
+		//if no MRR Providers and NiceHash Providers have insufficient funds
 		if (capableProviders.length === 0)
 			return {success: false, message: "Insufficient Funds", incapableProviders}
 
-		//check how much it would cost to rent from MRR
+		//check for MRR Prov && how much it would cost to rent from MRR
 		let mrrPreprocess = {};
 		let mrrExists = false
 		for (let provider of capableProviders) {
@@ -292,6 +292,7 @@ class AutoRenter {
 			let duration = options.duration
 			let price = (amount / limit / duration) * 24
 
+			//return the first NiceHash Provider found with funds. Does not yet split costs between multiple
 			return {uid: capableProviders[0].uid, price, limit, amount}
 		}
 
