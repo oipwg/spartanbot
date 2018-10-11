@@ -279,12 +279,25 @@ class AutoRenter {
 
 		let market = []
 		if (Array.isArray(badges)) {
+			let prices = []
+			let limits = []
 			for (let badge of badges) {
+				limits.push(Number(badge.limit))
+				prices.push(Number(badge.price))
+
 				limit += Number(badge.limit)
 				amount += Number(badge.amount)
-				price += Number(badge.price)
 				balance += Number(badge.balance)
 				duration = badge.duration
+				market.push(badge.market)
+			}
+
+			let weights = 0
+			for (let i = 0; i < prices.length; i++) {
+				weights += prices[i]*limits[i]
+			}
+			let weighetedPrice = weights/limit
+			price = weighetedPrice
 
 			let nh = market.includes(NiceHash)
 			let mrr = market.includes(MiningRigRentals)
