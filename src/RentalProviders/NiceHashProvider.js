@@ -259,7 +259,7 @@ class NiceHashProvider extends RentalProvider {
 	 * @async
 	 * @returns {Promise<Object>}
 	 */
-	async rent(options) {
+	async _rent(options) {
 		if (!this.id || !this.key)
 			throw new Error('Must provide api key and api id on initialize')
 
@@ -294,10 +294,29 @@ class NiceHashProvider extends RentalProvider {
 		}
 		rentOptions = {...rentOptions, ..._pool}
 
+		let res;
 		try {
-			return await this.api.createOrder(rentOptions)
+			res = await this.api.createOrder(rentOptions)
 		} catch (err) {
-			throw new Error(`Error creating NiceHash order: ${err}`)
+			return {success: false, message: `Failed to create NiceHash order`, error: err}
+		}
+
+		if (res.result && res.result.success) {
+			return {
+				success: true,
+				market: "NiceHash",
+				amount: options.amount,
+				limit: options.limit,
+				price: options.price,
+				rentals: res.result.success
+			}
+		} else {
+			return {
+				success: false,
+				market: "NiceHash",
+				message: "Something went wrong creating a NiceHash order",
+				failed_rentals: res
+			}
 		}
 	}
 
