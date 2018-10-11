@@ -19,7 +19,16 @@ describe('NiceHashProvider', () => {
 		})
 	});
 	describe('Rent', () => {
-		it('Manual Rent', async () => {
+		it('preprocess nicehash rent', async () => {
+			let nh = new NiceHashProvider(apikey);
+
+			let hashrate = 800000
+			let duration = 3
+
+			let preprocess = await nh.manualRentPreprocess(hashrate, duration)
+			expect(preprocess.price).toBeDefined()
+		});
+		it.skip('Manual Rent', async () => {
 			let nh = new NiceHashProvider(apikey);
 
 			let poolOptions = {
@@ -38,9 +47,7 @@ describe('NiceHashProvider', () => {
 				limit: .01,
 				price: .500
 			}
-
-			console.log(await nh.manualRent(rentOptions))
-
+			// console.log(await nh.rent(rentOptions))
 		})
 	})
 })
