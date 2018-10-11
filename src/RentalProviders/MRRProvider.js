@@ -587,10 +587,9 @@ class MRRProvider extends RentalProvider {
 	 * @param {Array.<Object>} rigs_to_rent - An array of rigs to rent (see AutoRenter.manualRentPreprocess)
 	 * @returns {Promise<Object>}>}
 	 */
-	async rent(rigs_to_rent) {
+	async _rent(rigs_to_rent) {
 		//rent rigs
 		let rentalConfirmation = {};
-
 		for (let rig of rigs_to_rent) {
 			try {
 				let rental = await this.api.createRental(rig)
