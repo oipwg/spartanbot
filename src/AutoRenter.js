@@ -8,6 +8,7 @@ import {toNiceHashPrice} from "./util";
 const ERROR = 'ERROR'
 const NORMAL = 'NORMAL'
 const LOW_BALANCE = 'LOW_BALANCE'
+const MIXED = 'MIXED'
 
 /**
  * Manages Rentals of Miners from multiple API's
@@ -205,6 +206,7 @@ class AutoRenter {
 		for (let prov of nhProviders) {
 			badges.push(await prov.manualRentPreprocess(options.hashrate, options.duration))
 		}
+		console.log("badge results: ", badges)
 
 		let normal_badges = []
 		let low_balance_badges = []
@@ -224,6 +226,8 @@ class AutoRenter {
 			}
 		}
 
+		const hashLimit = options.hashrate/1000/1000
+
 		//check for successful preprocess
 		if (normal_badges.length === 1) {
 			return {status: NORMAL, badges: normal_badges[0]}
@@ -239,21 +243,21 @@ class AutoRenter {
 			return {status: NORMAL, badges: best_badge}
 		}
 
+
 		//check for low balance preprocess
 		if (low_balance_badges.length > 0 ) {
-			let teraHash = options.hashrate/1000/1000
 			let totalTeraHash = 0;
 			for (let badge of low_balance_badges) {
 				totalTeraHash += badge.limit
 			}
-			if (totalTeraHash <= teraHash) {
+			if (totalTeraHash <= hashLimit) {
 				return {status: LOW_BALANCE, badges: low_balance_badges}
 			} else {
 				let badges = []
 				totalTeraHash = 0;
 				low_balance_badges.sort((a,b) => {return a.amount - b.amount})
 				for (let badge of low_balance_badges) {
-					if ((totalTeraHash + Number(badge.limit)) <= teraHash) {
+					if ((totalTeraHash + Number(badge.limit)) <= hashLimit) {
 						totalTeraHash += Number(badge.limit)
 						badges.push(badge)
 					}
@@ -276,7 +280,6 @@ class AutoRenter {
 	async confirmPreprocess(preprocess, confirmFn) {
 		let badges = preprocess.badges
 		let limit = 0, amount = 0, price = 0, balance = 0, duration
-
 		let market = []
 		if (Array.isArray(badges)) {
 			let prices = []
