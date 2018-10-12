@@ -350,15 +350,14 @@ class RentalProvider {
 	 */
 	async manualRent(options) {
 		if (options.market === MiningRigRentals) {
-			console.log('rent from miningrigrentals')
 			let rigs_to_rent = []
 			for (let rig of options.rigs) {
 				rigs_to_rent.push(rig.rental_info)
 			}
+
 			return await this._rent(rigs_to_rent)
 		}
 		if (options.market === NiceHash) {
-			console.log('rent from nicehash')
 			return await this._rent(options)
 		}
 	}
