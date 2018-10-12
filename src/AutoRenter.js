@@ -166,6 +166,8 @@ class AutoRenter {
 				duration,
 				status,
 				market,
+				totalHashes: limit*60*60*duration,
+				hashesDesired: (options.hashrate/1000/1000)*60*60*options.duration,
 				query: {
 					hashrate_found,
 					cost_found
