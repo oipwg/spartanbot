@@ -219,7 +219,7 @@ class AutoRenter {
 		for (let prov of nhProviders) {
 			badges.push(await prov.manualRentPreprocess(options.hashrate, options.duration))
 		}
-		console.log("badge results: ", badges)
+		// console.log("badge results: ", badges)
 
 		let usable_badges = []
 		let error_badges = []
@@ -247,6 +247,7 @@ class AutoRenter {
 	/**
 	 * Selects the best rental options from the returned preprocess function
 	 * @param {Object} preprocess - the returned object from manualRentPreprocess()
+	 * @param {Object} options - options passed down into manualRent func (hashrate, duration)
 	 * @returns {Promise<{Object}>}
 	 */
 	async manualRentSelector(preprocess) {
