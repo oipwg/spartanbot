@@ -1,6 +1,6 @@
 import RentalProvider from "./RentalProvider";
 import NiceHash from 'nicehash-api'
-import {getDuration, getLimit, toMRRAmount, toNiceHashPrice} from "../util";
+import {getDuration, getEstAmountSpent, getLimit, toMRRAmount, toNiceHashPrice} from "../util";
 
 //status.status
 const ERROR = 'ERROR'
@@ -246,11 +246,12 @@ class NiceHashProvider extends RentalProvider {
 			status.message = 'Ideal amount to spend for desired limit/duration is below minimum amount.' +
 				'Either cutoff rental at desired duration or let rental finish calculated time for 0.005 BTC'
 			status.totalDuration = duration
-			status.durationExtension = duration - desiredDuration
+			status.extendedDuration = duration - desiredDuration
 			status.desiredDuration = desiredDuration
 			status.idealAmount = idealAmount
-			status.amountToSpend = amount
+			status.cost = amount
 			status.amountOver = amount - idealAmount
+			status.cuttoffCost = getEstAmountSpent(price, limit, desiredDuration)
 		}
 
 		return {
