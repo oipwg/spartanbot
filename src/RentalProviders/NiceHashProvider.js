@@ -216,8 +216,8 @@ class NiceHashProvider extends RentalProvider {
 		}
 
 		const desiredDuration = duration
-		const limit = hashrateTH
 		const price = marketPrice
+		const limit = hashrateTH
 		let amount = minimumAmount
 
 		let idealAmount = toMRRAmount(price, duration, limit)
@@ -228,6 +228,8 @@ class NiceHashProvider extends RentalProvider {
 			//rent at balance for shorter duration
 			amount = balance
 			duration = getDuration(price, limit, amount)
+
+			// -------STATUS---------
 			status.status = WARNING
 			status.type = LOW_BALANCE
 			status.costToRent = idealAmount
@@ -241,6 +243,7 @@ class NiceHashProvider extends RentalProvider {
 			amount = minimumAmount
 			duration = getDuration(price, limit, amount)
 
+			// -------STATUS---------
 			status.status = WARNING
 			status.type = CUTOFF
 			status.message = 'Ideal amount to spend for desired limit/duration is below minimum amount.' +
