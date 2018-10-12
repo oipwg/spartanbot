@@ -264,6 +264,31 @@ describe("SpartanBot", () => {
 			let preprocess = await autorenter.manualRent(rentOptions)
 
 		});
+			let options = {
+				algo: 'scrypt',
+				host: 'thecoin.pw',
+				port: 3977,
+				user: 'bitspill.1',
+				pass: 'x',
+				name: 'bits coin pw'
+			}
+			// await spartan.createPool(options)
+			//
+
+			//
+			// let id;
+			// for (let p of spartan.getRentalProviders()) {
+			// 	for (let pool of p.returnPools()) {
+			// 		if (pool.name === options.name) {
+			// 			id = pool.id
+			// 		}
+			// 	}
+			// }
+			//
+			// let res = await spartan.deletePool(id)
+			// expect(res.success).toBeTruthy()
+
+		}, 250 * 100 * 100);
 	})
 	describe('Setup multile providers of different types', () => {
 		it('setup both MRR and NiceHash', async (done) => {
