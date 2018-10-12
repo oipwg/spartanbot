@@ -180,6 +180,7 @@ class NiceHashProvider extends RentalProvider {
 		let balance;
 		try {
 			balance = await this.getBalance()
+			balance = Number(await this.getBalance())
 		} catch (err) {
 			status.status = ERROR
 			return {success: false, message: 'failed to get balance', status}
