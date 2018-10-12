@@ -258,7 +258,7 @@ class AutoRenter {
 	 * @param {Object} options - The Options for the rental operation
 	 * @param {Number} options.hashrate - The amount of Hashrate you wish to rent
 	 * @param {Number} options.duration - The duration (IN HOURS) that you wish to rent hashrate for
-	 * @param {Function} [options.confirm] - This function will be run to decide if the rental should proceed. If it returns `true`, the rental will continue, if false, the rental cancels
+	 * @param {Function} [options.rentSelector] - This function runs to let the user decide which rent option to go for. If no func is passed, will attempt to pick best possible rent opt.
 	 * @return {Promise<Object>} Returns a Promise that will resolve to an Object containing info about the rental made
 	 */
 	async manualRent(options) {
@@ -282,13 +282,16 @@ class AutoRenter {
 			return {success: false, message: 'No providers are capable of renting with set options', preprocess}
 		}
 
-		if (options.confirm) {
-			let proceed = await this.confirmPreprocess(preprocess, options.confirm)
-			if (!proceed)
+		let badges = preprocess.badges
+		if (options.rentSelector) {
+			let selector = await options.rentSelector(preprocess)
+			if (!selector.confirm)
 				return {success: false, message: `Rental Cancelled`}
+			badges = selector.badges
+		} else {
+			badges = await this.manualRentSelector(preprocess)
 		}
 
-		let badges = preprocess.badges
 		// console.log('badges: ', badges)
 		let rentals = []
 		if (Array.isArray(badges)) {
@@ -299,6 +302,7 @@ class AutoRenter {
 			rentals.push(await badges.provider.manualRent(badges))
 		}
 
+		return rentals
 	}
 
 	//this is now to use just as reference until later date
