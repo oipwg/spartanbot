@@ -341,6 +341,7 @@ class NiceHashProvider extends RentalProvider {
 				amount: options.amount,
 				limit: options.limit,
 				price: options.price,
+				res: res.result,
 				rentals: [{id: orderID}]
 			}
 		} else {
@@ -348,7 +349,8 @@ class NiceHashProvider extends RentalProvider {
 				success: false,
 				market: "NiceHash",
 				message: "Something went wrong creating a NiceHash order",
-				failed_rentals: res
+				failed_rentals: [options],
+				res
 			}
 		}
 	}
