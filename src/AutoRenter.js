@@ -373,7 +373,6 @@ class AutoRenter {
 			badges = await this.manualRentSelector(preprocess, options)
 		}
 
-		// console.log('badges: ', badges)
 		let rentals = []
 		if (Array.isArray(badges)) {
 			for (let badge of badges) {
