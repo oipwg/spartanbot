@@ -632,10 +632,10 @@ class SpartanBot {
 	 * Run a Manual Rental instruction
 	 * @param  {Number} hashrate - The hashrate you wish to rent (in MegaHash)
 	 * @param  {Number} duration - The number of seconds that you wish to rent the miners for
-	 * @param  {Function} [confirmation] - Pass in a function that returns a Promise to offer confirmation to the user
+	 * @param  {Function} [rentSelector] - Pass in a function that returns a Promise to offer rent options to user
 	 * @return {Promise<Object>} Returns a Promise that will resolve to an Object that contains information about the rental request
 	 */
-	async manualRental(hashrate, duration, confirmation){
+	async manualRental(hashrate, duration, rentSelector){
 		this.autorenter = new AutoRenter({
 			rental_providers: this.rental_providers
 		})
@@ -644,7 +644,7 @@ class SpartanBot {
 			let rental_info = await this.autorenter.rent({
 				hashrate,
 				duration,
-				confirm: confirmation
+				rentSelector
 			})
 
 			return rental_info
