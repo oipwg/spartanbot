@@ -365,12 +365,12 @@ class AutoRenter {
 
 		let badges = preprocess.badges
 		if (options.rentSelector) {
-			let selector = await options.rentSelector(preprocess)
+			let selector = await options.rentSelector(preprocess, options)
 			if (!selector.confirm)
 				return {success: false, message: `Rental Cancelled`}
 			badges = selector.badges
 		} else {
-			badges = await this.manualRentSelector(preprocess)
+			badges = await this.manualRentSelector(preprocess, options)
 		}
 
 		// console.log('badges: ', badges)
