@@ -50,6 +50,10 @@ export const getLimit = (price, amount, time) => {
 	return ((amount/(price/24))/time).toFixed(fixedLength)
 }
 
+export const getDuration = (price, hash, amount) => {
+	return ((amount/hash)/(price/24)).toFixed(fixedLength)
+}
+
 export const getEstAmountSpent = (price, hash, time) => {
 	return (((price*hash)/24)*time).toFixed(fixedLength)
 }
