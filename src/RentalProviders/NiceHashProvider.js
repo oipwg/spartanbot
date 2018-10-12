@@ -1,10 +1,15 @@
 import RentalProvider from "./RentalProvider";
 import NiceHash from 'nicehash-api'
-import {getLimit, toMRRAmount, toNiceHashPrice} from "../util";
+import {getDuration, getLimit, toMRRAmount, toNiceHashPrice} from "../util";
 
+//status.status
 const ERROR = 'ERROR'
 const NORMAL = 'NORMAL'
+const WARNING = 'WARNING'
+//status.type
+const LOW_LIMIT = 'LOW_LIMIT'
 const LOW_BALANCE = 'LOW_BALANCE'
+const CUTOFF = 'CUTOFF'
 
 class NiceHashProvider extends RentalProvider {
 	constructor(settings) {
