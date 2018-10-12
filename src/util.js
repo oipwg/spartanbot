@@ -41,19 +41,19 @@ export function selectBestCombination(original_array, target_value, object_value
 const fixedLength = 6;
 
 export const toNiceHashPrice = (amount, hash, time) => {
-	return ((amount / hash / time) * 24).toFixed(fixedLength)
+	return Number(((amount / hash / time) * 24).toFixed(fixedLength))
 }
 export const toMRRAmount = (price, time, hash) => {
-	return (((price/24)*time)*hash).toFixed(fixedLength)
+	return Number((((price/24)*time)*hash).toFixed(fixedLength))
 }
 export const getLimit = (price, amount, time) => {
-	return ((amount/(price/24))/time).toFixed(fixedLength)
+	return Number(((amount/(price/24))/time).toFixed(fixedLength))
 }
 
 export const getDuration = (price, hash, amount) => {
-	return ((amount/hash)/(price/24)).toFixed(fixedLength)
+	return Number(((amount/hash)/(price/24)).toFixed(fixedLength))
 }
 
 export const getEstAmountSpent = (price, hash, time) => {
-	return (((price*hash)/24)*time).toFixed(fixedLength)
+	return Number((((price*hash)/24)*time).toFixed(fixedLength))
 }
