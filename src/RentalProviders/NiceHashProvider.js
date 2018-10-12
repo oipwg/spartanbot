@@ -332,13 +332,16 @@ class NiceHashProvider extends RentalProvider {
 		}
 
 		if (res.result && res.result.success) {
+			let orderSuccess = res.result.success
+			let split = orderSuccess.split(' ')
+			let order = split[1]
+			let orderID = order.substr(1)
 			return {
-				success: true,
 				market: "NiceHash",
 				amount: options.amount,
 				limit: options.limit,
 				price: options.price,
-				rentals: res.result.success
+				rentals: [{id: orderID}]
 			}
 		} else {
 			return {
