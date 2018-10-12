@@ -252,8 +252,86 @@ class AutoRenter {
 	 */
 	async manualRentSelector(preprocess, options) {
 		let badges = preprocess.badges
-		
-		return badges
+		const totalHashesDesired = (options.hashrate/1000/1000)*60*60*options.duration
+
+		let normal_badges = []
+		let warning_badges = []
+		for (let badge of badges) {
+			if (badge.status.status === NORMAL) {
+				normal_badges.push(badge)
+			} else if (badge.status.status === WARNING) {
+				warning_badges.push(badge)
+			}
+		}
+
+		// console.log('normal badges: ', normal_badges)
+		// console.log('warning badges: ', warning_badges)
+
+		const limitTH = options.hashrate/1000/1000
+
+
+		if (normal_badges.length > 0) {
+			let best_badge = {}
+			let amount = 1000000
+			for (let badge of normal_badges) {
+				if (badge.amount < amount) {
+					amount = badge.amount
+					best_badge = badge
+				}
+			}
+
+			let limit10Perc = limitTH * 0.10
+			let minLimit = limitTH - limit10Perc
+			if (best_badge.limit > minLimit)
+				return best_badge
+
+			let selected_badges = [best_badge]
+			let hashes = 0
+			if (best_badge.totalHashes < totalHashesDesired) {
+				hashes += best_badge.totalHashes
+				for (let badge of normal_badges) {
+					if ((badge.totalHashes + hashes) <= totalHashesDesired) {
+						selected_badges.push(badge)
+						hashes += badge.totalHashes
+					}
+				}
+			}
+			if (hashes < totalHashesDesired) {
+				for (let badge of warning_badges) {
+					if ((badge.totalHashes + hashes) <= totalHashesDesired) {
+						selected_badges.push(badge)
+						hashes += badge.totalHashes
+					}
+				}
+			}
+
+			if (selected_badges.length > 0)
+				return selected_badges
+		}
+
+		if (warning_badges.length > 0) {
+			let cutoffs = []
+			let low_balances = []
+			for (let badge of warning_badges) {
+				if (badge.status.type === LOW_BALANCE) {
+					low_balances.push(badge)
+				} else if (badge.type === CUTOFF) {
+					cutoffs.push(badge)
+				}
+			}
+
+			let selected_badges = []
+			let hashes = 0;
+
+			for (let badge of low_balances) {
+				if ((badge.totalHashes + hashes) <= totalHashesDesired) {
+					hashes += badge.limit
+					selected_badges.push(badge)
+				}
+			}
+
+			return selected_badges
+		}
 	}
 
 	/**
