@@ -250,7 +250,7 @@ class AutoRenter {
 	 * @param {Object} options - options passed down into manualRent func (hashrate, duration)
 	 * @returns {Promise<{Object}>}
 	 */
-	async manualRentSelector(preprocess) {
+	async manualRentSelector(preprocess, options) {
 		let badges = preprocess.badges
 		
 		return badges
