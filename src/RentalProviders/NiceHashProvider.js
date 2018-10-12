@@ -263,6 +263,8 @@ class NiceHashProvider extends RentalProvider {
 			price,
 			amount,
 			duration,
+			totalHashes: limit*60*60*duration,
+			hashesDesired: hashrateTH*60*60*desiredDuration,
 			status,
 			market: "NiceHash",
 			uid: this.getUID(),
