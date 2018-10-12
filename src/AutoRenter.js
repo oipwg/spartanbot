@@ -7,6 +7,7 @@ import {toNiceHashPrice} from "./util";
 
 const ERROR = 'ERROR'
 const NORMAL = 'NORMAL'
+const WARNING = 'WARNING'
 const LOW_BALANCE = 'LOW_BALANCE'
 const MIXED = 'MIXED'
 
@@ -142,9 +143,11 @@ class AutoRenter {
 			let balance = p.balance
 
 			if (cost_found > balance) {
-				status.status = LOW_BALANCE
+				status.status = WARNING
+				status.type = LOW_BALANCE
 			} else if (p.rigs_to_rent.length === 0) {
 				status.status = ERROR
+				status.type = "NO_RIGS_FOUND"
 			}
 
 			providerBadges.push({
