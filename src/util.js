@@ -49,3 +49,7 @@ export const toMRRAmount = (price, time, hash) => {
 export const getLimit = (price, amount, time) => {
 	return ((amount/(price/24))/time).toFixed(fixedLength)
 }
+
+export const getEstAmountSpent = (price, hash, time) => {
+	return (((price*hash)/24)*time).toFixed(fixedLength)
+}
