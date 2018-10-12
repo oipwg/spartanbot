@@ -80,6 +80,9 @@ class AutoRenter {
 		let hashrate_found = _provider.getTotalHashPower(rigs_to_rent)
 		let cost_found = _provider.getRentalCost(rigs_to_rent)
 
+		let hashratePerc = options.hashrate * .10
+		let hashrateMin = options.hashrate - hashratePerc
+
 		// console.log("total hashpower: ", hashpower_found)
 		// console.log("total cost: ", cost_found)
 
@@ -146,6 +149,10 @@ class AutoRenter {
 			if (cost_found > balance) {
 				status.status = WARNING
 				status.type = LOW_BALANCE
+				if (hashrate_found < hashrateMin) {
+					status.warning = LOW_HASHRATE
+					status.message = `Can only find ${((hashrate_found/options.hashrate)*100).toFixed(2)}% of the hashrate desired`
+				}
 			} else if (p.rigs_to_rent.length === 0) {
 				status.status = ERROR
 				status.type = "NO_RIGS_FOUND"
