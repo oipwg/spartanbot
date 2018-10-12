@@ -243,66 +243,14 @@ class AutoRenter {
 	}
 
 	/**
-	 * Confirms the preprocess returned information (this function merely organizes the preprocess data FOR the confirmFn)
+	 * Selects the best rental options from the returned preprocess function
 	 * @param {Object} preprocess - the returned object from manualRentPreprocess()
-	 * @param {Function} confirmFn - an async function to confirm the preprocess
-	 * @returns {Promise<Boolean>}
+	 * @returns {Promise<{Object}>}
 	 */
-	async confirmPreprocess(preprocess, confirmFn) {
+	async manualRentSelector(preprocess) {
 		let badges = preprocess.badges
-		let limit = 0, amount = 0, price = 0, balance = 0, duration
-		let market = []
-		if (Array.isArray(badges)) {
-			let prices = []
-			let limits = []
-			for (let badge of badges) {
-				limits.push(Number(badge.limit))
-				prices.push(Number(badge.price))
-
-				limit += Number(badge.limit)
-				amount += Number(badge.amount)
-				balance += Number(badge.balance)
-				duration = badge.duration
-				market.push(badge.market)
-			}
-
-			let weights = 0
-			for (let i = 0; i < prices.length; i++) {
-				weights += prices[i]*limits[i]
-			}
-			let weighetedPrice = weights/limit
-			price = weighetedPrice
-
-			let nh = market.includes(NiceHash)
-			let mrr = market.includes(MiningRigRentals)
-			if (nh && mrr) {
-				market = MIXED
-			} else if (nh) {
-				market = NiceHash
-			} else {
-				if (mrr)
-					market = MiningRigRentals
-			}
-
-		} else {
-			limit += Number(badges.limit)
-			amount += Number(badges.amount)
-			price += Number(badges.price)
-			balance += Number(badges.balance)
-			duration = badges.duration
-			market = badges.market
-		}
-
-		return await confirmFn({
-			market,
-			limit,
-			amount,
-			price,
-			duration,
-			balance,
-			market,
-			status: preprocess.status
-		})
+		
+		return badges
 	}
 
 	/**
