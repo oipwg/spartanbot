@@ -24,6 +24,9 @@ const niceHashAPI = {
 	api_key: process.env.NICEHASH_API_KEY
 }
 
+const NiceHash = "NiceHash"
+const MiningRigRentals = "MiningRigRentals"
+
 // After all the tests have run, remove the test data :)
 afterAll(() => {
 	require('./rm-test-data.js')
