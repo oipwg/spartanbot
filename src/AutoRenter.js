@@ -219,17 +219,16 @@ class AutoRenter {
 		}
 		console.log("badge results: ", badges)
 
-		let normal_badges = []
-		let low_balance_badges = []
+		let usable_badges = []
 		let error_badges = []
 
 		for (let badge of badges) {
 			switch (badge.status.status) {
 				case NORMAL:
-					normal_badges.push(badge)
+					usable_badges.push(badge)
 					break
-				case LOW_BALANCE:
-					low_balance_badges.push(badge)
+				case WARNING:
+					usable_badges.push(badge)
 					break
 				case ERROR:
 					error_badges.push(badge)
@@ -237,78 +236,10 @@ class AutoRenter {
 			}
 		}
 
-		const hashLimit = options.hashrate/1000/1000
-
-		//check for successful preprocess
-		if (normal_badges.length === 1) {
-			return {status: NORMAL, badges: normal_badges[0]}
-		} else if (normal_badges.length > 1) {
-			let amount = 10000; //begin with an arbitrarily large number
-			let best_badge;
-		if (normal_badges.length > 0) {
-			let status = NORMAL
-
-			let amount = 10000
-			let bestPick = {}
-			for (let badge of normal_badges) {
-				if (badge.amount < amount) {
-					amount = badge.amount
-					bestPick = badge
-				}
-			}
-
-			let bestPicks = [bestPick]
-
-			if (bestPick.limit < hashLimit) {
-				for (let badge of normal_badges) {
-					if (Number(badge.limit) + bestPick.limit <= hashLimit) {
-						bestPicks.push(badge)
-					}
-				}
-			}
-			let currentTotalHash = 0;
-			for (let badge of bestPicks) {
-				currentTotalHash += Number(badge.limit)
-			}
-			if (currentTotalHash < hashLimit) {
-				if (low_balance_badges.length > 0) {
-					for (let badge of low_balance_badges) {
-						if (Number(badge.limit) + bestPick.limit <= hashLimit) {
-							status = MIXED
-							bestPicks.push(badge)
-						}
-					}
-				}
-			}
-			return {status, badges: bestPicks}
-		}
-
-
-		//check for low balance preprocess
-		if (low_balance_badges.length > 0 ) {
-			let totalTeraHash = 0;
-			for (let badge of low_balance_badges) {
-				totalTeraHash += badge.limit
-			}
-			if (totalTeraHash <= hashLimit) {
-				return {status: LOW_BALANCE, badges: low_balance_badges}
-			} else {
-				let badges = []
-				totalTeraHash = 0;
-				low_balance_badges.sort((a,b) => {return a.amount - b.amount})
-				for (let badge of low_balance_badges) {
-					if ((totalTeraHash + Number(badge.limit)) <= hashLimit) {
-						totalTeraHash += Number(badge.limit)
-						badges.push(badge)
-					}
-				}
-				return {status: LOW_BALANCE, badges}
-			}
-		}
-
-		if (error_badges > 0) {
+		if (usable_badges.length === 0 && error_badges > 0) {
 			return {status: ERROR, badges: error_badges}
-		}
+		} else
+			return {status: NORMAL, badges: usable_badges}
 	}
 
 	/**
