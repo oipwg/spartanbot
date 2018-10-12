@@ -132,7 +132,7 @@ class AutoRenter {
 
 		let providerBadges = []
 		for (let p of providers) {
-			status.status = NORMAL
+			let status = {status: NORMAL}
 
 			p.provider.setActivePoolProfile(p.profile)
 			for (let rig of p.rigs_to_rent) {
