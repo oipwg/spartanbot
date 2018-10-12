@@ -68,3 +68,5 @@ localStorage/*
 
 //MRR api information
 apikey.js
+
+notes.js
