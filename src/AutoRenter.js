@@ -9,6 +9,7 @@ const ERROR = 'ERROR'
 const NORMAL = 'NORMAL'
 const WARNING = 'WARNING'
 const LOW_BALANCE = 'LOW_BALANCE'
+const LOW_HASHRATE = 'LOW_HASHRATE'
 const MIXED = 'MIXED'
 
 /**
