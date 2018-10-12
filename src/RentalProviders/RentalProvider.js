@@ -349,8 +349,6 @@ class RentalProvider {
 	 * @returns {Promise<Object>}
 	 */
 	async manualRent(options) {
-
-		return
 		if (options.market === MiningRigRentals) {
 			console.log('rent from miningrigrentals')
 			let rigs_to_rent = []
