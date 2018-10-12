@@ -616,6 +616,7 @@ class MRRProvider extends RentalProvider {
 
 		let duration = rigs_to_rent[0].length
 		return {
+			market: "MiningRigRentals",
 			rentals: rented_rigs,
 			failed_rentals, // can check if failed_rentals is 0
 			amount: spent_btc_amount,
