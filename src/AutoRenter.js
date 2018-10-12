@@ -10,7 +10,7 @@ const NORMAL = 'NORMAL'
 const WARNING = 'WARNING'
 const LOW_BALANCE = 'LOW_BALANCE'
 const LOW_HASHRATE = 'LOW_HASHRATE'
-const MIXED = 'MIXED'
+const CUTOFF = 'CUTOFF'
 
 /**
  * Manages Rentals of Miners from multiple API's
