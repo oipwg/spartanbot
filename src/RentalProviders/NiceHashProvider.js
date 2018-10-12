@@ -179,60 +179,78 @@ class NiceHashProvider extends RentalProvider {
 		let status = {status: NORMAL}
 		let balance;
 		try {
-			balance = await this.getBalance()
 			balance = Number(await this.getBalance())
 		} catch (err) {
 			status.status = ERROR
 			return {success: false, message: 'failed to get balance', status}
 		}
 
-		if (balance < 0.005 || hashrate/1000/1000 < 0.01) {
+		const hashrateTH = hashrate/1000/1000
+		const minimumAmount = 0.005
+		const minimumLimit = 0.01
+
+		if (balance < minimumAmount || hashrateTH < minimumLimit) {
 			status.status = ERROR
-			let message;
-			if (balance < 0.005)
+			let message
+			if (balance < minimumAmount)
 				message = `Balance must be >= 0.005`
-			if (hashrate/1000/1000 < 0.01)
+				status.type = LOW_BALANCE
+			if (hashrateTH < minimumLimit)
 				message = `Hashrate/limit must be >= 0.01 TH (10,000 MH)`
+				status.type = LOW_LIMIT
 			return {success: false, message, status}
 		}
 
-		const defaultPrice = 0.5
-		const minimumAmount = 0.005
-		const minimumLimit = .01
+		//get price, amount, hash
+		let marketPrice;
+		try {
+			let stats = await this.api.getCurrentGlobalStats24h()
+			for (let stat of stats) {
+				if (stat.algo === "Scrypt") {
+					marketPrice = stat.price
+					break
+				}
+			}
+		} catch (err) {
+			status.status = ERROR; status.type = 'HTML_ERROR';status.error = err; status.message = `Failed to get current global nice hash stats`
+		}
 
-		let limit = hashrate / 1000 / 1000 //ALWAYS CONVERT MH TO TH
+		const desiredDuration = duration
+		const limit = hashrateTH
+		const price = marketPrice
 		let amount = minimumAmount
-		let price = toNiceHashPrice(amount, limit, duration)
 
-		if (price < 0.5) {
-			let stats;
-			let httpError;
-			try {
-				stats = await this.api.getCurrentGlobalStats24h()
-			} catch (err) {
-				httpError = new Error(`Failed to get current global nice hash stats: ${err}`)
-			}
-			if (!httpError) {
-				for (let stat of stats) {
-					if (stat.algo === "Scrypt") {
-						price = stat.price
-						break
-					}
-				}
-			} else {
-				price = defaultPrice
-			}
+		let idealAmount = toMRRAmount(price, duration, limit)
+		if (idealAmount <= balance && idealAmount >= minimumAmount) {
+			//rent at ideal amount for ideal time
+			amount = idealAmount
+		} else if (idealAmount > balance) {
+			//rent at balance for shorter duration
+			amount = balance
+			duration = getDuration(price, limit, amount)
+			status.status = WARNING
+			status.type = LOW_BALANCE
+			status.costToRent = idealAmount
+			status.balance = balance
+			status.fundsNeeded = (idealAmount - balance).toFixed(6)
+			status.duration = duration
+			status.desiredDuration = desiredDuration
+			status.message = `Don't have high enough balance to rent hash for desired duration.`
+		} else {
+			//rent at minimum for longer duration
+			amount = minimumAmount
+			duration = getDuration(price, limit, amount)
 
-			amount = toMRRAmount(price, duration, hashrate)
-			if (amount > balance) {
-				status.status = LOW_BALANCE
-				amount = balance
-				limit = getLimit(price, amount, duration)
-				if (limit < minimumLimit) {
-					status.status = ERROR
-					status.message = 'Cannot rent limit based on minimum price and balance'
-				}
-			}
+			status.status = WARNING
+			status.type = CUTOFF
+			status.message = 'Ideal amount to spend for desired limit/duration is below minimum amount.' +
+				'Either cutoff rental at desired duration or let rental finish calculated time for 0.005 BTC'
+			status.totalDuration = duration
+			status.durationExtension = duration - desiredDuration
+			status.desiredDuration = desiredDuration
+			status.idealAmount = idealAmount
+			status.amountToSpend = amount
+			status.amountOver = amount - idealAmount
 		}
 
 		return {
