@@ -274,7 +274,7 @@ class NiceHashProvider extends RentalProvider {
 	}
 
 	/**
-	 * Create new order. Only standard orders can be created with use of API.
+	 * Create new order. Only standard orders can be created with use of API. Gets passed a badge by RentalProvider
 	 * @param options
 	 * @param {string|number} options.amount - Pay amount in BTC;
 	 * @param {string|number} options.price - Price in BTC/GH/day or BTC/TH/day;
