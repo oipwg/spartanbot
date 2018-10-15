@@ -452,18 +452,33 @@ class AutoRenter {
 
 				if (!should_continue) {
 					return {success: false, message: `Rental Cancelled`}
+		let amount = 0
+		let limit = 0
+		let duration = 0
+		let prices = []
+
+		for (let rental of rentals) {
+			if (rental.success) {
+				if (rental.status.status === WARNING && rental.status.type === CUTOFF) {
+					this.cutoffRental(rental.id, rental.uid, options.duration)
+					amount += rental.status.cuttoffCost
+					limit += rental.limit
+					duration += rental.status.desiredDuration
+				} else {
+					amount += rental.amount
+					limit += rental.limit
+					rental += rental.duration
+					if (rental.market === "NiceHash")
+						prices.push(rental.price)
 				}
-			} catch (e) {
-				return {success: false, message: `Rental Cancelled: \n ${e}`}
 			}
 		}
+		let mrrPrice = toNiceHashPrice(amount, limit, options.duration)
+		prices.push(mrrPrice)
+		let averagePrice = 0
 
-		//rent
-		let rental_info
-		try {
-			rental_info = await this.rental_providers[0].rent(prepurchase_info.rigs)
-		} catch (err) {
-			throw new Error(`Error renting rigs in AutoRenter: \n ${err}`)
+		for (let price of prices) {
+			averagePrice += price
 		}
 
 		//return average price and average duration
