@@ -466,15 +466,9 @@ class AutoRenter {
 			throw new Error(`Error renting rigs in AutoRenter: \n ${err}`)
 		}
 
-		//check rental success
-		if (!rental_info.success)
-			return rental_info
-
-		let btc_to_usd_rate = await this.exchange.getExchangeRate("bitcoin", "usd")
-		let total_rigs = 0
-
-		if (rental_info.rented_rigs)
-			total_rigs = rental_info.rented_rigs.length
+		//return average price and average duration
+		averagePrice /= prices.length
+		duration /= rentals.length
 
 		return {
 			amount,
