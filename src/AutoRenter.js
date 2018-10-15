@@ -368,6 +368,7 @@ class AutoRenter {
 			return {success: false, message: 'No providers are capable of renting with set options', preprocess}
 		}
 
+		//confirm/select
 		let badges = preprocess.badges
 		if (options.rentSelector) {
 			let selector = await options.rentSelector(preprocess, options)
@@ -378,13 +379,27 @@ class AutoRenter {
 			badges = await this.manualRentSelector(preprocess, options)
 		}
 
+		//rent
 		let rentals = []
 		if (Array.isArray(badges)) {
 			for (let badge of badges) {
-				rentals.push(await badge.provider.manualRent(badge))
+				let rentalReturn = await badge.provider.manualRent(badge)
+				if (Array.isArray(rentalReturn)) {
+					for (let rental of rentalReturn) {
+						rentals.push(rental)
+					}
+				} else {
+					rentals.push(rentalReturn)
+				}
 			}
 		} else {
+			let rentalReturn = await badges.provider.manualRent(badges)
+			if (Array.isArray(rentalReturn)) {
+				for (let rental of rentalReturn) {
+					rentals.push(rental)
+				}
 			} else {
+				rentals.push(rentalReturn)
 			}
 		}
 
