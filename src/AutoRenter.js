@@ -484,6 +484,50 @@ class AutoRenter {
 		}
 	}
 
+	/** Cutoff a NiceHash rental at a desired time
+	 * @param {string|number} id - id of the rental
+	 * @param {string|number} uid - the uid of the rental provider
+	 * @param {number} duration - the amount of time to let the rental run
+	 * @returns {void}
+	 */
+	cutoffRental(id, uid, duration) {
+		let cutoffTime = Date.now() + duration * 60 * 60 * 1000
+		let check = async () => {
+			if (Date.now() >= cutoffTime) {
+				let _provider
+				for (let provider of this.rental_providers) {
+					if (provider.getUID() === uid) {
+						_provider = provider
+						break
+					}
+				}
+				let cancel = await _provider.cancelRental(id)
+				if (cancel.success) {
+					//ToDo: Write to log
+					if (!this.cancellations) {
+						this.cancellations = []
+					}
+					this.cancellations.push(cancel)
+				} else {
+					if (cancel.errorType === 'NETWORK') {
+						//ToDo: Write to log
+						setTimeout( check,  60 * 1000)
+					}
+					if (cancel.errorType === 'NICEHSAH') {
+						//ToDo: Write to log
+						console.log(`Failed to cancel order: ${id}`, cancel)
+						if (!this.cancellations) {
+							this.cancellations = []
+						}
+						this.cancellations.push(cancel)
+					}
+				}
+			} else {
+				setTimeout( check,  60 * 1000)
+			}
+		}
+		setTimeout(check, 60 * 1000)
+	}
 }
 
 export default AutoRenter
