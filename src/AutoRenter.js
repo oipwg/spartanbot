@@ -348,7 +348,7 @@ class AutoRenter {
 	 * @return {Promise<Object>} Returns a Promise that will resolve to an Object containing info about the rental made
 	 */
 	async manualRent(options) {
-		if (!(this.rental_providers.length >= 1)){
+		if (!(this.rental_providers.length >= 1)) {
 			return {
 				success: false,
 				type: "NO_RENTAL_PROVIDERS",
