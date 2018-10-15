@@ -2,9 +2,11 @@ import { Account } from 'oip-account'
 import uid from 'uid';
 
 import { MRRProvider, NiceHashProvider } from './RentalProviders'
+import { SpartanSenseStrategy } from './RentalStrategies'
 import AutoRenter from './AutoRenter'
 
 const SUPPORTED_RENTAL_PROVIDERS = [ MRRProvider, NiceHashProvider ]
+const SUPPORTED_RENTAL_STRATEGIES = [ SpartanSenseStrategy ]
 
 let localStorage
 
@@ -34,6 +36,7 @@ class SpartanBot {
 		this.settings = settings || {}
 
 		this.rental_providers = []
+		this.rental_strategies = []
 		this.pool = []
 		this.poolProfiles = []
 
@@ -317,6 +320,32 @@ class SpartanBot {
 		this.serialize()
 
 		return true
+	}
+
+	/**
+	 * Setup a new Rental Strategy to auto-rent machines with.
+	 * @return {Boolean} Returns `true` if setup was successful
+	 */
+	async setupRentalStrategy(settings) {
+		let rental_strategy
+
+		for (let strategy of SUPPORTED_RENTAL_STRATEGIES){
+			console.log(strategy)
+			if (strategy.getType() === settings.type){
+				rental_strategy = strategy
+			}
+		}
+
+		if (!rental_strategy)
+			throw new Error("No Strategy match found for `settings.type`!")
+
+		let strat = new rental_strategy(settings)
+
+		strat.onRentalTrigger(this.manualRental)
+
+		this.rental_strategies.push(strat)
+
+		this.serialize()
 	}
 
 	/**
@@ -660,16 +689,20 @@ class SpartanBot {
 	 */
 	serialize(){
 		let serialized = {
-			rental_providers: []
+			rental_providers: [],
+			rental_strategies: []
 		}
 
 		serialized.settings = this.settings
 		serialized.pools = this.pools
 		serialized.poolProfiles = this.poolProfiles
 
-		for (let provider of this.rental_providers){
+		for (let provider of this.rental_providers)
 			serialized.rental_providers.push(provider.serialize())
-		}
+
+		for (let strategy of this.rental_strategies)
+			serialized.rental_strategies.push(strategy.serialize())
+		
 
 		serialized.oip_account = this.oip_account
 
@@ -694,6 +727,12 @@ class SpartanBot {
 		if (data_from_storage.rental_providers){
 			for (let provider of data_from_storage.rental_providers){
 				await this.setupRentalProvider(provider)
+			}
+		}
+
+		if (data_from_storage.rental_strategies){
+			for (let strategy of data_from_storage.rental_strategies){
+				await this.setupRentalStrategy(strategy)
 			}
 		}
 
