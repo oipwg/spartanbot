@@ -367,7 +367,29 @@ class NiceHashProvider extends RentalProvider {
 		}
 	}
 
+	/**
+	 * Cancel NiceHash rental
+	 * @param {string|number} id - the id of the order you wish to cancel
+	 * @param {string|number} [location=1] - 0 for Europe, 1 for AMERICA
+	 * @param {string|number} [algo='scrypt'] - the algorithm the rental is running
+	 * @private
+	 * @async
+	 * @returns {Promise<Object>}
+	 */
+	async _cancelRental(id, location, algo) {
+		let res;
+		try {
+			res = this.api.removeOrder(id)
+		} catch (err) {
+			return {success: false, error: err, errorType: 'NETWORK', id}
+		}
 
+		if (res.error) {
+			return {success: false, error: res.error, errorType: 'NICEHASH', id}
+		} else {
+			return {success: true, data: res, id}
+		}
+	}
 }
 
 export default NiceHashProvider
