@@ -1,4 +1,5 @@
 import Exchange from 'oip-exchange-rate';
+import moment from 'moment'
 
 const NiceHash = "NiceHash"
 const MiningRigRentals = "MiningRigRentals"
@@ -348,7 +349,7 @@ class AutoRenter {
 	 * @return {Promise<Object>} Returns a Promise that will resolve to an Object containing info about the rental made
 	 */
 	async manualRent(options) {
-		if (!(this.rental_providers.length >= 1)){
+		if (!(this.rental_providers.length >= 1)) {
 			return {
 				success: false,
 				type: "NO_RENTAL_PROVIDERS",
@@ -437,11 +438,15 @@ class AutoRenter {
 		duration /= rentals.length
 
 		return {
-			amount,
-			limit,
-			duration,
-			price: averagePrice,
-			desiredLimit: options.hashrate/1000/1000
+			total_cost: amount,
+			hashrateTH_rented: limit,
+			average_duration: duration,
+			average_price: averagePrice,
+			hashrateTH_desired: options.hashrate / 1000 / 1000,
+			duration_desired: options.duration,
+			rentals,
+			timestamp: moment().format("dddd, MMMM Do YYYY, h:mm:ss a"),
+			unixTimestamp: Date.now(),
 		}
 	}
 
@@ -468,6 +473,7 @@ class AutoRenter {
 					if (!this.cancellations) {
 						this.cancellations = []
 					}
+					console.log(`Cancelled Order ${id}`)
 					this.cancellations.push(cancel)
 				} else {
 					if (cancel.errorType === 'NETWORK') {
@@ -484,7 +490,7 @@ class AutoRenter {
 					}
 				}
 			} else {
-				setTimeout( check,  60 * 1000)
+				setTimeout(check, 60 * 1000)
 			}
 		}
 		setTimeout(check, 60 * 1000)
