@@ -438,11 +438,15 @@ class AutoRenter {
 		duration /= rentals.length
 
 		return {
-			amount,
-			limit,
-			duration,
-			price: averagePrice,
-			desiredLimit: options.hashrate/1000/1000
+			total_cost: amount,
+			hashrateTH_rented: limit,
+			average_duration: duration,
+			average_price: averagePrice,
+			hashrateTH_desired: options.hashrate / 1000 / 1000,
+			duration_desired: options.duration,
+			rentals,
+			timestamp: moment().format("dddd, MMMM Do YYYY, h:mm:ss a"),
+			unixTimestamp: Date.now(),
 		}
 	}
 
