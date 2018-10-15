@@ -477,10 +477,11 @@ class AutoRenter {
 			total_rigs = rental_info.rented_rigs.length
 
 		return {
-			success: true,
-			total_rigs_rented: total_rigs,
-			total_cost: (rental_info.btc_total_price * btc_to_usd_rate).toFixed(2),
-			total_hashrate: rental_info.total_hashrate
+			amount,
+			limit,
+			duration,
+			price: averagePrice,
+			desiredLimit: options.hashrate/1000/1000
 		}
 	}
 
