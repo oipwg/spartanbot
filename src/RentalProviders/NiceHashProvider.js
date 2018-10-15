@@ -217,7 +217,10 @@ class NiceHashProvider extends RentalProvider {
 				}
 			}
 		} catch (err) {
-			status.status = ERROR; status.type = 'HTML_ERROR';status.error = err; status.message = `Failed to get current global nice hash stats`
+			status.status = ERROR;
+			status.type = 'HTML_ERROR';
+			status.error = err;
+			status.message = `Failed to get current global nice hash stats`
 		}
 
 		const desiredDuration = duration
@@ -266,8 +269,8 @@ class NiceHashProvider extends RentalProvider {
 			market: "NiceHash",
 			status,
 			amount,
-			totalHashes: limit*60*60*duration,
-			hashesDesired: hashrateTH*60*60*desiredDuration,
+			totalHashes: limit * 60 * 60 * duration,
+			hashesDesired: hashrateTH * 60 * 60 * desiredDuration,
 			duration,
 			limit,
 			price,
@@ -340,31 +343,29 @@ class NiceHashProvider extends RentalProvider {
 		} catch (err) {
 			return {success: false, message: `Failed to create NiceHash order`, error: err}
 		}
-
+		let id, success = true
 		if (res.result && res.result.success) {
 			let orderSuccess = res.result.success
 			let split = orderSuccess.split(' ')
 			let order = split[1]
-			let orderID = order.substr(1)
-			return {
-				market: "NiceHash",
-				amount: options.amount,
-				limit: options.limit,
-				price: options.price,
-				res: res.result,
-				rentals: [{id: orderID}]
-			}
+			id = order.substr(1)
 		} else {
-			return {
-				success: false,
-				market: "NiceHash",
-				message: "Something went wrong creating a NiceHash order",
-				failed_rentals: [options],
-				res
-			}
+			success = false
+		}
+
+		return {
+			market: "NiceHash",
+			success,
+			amount: options.amount,
+			limit: options.limit,
+			price: options.price,
+			duration: options.duration,
+			status: options.status,
+			res,
+			id,
+			uid: this.getUID()
 		}
 	}
-
 
 
 }
