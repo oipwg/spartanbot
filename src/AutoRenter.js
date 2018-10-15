@@ -490,7 +490,7 @@ class AutoRenter {
 					}
 				}
 			} else {
-				setTimeout( check,  60 * 1000)
+				setTimeout(check, 60 * 1000)
 			}
 		}
 		setTimeout(check, 60 * 1000)
