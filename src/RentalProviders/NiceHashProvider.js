@@ -26,7 +26,7 @@ class NiceHashProvider extends RentalProvider {
 	 * @return {String} Returns "NiceHash"
 	 * @static
 	 */
-	static getType(){
+	static getType() {
 		return "NiceHash"
 	}
 
