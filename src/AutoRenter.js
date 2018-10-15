@@ -1,4 +1,5 @@
 import Exchange from 'oip-exchange-rate';
+import moment from 'moment'
 
 const NiceHash = "NiceHash"
 const MiningRigRentals = "MiningRigRentals"
