@@ -363,6 +363,15 @@ class RentalProvider {
 	}
 
 	/**
+	 * Cancel a rental
+	 * @param {string|number} id - id of the rental order
+	 * @returns {Promise<Object>}
+	 */
+	async cancelRental(id) {
+		return await this._cancelRental(id)
+	}
+
+	/**
 	 * Get back a "Serialized" state of the Provider
 	 * @return {Object} Returns a JSON object that contains the current rental provider state
 	 */
