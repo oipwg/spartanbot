@@ -600,29 +600,25 @@ class MRRProvider extends RentalProvider {
 		}
 
 		let rented_rigs = []
-		let failed_rentals = []
-		let spent_btc_amount = 0
-		let total_rented_hashrate = 0
 
 		for (let rig in rentalConfirmation){
 			if (rentalConfirmation[rig].success){
-				rented_rigs.push(rentalConfirmation[rig].data)
-				spent_btc_amount += parseFloat(rentalConfirmation[rig].data.price.paid)
-				total_rented_hashrate += rentalConfirmation[rig].data.hashrate.advertised.hash
+				let rentalObject = {}
+				rentalObject.market = "MiningRigRentals"
+				rentalObject.success = true
+				rentalObject.amount = parseFloat(rentalConfirmation[rig].data.price.paid)
+				rentalObject.limit = (rentalConfirmation[rig].data.hashrate.advertised.hash)/1000/1000
+				rentalObject.duration = rentalConfirmation[rig].data.length
+				rentalObject.id = rig
+				rentalObject.status = {status: "NORMAL"}
+				rentalObject.uid = this.getUID()
+				rented_rigs.push(rentalObject)
 			} else {
-				failed_rentals.push(rentalConfirmation[rig])
+				rented_rigs.push({success: false, ...rentalConfirmation[rig], status: {status: "NORMAl"}})
 			}
 		}
 
-		let duration = rigs_to_rent[0].length
-		return {
-			market: "MiningRigRentals",
-			rentals: rented_rigs,
-			failed_rentals, // can check if failed_rentals is 0
-			amount: spent_btc_amount,
-			limit: total_rented_hashrate/1000/1000, //convert to TH from MH,
-			price: toNiceHashPrice(spent_btc_amount, total_rented_hashrate, duration)
-		}
+		return rented_rigs
 	}
 
 	/**
