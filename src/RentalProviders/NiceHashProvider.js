@@ -43,10 +43,10 @@ class NiceHashProvider extends RentalProvider {
 	 * @async
 	 * @returns {Promise<Boolean>}
 	 */
-	async _testAuthorization(){
+	async _testAuthorization() {
 		try {
 			return await this.api.testAuthorization()
-		} catch(err) {
+		} catch (err) {
 			throw new Error(`Authorization failed: ${err}`)
 		}
 	}
