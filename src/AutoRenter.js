@@ -384,74 +384,10 @@ class AutoRenter {
 				rentals.push(await badge.provider.manualRent(badge))
 			}
 		} else {
-			rentals.push(await badges.provider.manualRent(badges))
-		}
-
-		return rentals
-	}
-
-	//this is now to use just as reference until later date
-	/**
-	 * Rent an amount of hashrate for a period of time
-	 * @param {Object} options - The Options for the rental operation
-	 * @param {Number} options.hashrate - The amount of Hashrate you wish to rent
-	 * @param {Number} options.duration - The duration (IN SECONDS) that you wish to rent hashrate for
-	 * @param {Function} [options.confirm] - This function will be run to decide if the rental should proceed. If it returns `true`, the rental will continue, if false, the rental cancels
-	 * @return {Promise<Object>} Returns a Promise that will resolve to an Object containing info about the rental made
-	 */
-	async rent(options) {
-		// Make sure we have some Rental Providers, if not, return failure
-		if (!(this.rental_providers.length >= 1)){
-			return {
-				success: false,
-				type: "NO_RENTAL_PROVIDERS",
-				message: "Rent Cancelled, no RentalProviders found to rent from"
-			}
-		}
-
-		// tmp convert for MRRProvider
-		let hours = options.duration / 60 / 60
-		options.duration = hours
-
-		//preprocess
-		let prepurchase_info;
-		try {
-			prepurchase_info = await this.mrrRentPreprocess(options)
-		} catch (err) {
-			throw new Error(`Failed to get prepurchase_info! \n ${err}`)
-		}
-
-		let status = {
-			status: 'normal'
-		}
-
-		if (prepurchase_info.total_balance < prepurchase_info.initial_cost) {
-			status.status = 'warning';
-			status.type = 'LOW_BALANCE_WARNING'
-			status.totalBalance = prepurchase_info.btc_total_price
-
-			if (prepurchase_info.initial_rigs === 0) {
-				status.message = `Could not find any rigs to rent with available balance`
 			} else {
-				status.message = `${prepurchase_info.total_rigs}/${prepurchase_info.initial_rigs} rigs available to rent with current balance.`
 			}
 		}
 
-		// -> confirm total
-		if (options.confirm){
-			try {
-				let btc_to_usd_rate = await this.exchange.getExchangeRate("bitcoin", "usd")
-
-				let should_continue = await options.confirm({
-					total_cost: (prepurchase_info.initial_cost * btc_to_usd_rate).toFixed(2),
-					cost_to_rent: (prepurchase_info.btc_total_price * btc_to_usd_rate).toFixed(2),
-					hashrate_to_rent: prepurchase_info.total_hashrate,
-					total_rigs: prepurchase_info.total_rigs,
-					status
-				})
-
-				if (!should_continue) {
-					return {success: false, message: `Rental Cancelled`}
 		let amount = 0
 		let limit = 0
 		let duration = 0
