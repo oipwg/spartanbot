@@ -78,7 +78,10 @@ class NiceHashProvider extends RentalProvider {
 	 */
 	_createPool(options) {
 		if (!options.pool_host || !options.pool_port || !options.pool_user || !options.pool_pass) {
-			return {success: false, message: 'must provide all of the following: pool_host, pool_port, pool_user, pool_pass'}
+			return {
+				success: false,
+				message: 'must provide all of the following: pool_host, pool_port, pool_user, pool_pass'
+			}
 		}
 		let pool = {...options, market: this.getInternalType(), providerUID: this.getUID()};
 		this.addPools(pool)
@@ -145,7 +148,7 @@ class NiceHashProvider extends RentalProvider {
 				}
 			}
 		}
-		return {success: true,  data: { id, success: true, message: 'Updated' }}
+		return {success: true, data: {id, success: true, message: 'Updated'}}
 	}
 
 	/**
@@ -185,19 +188,21 @@ class NiceHashProvider extends RentalProvider {
 			return {success: false, message: 'failed to get balance', status}
 		}
 
-		const hashrateTH = hashrate/1000/1000
+		const hashrateTH = hashrate / 1000 / 1000
 		const minimumAmount = 0.005
 		const minimumLimit = 0.01
 
 		if (balance < minimumAmount || hashrateTH < minimumLimit) {
 			status.status = ERROR
 			let message
-			if (balance < minimumAmount)
+			if (balance < minimumAmount) {
 				message = `Balance must be >= 0.005`
 				status.type = LOW_BALANCE
-			if (hashrateTH < minimumLimit)
+			}
+			if (hashrateTH < minimumLimit) {
 				message = `Hashrate/limit must be >= 0.01 TH (10,000 MH)`
 				status.type = LOW_LIMIT
+			}
 			return {success: false, message, status}
 		}
 
