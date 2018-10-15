@@ -246,7 +246,7 @@ class NiceHashProvider extends RentalProvider {
 			// -------STATUS---------
 			status.status = WARNING
 			status.type = CUTOFF
-			status.message = 'Ideal amount to spend for desired limit/duration is below minimum amount.' +
+			status.message = 'Ideal amount to spend for desired limit/duration is below minimum amount. ' +
 				'Either cutoff rental at desired duration or let rental finish calculated time for 0.005 BTC'
 			status.totalDuration = duration
 			status.extendedDuration = duration - desiredDuration
@@ -258,15 +258,20 @@ class NiceHashProvider extends RentalProvider {
 		}
 
 		return {
-			balance,
-			limit,
-			price,
+			market: "NiceHash",
+			status,
 			amount,
-			duration,
 			totalHashes: limit*60*60*duration,
 			hashesDesired: hashrateTH*60*60*desiredDuration,
-			status,
-			market: "NiceHash",
+			duration,
+			limit,
+			price,
+			balance,
+			query: {
+				hashrate_found: limit,
+				cost_found: idealAmount,
+				duration: desiredDuration
+			},
 			uid: this.getUID(),
 			provider: this,
 		}

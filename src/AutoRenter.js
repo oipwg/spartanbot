@@ -159,29 +159,29 @@ class AutoRenter {
 			}
 
 			providerBadges.push({
-				balance,
-				limit,
-				price,
-				amount,
-				duration,
-				status,
 				market,
+				status,
+				amount,
 				totalHashes: limit*60*60*duration,
 				hashesDesired: (options.hashrate/1000/1000)*60*60*options.duration,
+				duration,
+				limit,
+				price,
+				balance,
 				query: {
 					hashrate_found,
-					cost_found
+					cost_found,
+					duration: options.duration
 				},
-				rigs: p.rigs_to_rent,
 				uid: p.uid,
-				provider: p.provider,
-				success: true
+				rigs: p.rigs_to_rent,
+				provider: p.provider
 			})
 		}
 		if (providerBadges.length === 1) {
-			return providerBadges[0]
+			return {success: true, badges: providerBadges[0]}
 		} else {
-			return providerBadges
+			return {success: true, badges: providerBadges}
 		}
 	}
 
@@ -209,11 +209,16 @@ class AutoRenter {
 
 		if (mrrProviders.length >= 1) {
 			let mrrPreprocess = await this.mrrRentPreprocess(options)
-			if (Array.isArray(mrrPreprocess)) {
-				for (let badge of mrrPreprocess) {
-					badges.push(badge)
-				}
-			} else {badges.push(mrrPreprocess)}
+			if (!mrrPreprocess.success) {
+				return mrrPreprocess
+			} else {
+				if (Array.isArray(mrrPreprocess.badges)) {
+					for (let badge of mrrPreprocess.badges) {
+						badges.push(badge)
+					}
+				} else {badges.push(mrrPreprocess.badges)}
+			}
+
 		}
 
 		for (let prov of nhProviders) {
