@@ -36,6 +36,7 @@ class SpartanBot {
 		this.rental_providers = []
 		this.pool = []
 		this.poolProfiles = []
+		this.receipts = []
 
 		// Try to load state from LocalStorage if we are not memory only
 		if (!this.settings.memory){
@@ -627,7 +628,6 @@ class SpartanBot {
 		this.poolProfiles = profiles
 	}
 
-	
 	/**
 	 * Run a Manual Rental instruction
 	 * @param  {Number} hashrate - The hashrate you wish to rent (in MegaHash)
@@ -640,17 +640,29 @@ class SpartanBot {
 			rental_providers: this.rental_providers
 		})
 
+		let rental_info
 		try {
-			let rental_info = await this.autorenter.manualRent({
+			rental_info = await this.autorenter.manualRent({
 				hashrate,
 				duration,
 				rentSelector
 			})
-
-			return rental_info
 		} catch (e) {
 			throw new Error("Unable to rent using SpartanBot!\n" + e)
 		}
+
+		this.saveReceipt(rental_info)
+
+		return rental_info
+	}
+
+	/**
+	 * Save a rental_info/history object to local storage
+	 * @param {Object} receipt - an object containing information about a rental
+	 */
+	saveReceipt(receipt) {
+		this.receipts.push(receipt)
+		this.serialize()
 	}
 
 	/**
@@ -666,6 +678,7 @@ class SpartanBot {
 		serialized.settings = this.settings
 		serialized.pools = this.pools
 		serialized.poolProfiles = this.poolProfiles
+		serialized.receipts = this.receipts
 
 		for (let provider of this.rental_providers){
 			serialized.rental_providers.push(provider.serialize())
@@ -707,6 +720,10 @@ class SpartanBot {
 
 		if (data_from_storage.oip_account){
 			this.oip_account = data_from_storage.oip_account
+		}
+
+		if (data_from_storage.receipts){
+			this.receipts = data_from_storage.receipts
 		}
 
 		return true
