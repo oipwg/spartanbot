@@ -612,6 +612,7 @@ class MRRProvider extends RentalProvider {
 				rentalObject.id = rig
 				rentalObject.status = {status: "NORMAL"}
 				rentalObject.uid = this.getUID()
+				rentalObject.mrrData = rentalConfirmation[rig].data
 				rented_rigs.push(rentalObject)
 			} else {
 				rented_rigs.push({success: false, ...rentalConfirmation[rig], status: {status: "NORMAl"}})
