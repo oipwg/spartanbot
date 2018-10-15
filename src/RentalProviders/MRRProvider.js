@@ -615,7 +615,7 @@ class MRRProvider extends RentalProvider {
 				rentalObject.mrrData = rentalConfirmation[rig].data
 				rented_rigs.push(rentalObject)
 			} else {
-				rented_rigs.push({success: false, ...rentalConfirmation[rig], status: {status: "NORMAl"}})
+				rented_rigs.push({success: false, ...rentalConfirmation[rig], status: {status: "NORMAl"}, rig})
 			}
 		}
 
