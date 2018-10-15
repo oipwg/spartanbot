@@ -468,6 +468,7 @@ class AutoRenter {
 					if (!this.cancellations) {
 						this.cancellations = []
 					}
+					console.log(`Cancelled Order ${id}`)
 					this.cancellations.push(cancel)
 				} else {
 					if (cancel.errorType === 'NETWORK') {
