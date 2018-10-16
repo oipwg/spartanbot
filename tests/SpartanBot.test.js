@@ -269,18 +269,20 @@ describe("SpartanBot", () => {
 				rentSelector
 			}
 
-			let rent = await autorenter.manualRent(rentOptions)
-			console.log(rent)
-
 			let options = {
 				algo: 'scrypt',
 				host: 'thecoin.pw',
-				port: 3977,
+				port: 3978,
 				user: 'bitspill.1',
 				pass: 'x',
-				name: 'bits coin pw'
+				name: 'created in spartanbot manual rent (new) test'
 			}
+
 			await spartan.createPool(options)
+
+			let rent = await autorenter.manualRent(rentOptions)
+			console.log(rent)
+
 
 			let id;
 			for (let p of spartan.getRentalProviders()) {
