@@ -260,11 +260,15 @@ describe("SpartanBot", () => {
 		it.skip('manual rent (new) | manualRent', async (done) => {
 			await setupProviders()
 			const rentSelector = async (p, o) => {
-				console.log(p, o)
-				return {badges: undefined, confirm: false}
+				let b;
+				for (let pr of p.badges) {
+					if (pr.cutoff)
+						b = pr
+				}
+				return {badges: b, confirm: false}
 			}
 			let rentOptions = {
-				hashrate: 50000,
+				hashrate: 10000,
 				duration: 3,
 				rentSelector
 			}
