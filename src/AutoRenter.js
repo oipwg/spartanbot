@@ -393,7 +393,7 @@ class AutoRenter {
 		if (options.rentSelector) {
 			let selector = await options.rentSelector(preprocess, options)
 			if (!selector.confirm)
-				return {success: false, message: `Rental Cancelled`}
+				return {success: false, message: selector.message }
 			badges = selector.badges
 		} else {
 			badges = await this.manualRentSelector(preprocess, options)
