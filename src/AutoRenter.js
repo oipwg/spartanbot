@@ -435,9 +435,9 @@ class AutoRenter {
 					this.cutoffRental(rental.id, rental.uid, options.duration)
 					limits.push(rental.limit)
 					limit += rental.limit
-					duration += options.duration
-					durations.push(options.duration)
-					amount += rental.status.cuttoffCost
+					duration += rental.status.desiredDuration
+					durations.push(rental.status.desiredDuration)
+					amount += rental.status.cutoffCost
 				} else {
 					limits.push(rental.limit)
 					limit += rental.limit
