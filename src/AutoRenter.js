@@ -23,7 +23,7 @@ class AutoRenter {
 	 * @param  {Array.<RentalProvider>} settings.rental_providers - The Rental Providers that you wish to use to rent miners.
 	 * @return {Boolean}
 	 */
-	constructor(settings){
+	constructor(settings) {
 		this.settings = settings
 		this.rental_providers = settings.rental_providers
 		this.exchange = new Exchange();
@@ -108,7 +108,7 @@ class AutoRenter {
 				while (p.balance < rental_cost && p.rigs_to_rent.length > 0) {
 					// console.log(`balance: ${p.balance}\nRental cost: ${rental_cost}\nOver Under: ${p.balance-rental_cost}\nAmount substracted -${p.rigs_to_rent[0].btc_price}\nLeft Over: ${rental_cost-p.rigs_to_rent[0].btc_price}`)
 					let tmpRig;
-					[tmpRig] = p.rigs_to_rent.splice(0,1)
+					[tmpRig] = p.rigs_to_rent.splice(0, 1)
 					extra_rigs.push(tmpRig)
 
 					rental_cost = _provider.getRentalCost(p.rigs_to_rent)
@@ -120,10 +120,10 @@ class AutoRenter {
 		for (let p of providers) {
 			let rental_cost = _provider.getRentalCost(p.rigs_to_rent);
 			if (p.balance > rental_cost) {
-				for (let i = extra_rigs.length -1; i >= 0; i--){
+				for (let i = extra_rigs.length - 1; i >= 0; i--) {
 					if ((extra_rigs[i].btc_price + rental_cost) <= p.balance) {
 						let tmpRig;
-						[tmpRig] = extra_rigs.splice(i,1);
+						[tmpRig] = extra_rigs.splice(i, 1);
 						p.rigs_to_rent.push(tmpRig)
 						rental_cost = _provider.getRentalCost(p.rigs_to_rent);
 					}
@@ -152,7 +152,7 @@ class AutoRenter {
 				status.type = LOW_BALANCE
 				if (hashrate_found < hashrateMin) {
 					status.warning = LOW_HASHRATE
-					status.message = `Can only find ${((hashrate_found/options.hashrate)*100).toFixed(2)}% of the hashrate desired`
+					status.message = `Can only find ${((hashrate_found / options.hashrate) * 100).toFixed(2)}% of the hashrate desired`
 				}
 			} else if (p.rigs_to_rent.length === 0) {
 				status.status = ERROR
@@ -163,8 +163,8 @@ class AutoRenter {
 				market,
 				status,
 				amount,
-				totalHashes: limit*60*60*duration,
-				hashesDesired: (options.hashrate/1000/1000)*60*60*options.duration,
+				totalHashes: limit * 60 * 60 * duration,
+				hashesDesired: (options.hashrate / 1000 / 1000) * 60 * 60 * options.duration,
 				duration,
 				limit,
 				price,
@@ -217,7 +217,9 @@ class AutoRenter {
 					for (let badge of mrrPreprocess.badges) {
 						badges.push(badge)
 					}
-				} else {badges.push(mrrPreprocess.badges)}
+				} else {
+					badges.push(mrrPreprocess.badges)
+				}
 			}
 
 		}
@@ -258,7 +260,7 @@ class AutoRenter {
 	 */
 	async manualRentSelector(preprocess, options) {
 		let badges = preprocess.badges
-		const totalHashesDesired = (options.hashrate/1000/1000)*60*60*options.duration
+		const totalHashesDesired = (options.hashrate / 1000 / 1000) * 60 * 60 * options.duration
 
 		let normal_badges = []
 		let warning_badges = []
@@ -273,7 +275,7 @@ class AutoRenter {
 		// console.log('normal badges: ', normal_badges)
 		// console.log('warning badges: ', warning_badges)
 
-		const limitTH = options.hashrate/1000/1000
+		const limitTH = options.hashrate / 1000 / 1000
 
 
 		if (normal_badges.length > 0) {
