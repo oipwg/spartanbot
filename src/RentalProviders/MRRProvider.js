@@ -244,6 +244,28 @@ class MRRProvider extends RentalProvider {
 		}
 	}
 
+	_addPools(pools) {
+		if (Array.isArray(pools)) {
+			for (let pool of pools) {
+				let match = false
+				for (let p of this.pools) {
+					if (p.id === pool.id || p.mrrID === pool.mrrID)
+						match = true
+				}
+				if (!match)
+					this.pools.push(serializePool(pool, this.getInternalType()))
+			}
+		} else {
+			for (let p of this.pools) {
+				let match = false
+				if (p.id === pools.id || p.mrrID === pools.mrrID)
+					match = true
+			}
+			if (!match)
+				this.pools.push(serializePool(pools, this.getInternalType()))
+		}
+	}
+
 	/**
 	 * Add a pool to the profile
 	 * @param {Object} options

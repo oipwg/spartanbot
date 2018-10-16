@@ -159,6 +159,29 @@ class NiceHashProvider extends RentalProvider {
 		return await this.pools
 	}
 
+	_addPools(pools) {
+		if (Array.isArray(pools)) {
+			for (let pool of pools) {
+				let match = false
+				for (let p of this.pools) {
+					if (p.id === pool.id)
+						match = true
+				}
+				if (!match)
+					this.pools.push(serializePool(pool, this.getInternalType()))
+
+			}
+		} else {
+			for (let p of this.pools) {
+				let match = false
+				if (p.id === pools.id)
+					match = true
+			}
+			if (!match)
+				this.pools.push(serializePool(pools, this.getInternalType()))
+		}
+	}
+
 	/**
 	 * Set pool to active
 	 * poolid
