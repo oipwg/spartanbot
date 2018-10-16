@@ -384,6 +384,7 @@ class NiceHashProvider extends RentalProvider {
 			status: options.status,
 			res,
 			id,
+			cutoff: options.cutoff,
 			uid: this.getUID()
 		}
 	}

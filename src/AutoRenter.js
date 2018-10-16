@@ -431,7 +431,7 @@ class AutoRenter {
 		let durations = []
 		for (let rental of rentals) {
 			if (rental.success) {
-				if (rental.status.status === WARNING && rental.status.type === CUTOFF) {
+				if (rental.cutoff) {
 					this.cutoffRental(rental.id, rental.uid, options.duration)
 					limits.push(rental.limit)
 					limit += rental.limit
