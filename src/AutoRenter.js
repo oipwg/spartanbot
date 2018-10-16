@@ -393,7 +393,7 @@ class AutoRenter {
 		if (options.rentSelector) {
 			let selector = await options.rentSelector(preprocess, options)
 			if (!selector.confirm)
-				return {success: false, message: selector.message }
+				return {success: false, message: selector.message}
 			badges = selector.badges
 		} else {
 			badges = await this.manualRentSelector(preprocess, options)
@@ -461,8 +461,8 @@ class AutoRenter {
 		return {
 			total_cost: amount,
 			average_hashrate_rented: weightedLimit,
-			average_duration: duration/rentals.length,
-			average_price: toNiceHashPrice(amount, weightedLimit, duration/rentals.length),
+			average_duration: duration / rentals.length,
+			average_price: toNiceHashPrice(amount, weightedLimit, duration / rentals.length),
 			hashrateTH_desired: options.hashrate / 1000 / 1000,
 			duration_desired: options.duration,
 			rentals,
