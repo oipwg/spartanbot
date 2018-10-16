@@ -93,7 +93,7 @@
   <article>
     <pre class="prettyprint source linenums"><code>import RentalProvider from './RentalProvider'
 import MiningRigRentals from 'miningrigrentals-api-v2'
-import {selectBestCombination, toNiceHashPrice} from "../util";
+import {selectBestCombination, serializePool, toNiceHashPrice} from "../util";
 
 /**
  * A Rental Provider for MiningRigRentals
@@ -334,6 +334,28 @@ class MRRProvider extends RentalProvider {
 			} else {
 				throw new Error(`Success: false. ${res.data}`)
 			}
+		}
+	}
+
+	_addPools(pools) {
+		if (Array.isArray(pools)) {
+			for (let pool of pools) {
+				let match = false
+				for (let p of this.pools) {
+					if (p.id === pool.id || p.mrrID === pool.mrrID)
+						match = true
+				}
+				if (!match)
+					this.pools.push(serializePool(pool, this.getInternalType()))
+			}
+		} else {
+			for (let p of this.pools) {
+				let match = false
+				if (p.id === pools.id || p.mrrID === pools.mrrID)
+					match = true
+			}
+			if (!match)
+				this.pools.push(serializePool(pools, this.getInternalType()))
 		}
 	}
 

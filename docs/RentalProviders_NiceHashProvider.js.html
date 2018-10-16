@@ -93,7 +93,7 @@
   <article>
     <pre class="prettyprint source linenums"><code>import RentalProvider from "./RentalProvider";
 import NiceHash from 'nicehash-api'
-import {getDuration, getEstAmountSpent, getLimit, toMRRAmount, toNiceHashPrice} from "../util";
+import {getDuration, getEstAmountSpent, getLimit, serializePool, toMRRAmount, toNiceHashPrice} from "../util";
 
 //status.status
 const ERROR = 'ERROR'
@@ -177,10 +177,8 @@ class NiceHashProvider extends RentalProvider {
 			}
 		}
 		let pool = {...options, market: this.getInternalType(), providerUID: this.getUID()};
-		this.addPools(pool)
-
-		if (!this._returnActivePool())
-			this._setActivePool(pool.id)
+		this._addPools(pool)
+		this._setActivePool(pool.id)
 		return pool
 	}
 
@@ -252,6 +250,29 @@ class NiceHashProvider extends RentalProvider {
 	 */
 	async _getPools() {
 		return await this.pools
+	}
+
+	_addPools(pools) {
+		if (Array.isArray(pools)) {
+			for (let pool of pools) {
+				let match = false
+				for (let p of this.pools) {
+					if (p.id === pool.id)
+						match = true
+				}
+				if (!match)
+					this.pools.push(serializePool(pool, this.getInternalType()))
+
+			}
+		} else {
+			for (let p of this.pools) {
+				let match = false
+				if (p.id === pools.id)
+					match = true
+			}
+			if (!match)
+				this.pools.push(serializePool(pools, this.getInternalType()))
+		}
 	}
 
 	/**
