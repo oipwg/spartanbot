@@ -244,7 +244,7 @@ class RentalProvider {
 	 * Get pools
 	 * @param {Array.&lt;number>} [ids] - an array of pool ids
  	 */
-	async getPools(ids) {
+			async getPools(ids) {
 		if (typeof ids === 'number' &amp;&amp; !Array.isArray(ids)) {
 			try {
 				return await this.getPool(id)
