@@ -1,4 +1,5 @@
 import uid from 'uid'
+import {serializePool} from "../util";
 
 const NiceHash = "NiceHash"
 const MiningRigRentals = "MiningRigRentals"

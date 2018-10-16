@@ -1,6 +1,6 @@
 import RentalProvider from "./RentalProvider";
 import NiceHash from 'nicehash-api'
-import {getDuration, getEstAmountSpent, getLimit, toMRRAmount, toNiceHashPrice} from "../util";
+import {getDuration, getEstAmountSpent, getLimit, serializePool, toMRRAmount, toNiceHashPrice} from "../util";
 
 //status.status
 const ERROR = 'ERROR'
