@@ -57,3 +57,43 @@ export const getDuration = (price, hash, amount) => {
 export const getEstAmountSpent = (price, hash, time) => {
 	return Number((((price*hash)/24)*time).toFixed(fixedLength))
 }
+
+export const serializePool = (pool, type) => {
+	let serPool = {}
+	if (type === "MiningRigRentals") {
+		for (let opt in pool) {
+			if (opt === 'algo') {
+				serPool.type = pool[opt]
+			} else if (opt === 'pool_host') {
+				serPool.host = pool[opt]
+			} else if (opt === 'pool_port') {
+				serPool.port = pool[opt]
+			} else if (opt === 'pool_user') {
+				serPool.user = pool[opt]
+			} else if (opt === 'pool_pass') {
+				serPool.pass = pool[opt]
+			} else {
+				serPool[opt] = pool[opt]
+			}
+		}
+	}
+	if (type === "NiceHash") {
+		for (let opt in pool) {
+			if (opt === 'type') {
+				serPool.algo = pool[opt]
+			} else if (opt === 'host') {
+				serPool.pool_host = pool[opt]
+			} else if (opt === 'port') {
+				serPool.pool_port = pool[opt]
+			} else if (opt === 'user') {
+				serPool.pool_user = pool[opt]
+			} else if (opt === 'pass') {
+				serPool.pool_pass = pool[opt]
+			} else {
+				serPool[opt] = pool[opt]
+			}
+		}
+	}
+
+	return serPool
+}
