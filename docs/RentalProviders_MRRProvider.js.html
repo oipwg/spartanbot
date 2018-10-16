@@ -349,8 +349,8 @@ class MRRProvider extends RentalProvider {
 					this.pools.push(serializePool(pool, this.getInternalType()))
 			}
 		} else {
+			let match = false
 			for (let p of this.pools) {
-				let match = false
 				if (p.id === pools.id || p.mrrID === pools.mrrID)
 					match = true
 			}

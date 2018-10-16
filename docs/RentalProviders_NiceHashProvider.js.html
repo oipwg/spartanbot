@@ -265,8 +265,8 @@ class NiceHashProvider extends RentalProvider {
 
 			}
 		} else {
+			let match = false
 			for (let p of this.pools) {
-				let match = false
 				if (p.id === pools.id)
 					match = true
 			}
