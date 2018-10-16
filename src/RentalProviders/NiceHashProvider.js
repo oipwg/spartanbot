@@ -262,7 +262,7 @@ class NiceHashProvider extends RentalProvider {
 			status.idealAmount = idealAmount
 			status.cost = amount
 			status.amountOver = amount - idealAmount
-			status.cuttoffCost = getEstAmountSpent(price, limit, desiredDuration)
+			status.cutoffCost = getEstAmountSpent(price, limit, desiredDuration)
 		}
 
 		return {
