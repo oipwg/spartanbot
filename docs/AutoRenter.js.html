@@ -93,6 +93,7 @@
   <article>
     <pre class="prettyprint source linenums"><code>import Exchange from 'oip-exchange-rate';
 import moment from 'moment'
+import uid from 'uid'
 
 const NiceHash = "NiceHash"
 const MiningRigRentals = "MiningRigRentals"
@@ -331,6 +332,13 @@ class AutoRenter {
 					usable_badges.push(badge)
 					break
 				case WARNING:
+					if (badge.status.type === CUTOFF) {
+						let cutoffBadge = {...badge}
+						cutoffBadge.amount = cutoffBadge.status.cutoffCost
+						cutoffBadge.duration = cutoffBadge.status.desiredDuration
+						cutoffBadge.cutoffBadge = true
+						usable_badges.push(cutoffBadge)
+					}
 					usable_badges.push(badge)
 					break
 				case ERROR:
@@ -341,8 +349,13 @@ class AutoRenter {
 
 		if (usable_badges.length === 0 &amp;&amp; error_badges > 0) {
 			return {status: ERROR, badges: error_badges}
-		} else
+		} else {
+			//give each badge a unique id other than the provider id (uid)
+			for (let badge of usable_badges) {
+				badge.id = uid()
+			}
 			return {status: NORMAL, badges: usable_badges}
+		}
 	}
 
 	/**
