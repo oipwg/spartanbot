@@ -472,7 +472,7 @@ class NiceHashProvider extends RentalProvider {
 	async _cancelRental(id, location, algo) {
 		let res;
 		try {
-			res = this.api.removeOrder(id)
+			res = await this.api.removeOrder(id)
 		} catch (err) {
 			return {success: false, error: err, errorType: 'NETWORK', id}
 		}
