@@ -240,11 +240,17 @@ class AutoRenter {
 					break
 				case WARNING:
 					if (badge.status.type === CUTOFF) {
+						//if cutoff, make a copy of it to be used as a cutoff
 						let cutoffBadge = {...badge}
-						cutoffBadge.cutoffBadge = true
+						cutoffBadge.cutoff = true
 						usable_badges.push(cutoffBadge)
+						//the original badge, mark as an extension and push that
+						badge.extension = true
+						usable_badges.push(badge)
+					} else {
+						//these will be your LOW_BALANCE badges
+						usable_badges.push(badge)
 					}
-					usable_badges.push(badge)
 					break
 				case ERROR:
 					error_badges.push(badge)
