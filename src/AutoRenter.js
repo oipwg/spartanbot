@@ -1,5 +1,6 @@
 import Exchange from 'oip-exchange-rate';
 import moment from 'moment'
+import uid from 'uid'
 
 const NiceHash = "NiceHash"
 const MiningRigRentals = "MiningRigRentals"
@@ -255,8 +256,13 @@ class AutoRenter {
 
 		if (usable_badges.length === 0 && error_badges > 0) {
 			return {status: ERROR, badges: error_badges}
-		} else
+		} else {
+			//give each badge a unique id other than the provider id (uid)
+			for (let badge of usable_badges) {
+				badge.id = uid()
+			}
 			return {status: NORMAL, badges: usable_badges}
+		}
 	}
 
 	/**
