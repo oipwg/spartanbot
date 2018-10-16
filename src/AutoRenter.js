@@ -238,6 +238,13 @@ class AutoRenter {
 					usable_badges.push(badge)
 					break
 				case WARNING:
+					if (badge.status.type === CUTOFF) {
+						let cutoffBadge = {...badge}
+						cutoffBadge.amount = cutoffBadge.status.cutoffCost
+						cutoffBadge.duration = cutoffBadge.status.desiredDuration
+						cutoffBadge.cutoffBadge = true
+						usable_badges.push(cutoffBadge)
+					}
 					usable_badges.push(badge)
 					break
 				case ERROR:
