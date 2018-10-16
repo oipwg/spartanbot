@@ -84,10 +84,8 @@ class NiceHashProvider extends RentalProvider {
 			}
 		}
 		let pool = {...options, market: this.getInternalType(), providerUID: this.getUID()};
-		this.addPools(pool)
-
-		if (!this._returnActivePool())
-			this._setActivePool(pool.id)
+		this._addPools(pool)
+		this._setActivePool(pool.id)
 		return pool
 	}
 
