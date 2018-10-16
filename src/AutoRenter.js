@@ -409,41 +409,43 @@ class AutoRenter {
 		let amount = 0
 		let limit = 0
 		let duration = 0
-		let prices = []
 
+		let limits = []
+		let durations = []
 		for (let rental of rentals) {
 			if (rental.success) {
 				if (rental.status.status === WARNING && rental.status.type === CUTOFF) {
 					this.cutoffRental(rental.id, rental.uid, options.duration)
+					limits.push(rental.limit)
+					limit += rental.limit
+					duration += options.duration
+					durations.push(options.duration)
 					amount += rental.status.cuttoffCost
-					limit += rental.limit
-					duration += rental.status.desiredDuration
 				} else {
-					amount += rental.amount
+					limits.push(rental.limit)
 					limit += rental.limit
-					rental += rental.duration
-					if (rental.market === "NiceHash")
-						prices.push(rental.price)
+					duration += options.duration
+					durations.push(options.duration)
+					amount += rental.amount
 				}
 			}
 		}
-		let mrrPrice = toNiceHashPrice(amount, limit, options.duration)
-		prices.push(mrrPrice)
-		let averagePrice = 0
 
-		for (let price of prices) {
-			averagePrice += price
+		let weights = []
+		let weightedSum = 0
+		for (let i = 0; i < limits.length; i++) {
+			weights.push(limits[i] * durations[i])
 		}
-
-		//return average price and average duration
-		averagePrice /= prices.length
-		duration /= rentals.length
+		for (let weight of weights) {
+			weightedSum += weight
+		}
+		let weightedLimit = weightedSum / duration
 
 		return {
 			total_cost: amount,
-			hashrateTH_rented: limit,
-			average_duration: duration,
-			average_price: averagePrice,
+			average_hashrate_rented: weightedLimit,
+			average_duration: duration/rentals.length,
+			average_price: toNiceHashPrice(amount, weightedLimit, duration/rentals.length),
 			hashrateTH_desired: options.hashrate / 1000 / 1000,
 			duration_desired: options.duration,
 			rentals,
@@ -484,6 +486,7 @@ class AutoRenter {
 					if (cancel.errorType === 'NETWORK') {
 						//ToDo: Write to log
 						console.log("network error", cancel)
+						setTimeout(check, 60 * 1000)
 					}
 					if (cancel.errorType === 'NICEHSAH') {
 						//ToDo: Write to log
