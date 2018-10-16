@@ -1,5 +1,5 @@
 import GenericStrategy from './GenericStrategy'
-import { ChainScanner } from 'SpartanSense'
+import { ChainScanner } from 'spartansense'
 
 class SpartanSenseStrategy extends GenericStrategy {
 	constructor(settings){
