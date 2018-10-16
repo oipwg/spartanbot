@@ -333,11 +333,17 @@ class AutoRenter {
 					break
 				case WARNING:
 					if (badge.status.type === CUTOFF) {
+						//if cutoff, make a copy of it to be used as a cutoff
 						let cutoffBadge = {...badge}
-						cutoffBadge.cutoffBadge = true
+						cutoffBadge.cutoff = true
 						usable_badges.push(cutoffBadge)
+						//the original badge, mark as an extension and push that
+						badge.extension = true
+						usable_badges.push(badge)
+					} else {
+						//these will be your LOW_BALANCE badges
+						usable_badges.push(badge)
 					}
-					usable_badges.push(badge)
 					break
 				case ERROR:
 					error_badges.push(badge)
@@ -480,7 +486,7 @@ class AutoRenter {
 		if (options.rentSelector) {
 			let selector = await options.rentSelector(preprocess, options)
 			if (!selector.confirm)
-				return {success: false, message: `Rental Cancelled`}
+				return {success: false, message: selector.message}
 			badges = selector.badges
 		} else {
 			badges = await this.manualRentSelector(preprocess, options)
@@ -518,13 +524,13 @@ class AutoRenter {
 		let durations = []
 		for (let rental of rentals) {
 			if (rental.success) {
-				if (rental.status.status === WARNING &amp;&amp; rental.status.type === CUTOFF) {
+				if (rental.cutoff) {
 					this.cutoffRental(rental.id, rental.uid, options.duration)
 					limits.push(rental.limit)
 					limit += rental.limit
-					duration += options.duration
-					durations.push(options.duration)
-					amount += rental.status.cuttoffCost
+					duration += rental.status.desiredDuration
+					durations.push(rental.status.desiredDuration)
+					amount += rental.status.cutoffCost
 				} else {
 					limits.push(rental.limit)
 					limit += rental.limit
@@ -548,8 +554,8 @@ class AutoRenter {
 		return {
 			total_cost: amount,
 			average_hashrate_rented: weightedLimit,
-			average_duration: duration/rentals.length,
-			average_price: toNiceHashPrice(amount, weightedLimit, duration/rentals.length),
+			average_duration: duration / rentals.length,
+			average_price: toNiceHashPrice(amount, weightedLimit, duration / rentals.length),
 			hashrateTH_desired: options.hashrate / 1000 / 1000,
 			duration_desired: options.duration,
 			rentals,
