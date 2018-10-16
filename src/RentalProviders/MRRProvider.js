@@ -682,6 +682,7 @@ class MRRProvider extends RentalProvider {
 					newRPIrigs.push(rig)
 				} else {allOtherRigs.push(rig)}
 			}
+			//ToDo: Sort by price/rpi
 			allOtherRigs.sort((a,b) => {
 				return (b.rpi - a.rpi)
 			});
@@ -713,6 +714,7 @@ class MRRProvider extends RentalProvider {
 			}
 		}
 
+		//ToDo: add up by last_30min hash and not advertised
 		let rigs_to_rent = [], hashpower = 0;
 		for (let rig of available_rigs) {
 			let rig_hashrate = rig.hashrate.advertised.hash
