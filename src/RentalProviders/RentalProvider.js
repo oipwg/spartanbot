@@ -88,45 +88,18 @@ class RentalProvider {
 	 * @return {Promise}
 	 */
 	async createPool(options) {
-		let newOptions = {};
 		if (!options.id) {
 			options.id = uid()
 		}
 
 		if (this.getInternalType() === "NiceHash") {
-			for (let opt in options) {
-				if (opt === 'host') {
-					newOptions.pool_host = options[opt]
-				} else if (opt === 'port') {
-					newOptions.pool_port = options[opt]
-				} else if (opt === 'user') {
-					newOptions.pool_user = options[opt]
-				} else if (opt === 'pass') {
-					newOptions.pool_pass = options[opt]
-				} else {
-					newOptions[opt] = options[opt]
-				}
-			}
-			return this._createPool(newOptions)
+			options = serializePool(options, "NiceHash")
+			return this._createPool(options)
 		}
 		if (this.getInternalType() === "MiningRigRentals") {
-			for (let opt in options) {
-				if (opt === 'algo') {
-					newOptions.type = options[opt]
-				} else if (opt === 'pool_host') {
-					newOptions.host = options[opt]
-				} else if (opt === 'pool_port') {
-					newOptions.port = options[opt]
-				} else if (opt === 'pool_user') {
-					newOptions.user = options[opt]
-				} else if (opt === 'pool_pass') {
-					newOptions.pass = options[opt]
-				} else {
-					newOptions[opt] = options[opt]
-				}
-			}
+			options = serializePool(options, "MiningRigRentals")
 			try {
-				return await this._createPool(newOptions);
+				return await this._createPool(options);
 			} catch (err) {
 				throw new Error(err)
 			}
@@ -186,13 +159,7 @@ class RentalProvider {
 	 * @param pools
 	 */
 	addPools(pools) {
-		//ToDO: make sure the pool(s) don't already exist
-		if (Array.isArray(pools)) {
-			for (let pool of pools) {
-				this.pools.push(pool)
-			}
-		} else
-			this.pools.push(pools)
+		this._addPools(pools)
 	}
 
 	/**
