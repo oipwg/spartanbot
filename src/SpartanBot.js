@@ -83,71 +83,6 @@ class SpartanBot {
 	}
 
 	/**
-	 * Get all setting back from SpartanBot
-	 * @return {Object} Returns an object containing all the available settings
-	 */
-	getSettings(){
-		return JSON.parse(JSON.stringify(this.settings))
-	}
-
-	/**
-	 * Get a setting back from SpartanBot
-	 * @param  {String} key - The setting key you wish to get the value of
-	 * @return {Object|String|Array.<Object>} Returns the value of the requested setting
-	 */
-	getSetting(key){
-		return this.settings[key]
-	}
-
-	/**
-	 * Set a setting
-	 * @param {String} key - What setting you wish to set
-	 * @param {*} value - The value you wish to set the setting to
-	 */
-	setSetting(key, value){
-		if (key !== undefined && value !== undefined)
-			this.settings[key] = value
-
-		// Save the latest
-		this.serialize()
-
-		return true
-	}
-
-	/**
-	 * Get the balance of the internal wallet
-	 * @param  {Boolean} [fiat_value=false] - `true` if the balance should returned be in Fiat, `false` if the balance should be returned in the regular coin values
-	 * @return {Promise} 
-	 */
-	async getWalletBalance(fiat_value){
-		if (!this.wallet)
-			return {
-				success: false,
-				info: "NO_WALLET",
-				message: "No wallet was found in SpartanBot, may be running in memory mode"
-			}
-
-		if (fiat_value)
-			return await this.wallet.wallet.getFiatBalances(["flo"])
-		else
-			return await this.wallet.wallet.getCoinBalances(["flo"])
-	}
-	/**
-	 * Withdraw funds from your internal wallet
-	 * @param {String} options - passing of new address connecting to the HDMW sendPayment
-	 */
-	async withdrawFromWallet(options){
-		if (!this.wallet)
-		return {
-			success: false,
-			info: "NO_WALLET",
-			message: "No wallet was found in SpartanBot, may be running in memory mode"
-		}
-		if (options)
-		 return await this.wallet.wallet.sendPayment(options)
-	}
-
-	/**
 	 * Setup a new Rental Provider for use
 	 * @param {Object} settings - The settings for the Rental Provider
 	 * @param {String} settings.type - The "type" of the rental provider. Currently only accepts "MiningRigRentals".
@@ -387,6 +322,104 @@ class SpartanBot {
 		const mode = RENTAL_MODES.ManualRent
 		let manual_rent = this.getRentalStrategies(mode)
 		manual_rent.emitter.emit(mode, hashrate, duration, rentSelector, this.self)
+	}
+
+	/**
+	 * Rent
+	 * @param  {Number} hashrate - The hashrate you wish to rent (in MegaHash)
+	 * @param  {Number} duration - The number of seconds that you wish to rent the miners for
+	 * @param  {Function} [rentSelector] - Pass in a function that returns a Promise to offer rent options to user
+	 * @param  {Object} self - a reference to 'this', the SpartanBot class (needed because the reference is lost when using event emitters)
+ 	 * @private
+	 * @async
+	 * @return {Promise<Object>} Returns a Promise that will resolve to an Object that contains information about the rental request
+	 */
+	async _rent(hashrate, duration, rentSelector, self){
+		self.autorenter = new AutoRenter({
+			rental_providers: self.rental_providers
+		})
+		let rental_info
+		try {
+			rental_info = await self.autorenter.manualRent({
+				hashrate,
+				duration,
+				rentSelector
+			})
+		} catch (e) {
+			throw new Error("Unable to rent using SpartanBot!\n" + e)
+		}
+		if (rental_info.type !== 'RECEIPT') {
+			return rental_info
+		} else {
+			this.saveReceipt(rental_info)
+			return rental_info
+		}
+	}
+
+	/**
+	 * Get all setting back from SpartanBot
+	 * @return {Object} Returns an object containing all the available settings
+	 */
+	getSettings(){
+		return JSON.parse(JSON.stringify(this.settings))
+	}
+
+	/**
+	 * Get a setting back from SpartanBot
+	 * @param  {String} key - The setting key you wish to get the value of
+	 * @return {Object|String|Array.<Object>} Returns the value of the requested setting
+	 */
+	getSetting(key){
+		return this.settings[key]
+	}
+
+	/**
+	 * Set a setting
+	 * @param {String} key - What setting you wish to set
+	 * @param {*} value - The value you wish to set the setting to
+	 */
+	setSetting(key, value){
+		if (key !== undefined && value !== undefined)
+			this.settings[key] = value
+
+		// Save the latest
+		this.serialize()
+
+		return true
+	}
+
+	/**
+	 * Get the balance of the internal wallet
+	 * @param  {Boolean} [fiat_value=false] - `true` if the balance should returned be in Fiat, `false` if the balance should be returned in the regular coin values
+	 * @return {Promise}
+	 */
+	async getWalletBalance(fiat_value){
+		if (!this.wallet)
+			return {
+				success: false,
+				info: "NO_WALLET",
+				message: "No wallet was found in SpartanBot, may be running in memory mode"
+			}
+
+		if (fiat_value)
+			return await this.wallet.wallet.getFiatBalances(["flo"])
+		else
+			return await this.wallet.wallet.getCoinBalances(["flo"])
+	}
+
+	/**
+	 * Withdraw funds from your internal wallet
+	 * @param {String} options - passing of new address connecting to the HDMW sendPayment
+	 */
+	async withdrawFromWallet(options){
+		if (!this.wallet)
+			return {
+				success: false,
+				info: "NO_WALLET",
+				message: "No wallet was found in SpartanBot, may be running in memory mode"
+			}
+		if (options)
+			return await this.wallet.wallet.sendPayment(options)
 	}
 
 	/**
@@ -695,34 +728,6 @@ class SpartanBot {
 	 */
 	_setPoolProfiles(profiles) {
 		this.poolProfiles = profiles
-	}
-
-	/**
-	 * Run a Manual Rental instruction
-	 * @param  {Number} hashrate - The hashrate you wish to rent (in MegaHash)
-	 * @param  {Number} duration - The number of seconds that you wish to rent the miners for
-	 * @param  {Function} [rentSelector] - Pass in a function that returns a Promise to offer rent options to user
-	 * @return {Promise<Object>} Returns a Promise that will resolve to an Object that contains information about the rental request
-	 */
-	async manualRental(hashrate, duration, rentSelector){
-		this.autorenter = new AutoRenter({
-			rental_providers: this.rental_providers
-		})
-
-		let rental_info
-		try {
-			rental_info = await this.autorenter.manualRent({
-				hashrate,
-				duration,
-				rentSelector
-			})
-		} catch (e) {
-			throw new Error("Unable to rent using SpartanBot!\n" + e)
-		}
-
-		this.saveReceipt(rental_info)
-
-		return rental_info
 	}
 
 	/**
