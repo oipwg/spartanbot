@@ -742,7 +742,7 @@ class SpartanBot {
 	serialize(){
 		let serialized = {
 			rental_providers: [],
-			rental_strategies: []
+			rental_strategies: {}
 		}
 
 		serialized.settings = this.settings
@@ -753,8 +753,8 @@ class SpartanBot {
 		for (let provider of this.rental_providers)
 			serialized.rental_providers.push(provider.serialize())
 
-		for (let strategy of this.rental_strategies)
-			serialized.rental_strategies.push(strategy.serialize())
+		for (let strategyType in this.rental_strategies)
+			serialized.rental_strategies[strategyType] = this.rental_strategies[strategyType].serialize()
 		
 
 		serialized.oip_account = this.oip_account
@@ -784,8 +784,8 @@ class SpartanBot {
 		}
 
 		if (data_from_storage.rental_strategies){
-			for (let strategy of data_from_storage.rental_strategies){
-				await this.setupRentalStrategy(strategy)
+			for (let strategyType in data_from_storage.rental_strategies){
+				await this.setupRentalStrategy(data_from_storage.rental_strategies[strategyType])
 			}
 		}
 
