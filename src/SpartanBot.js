@@ -735,6 +735,14 @@ class SpartanBot {
 	}
 
 	/**
+	 * Clear Receipts
+	 */
+	clearReceipts() {
+		this.receipts = []
+		this.serialize()
+	}
+
+	/**
 	 * Serialize all information about SpartanBot to LocalStorage (save the current state)
 	 * @return {Boolean} Returns true if successful
 	 * @private
