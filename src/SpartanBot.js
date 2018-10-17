@@ -50,6 +50,7 @@ class SpartanBot {
 		this.receipts = []
 		this.emitter = new EventEmitter()
 
+		this.self = this
 
 		// Try to load state from LocalStorage if we are not memory only
 		if (!this.settings.memory){
