@@ -354,7 +354,7 @@ class SpartanBot {
 
 		strat.onRentalTrigger(this._rent)
 
-		this.rental_strategies.push(strat)
+		this.rental_strategies[strat.getInternalType] = strat
 
 		this.serialize()
 	}
