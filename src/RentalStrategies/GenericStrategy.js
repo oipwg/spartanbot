@@ -21,6 +21,10 @@ class GenericStrategy {
 		return this.uid
 	}
 
+	getInternalType() {
+		return this.type
+	}
+
 	serialize(){
 		return {
 			type: this.type,
