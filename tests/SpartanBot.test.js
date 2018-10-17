@@ -259,19 +259,20 @@ describe("SpartanBot", () => {
 		}, 250 * 100);
 		it.skip('manual rent (new) | manualRent', async (done) => {
 			await setupProviders()
+			await spartan.setupRentalStrategy({type: 'ManualRent'})
+
 			const rentSelector = async (p, o) => {
-				let b;
-				for (let pr of p.badges) {
-					if (pr.cutoff)
-						b = pr
-				}
-				return {badges: b, confirm: false}
+				console.log('badges: ', p.badges)
+				return {badges: p.badges, confirm: false}
 			}
-			let rentOptions = {
-				hashrate: 10000,
-				duration: 3,
-				rentSelector
-			}
+			// let rentOptions = {
+			// 	hashrate: 10000,
+			// 	duration: 3,
+			// 	rentSelector
+			// }
+
+			let hashrate = 10000,
+				duration = 3
 
 			let options = {
 				algo: 'scrypt',
@@ -284,9 +285,7 @@ describe("SpartanBot", () => {
 
 			await spartan.createPool(options)
 
-			let rent = await autorenter.manualRent(rentOptions)
-			console.log(rent)
-
+			spartan.manualRent(hashrate, duration, rentSelector)
 
 			let id;
 			for (let p of spartan.getRentalProviders()) {
