@@ -25,6 +25,10 @@ class GenericStrategy {
 		return this.type
 	}
 
+	static getType(){
+		return "Generic"
+	}
+
 	serialize(){
 		return {
 			type: this.type,
