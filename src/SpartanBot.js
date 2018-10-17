@@ -352,7 +352,7 @@ class SpartanBot {
 
 		let strat = new rental_strategy(settings)
 
-		strat.onRentalTrigger(this.manualRental)
+		strat.onRentalTrigger(this._rent)
 
 		this.rental_strategies.push(strat)
 
