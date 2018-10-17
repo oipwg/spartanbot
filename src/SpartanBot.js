@@ -3,11 +3,11 @@ import uid from 'uid';
 import EventEmitter from 'eventemitter3'
 
 import { MRRProvider, NiceHashProvider } from './RentalProviders'
-import { SpartanSenseStrategy } from './RentalStrategies'
+import { SpartanSenseStrategy, ManualRentStrategy } from './RentalStrategies'
 import AutoRenter from './AutoRenter'
 
 const SUPPORTED_RENTAL_PROVIDERS = [ MRRProvider, NiceHashProvider ]
-const SUPPORTED_RENTAL_STRATEGIES = [ SpartanSenseStrategy ]
+const SUPPORTED_RENTAL_STRATEGIES = [ SpartanSenseStrategy, ManualRentStrategy ]
 
 let localStorage
 
