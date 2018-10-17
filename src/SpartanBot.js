@@ -376,6 +376,20 @@ class SpartanBot {
 	}
 
 	/**
+	 * Fire off a manual rent event
+	 *
+	 * @param  {Number} hashrate - The hashrate you wish to rent (in MegaHash)
+	 * @param  {Number} duration - The number of seconds that you wish to rent the miners for
+	 * @param  {Function} [rentSelector] - Pass in a function that returns a Promise to offer rent options to user
+	 * @return {Promise<Object>} Returns a Promise that will resolve to an Object that contains information about the rental request
+	 */
+	manualRent(hashrate, duration, rentSelector) {
+		const mode = RENTAL_MODES.ManualRent
+		let manual_rent = this.getRentalStrategies(mode)
+		manual_rent.emitter.emit(mode, hashrate, duration, rentSelector, this.self)
+	}
+
+	/**
 	 * Get pools
 	 * @param {Array.<number>} [ids] - an array of pool ids
 	 * @return {Array.<Object>} pools
