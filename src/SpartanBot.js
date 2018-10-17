@@ -360,6 +360,22 @@ class SpartanBot {
 	}
 
 	/**
+	 * Get all rental strategies or by individual type
+	 * @param {String} [type]
+	 * @returns {Object}
+	 */
+	getRentalStrategies(type) {
+		if (type) {
+			for (let strat in this.rental_strategies) {
+				if (this.rental_strategies[strat].getInternalType() === type) {
+					return this.rental_strategies[strat]
+				}
+			}
+		}
+		return this.rental_strategies
+	}
+
+	/**
 	 * Get pools
 	 * @param {Array.<number>} [ids] - an array of pool ids
 	 * @return {Array.<Object>} pools
