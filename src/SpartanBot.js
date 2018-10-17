@@ -342,7 +342,6 @@ class SpartanBot {
 		let rental_strategy
 
 		for (let strategy of SUPPORTED_RENTAL_STRATEGIES){
-			console.log(strategy)
 			if (strategy.getType() === settings.type){
 				rental_strategy = strategy
 			}
