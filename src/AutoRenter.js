@@ -469,6 +469,7 @@ class AutoRenter {
 			timestamp: moment().format("dddd, MMMM Do YYYY, h:mm:ss a"),
 			unixTimestamp: Date.now(),
 			type: "RECEIPT",
+			id: uid()
 		}
 	}
 
