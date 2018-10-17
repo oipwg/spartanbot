@@ -29,6 +29,10 @@ class GenericStrategy {
 		return "Generic"
 	}
 
+	getEmitter() {
+		return this.emitter
+	}
+
 	serialize(){
 		return {
 			type: this.type,
