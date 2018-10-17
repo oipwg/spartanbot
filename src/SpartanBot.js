@@ -743,6 +743,33 @@ class SpartanBot {
 	}
 
 	/**
+	 * Remove Receipt(s)
+	 */
+	removeReceipts(ids) {
+		if (!Array.isArray(ids)) {
+			ids = [ids]
+		}
+		for (let id of ids) {
+			for (let i = this.receipts.length - 1; i >= 0; i--) {
+				if (this.receipts[i].id === id) {
+					this.receipts.splice(i, 1)
+				}
+			}
+		}
+
+		let match = false
+		for (let id of ids) {
+			for (let i = this.receipts.length - 1; i >= 0; i--) {
+				if (this.receipts[i].id === id) {
+					match = true
+				}
+			}
+		}
+		if (!match) this.serialize()
+		return {success: !match}
+	}
+
+	/**
 	 * Serialize all information about SpartanBot to LocalStorage (save the current state)
 	 * @return {Boolean} Returns true if successful
 	 * @private
