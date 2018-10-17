@@ -23,6 +23,7 @@ class SpartanSenseStrategy extends GenericStrategy {
 
 		this.scanner.onReorgTrigger((reorg_info) => {
 			// Using this reorg_info, you can decide if you should emit a "TriggerRental" event.
+			//{ best_height_tip: this.best_active_tip, reorg_tip: tip }
 			console.log(reorg_info)
 
 			// If you emit "TriggerRental" then the "manualRental" function of SpartanBot will be run using the paramaters passed
