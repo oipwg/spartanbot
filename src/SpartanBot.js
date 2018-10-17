@@ -44,7 +44,7 @@ class SpartanBot {
 		this.settings = settings || {}
 
 		this.rental_providers = []
-		this.rental_strategies = []
+		this.rental_strategies = {}
 		this.pool = []
 		this.poolProfiles = []
 		this.receipts = []
