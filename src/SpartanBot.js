@@ -1,5 +1,6 @@
 import { Account } from 'oip-account'
 import uid from 'uid';
+import EventEmitter from 'eventemitter3'
 
 import { MRRProvider, NiceHashProvider } from './RentalProviders'
 import { SpartanSenseStrategy } from './RentalStrategies'
@@ -40,6 +41,8 @@ class SpartanBot {
 		this.pool = []
 		this.poolProfiles = []
 		this.receipts = []
+		this.emitter = new EventEmitter()
+
 
 		// Try to load state from LocalStorage if we are not memory only
 		if (!this.settings.memory){
