@@ -22,6 +22,13 @@ let waitFn = async (time) => {
 	setTimeout(() => { return }, time || 1000)
 }
 
+const RENTAL_MODES = {
+	ManualRent: 'ManualRent',
+	SpotRent: 'SpotRent',
+	TradeBot: 'TradeBot',
+	CollectiveDefense: 'CollectiveDefense'
+}
+
 /**
  * Rent hashrate based on a set of circumstances
  */
