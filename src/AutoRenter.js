@@ -382,7 +382,7 @@ class AutoRenter {
 		}
 
 		if (preprocess.status === ERROR) {
-			return {success: false, message: 'No providers are capable of renting with set options', preprocess}
+			return {status: ERROR, success: false, message: 'No providers are capable of renting with set options', preprocess}
 		}
 
 		//confirm/select
