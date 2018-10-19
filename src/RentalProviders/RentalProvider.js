@@ -316,7 +316,8 @@ class RentalProvider {
 	 * @param {Object} options - see return value from AutoRenter -> manualRentPreprocess
 	 * @returns {Promise<Object>}
 	 */
-	async manualRent(options) {
+	async rent(options) {
+		let rental
 		if (options.market === MiningRigRentals) {
 			let rigs_to_rent = []
 			for (let rig of options.rigs) {
