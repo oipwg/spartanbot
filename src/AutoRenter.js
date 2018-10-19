@@ -400,24 +400,12 @@ class AutoRenter {
 		//rent
 		let rentals = []
 		if (Array.isArray(badges)) {
-			for (let badge of badges) {
-				let rentalReturn = await badge.provider.manualRent(badge)
-				if (Array.isArray(rentalReturn)) {
-					for (let rental of rentalReturn) {
-						rentals.push(rental)
-					}
-				} else {
-					rentals.push(rentalReturn)
-				}
-			}
-		} else {
-			let rentalReturn = await badges.provider.manualRent(badges)
-			if (Array.isArray(rentalReturn)) {
-				for (let rental of rentalReturn) {
-					rentals.push(rental)
-				}
-			} else {
-				rentals.push(rentalReturn)
+		if (!Array.isArray(badges))
+			badges = [badges]
+		for (let badge of badges) {
+			let rentalReturn = await badge.provider.rent(badge)
+			for (let rental of rentalReturn) {
+				rentals.push(rental)
 			}
 		}
 
