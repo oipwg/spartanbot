@@ -13,6 +13,7 @@ class ManualRentStrategy extends GenericStrategy {
 		super(settings);
 
 		this.type = SpotRent
+		this.self = this
 
 		if (settings.emitter)
 			this.startup()
