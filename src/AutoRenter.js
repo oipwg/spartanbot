@@ -221,7 +221,7 @@ class AutoRenter {
 		}
 
 		for (let prov of nhProviders) {
-			badges.push(await prov.manualRentPreprocess(options.hashrate, options.duration))
+			badges.push(await prov.preprocessRent(options.hashrate, options.duration))
 		}
 		// console.log("badge results: ", badges)
 
@@ -270,7 +270,7 @@ class AutoRenter {
 	 * @param {Object} options - options passed down into manualRent func (hashrate, duration)
 	 * @returns {Promise<{Object}>}
 	 */
-	async manualRentSelector(preprocess, options) {
+	async rentSelector(preprocess, options) {
 		let badges = preprocess.badges
 		const totalHashesDesired = (options.hashrate / 1000 / 1000) * 60 * 60 * options.duration
 
@@ -362,7 +362,7 @@ class AutoRenter {
 	 * @param {Function} [options.rentSelector] - This function runs to let the user decide which rent option to go for. If no func is passed, will attempt to pick best possible rent opt.
 	 * @return {Promise<Object>} Returns a Promise that will resolve to an Object containing info about the rental made
 	 */
-	async manualRent(options) {
+	async rent(options) {
 		if (!this.rental_providers || this.rental_providers.length === 0) {
 			return {
 				success: false,
