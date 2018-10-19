@@ -36,7 +36,7 @@ class ManualRentStrategy extends GenericStrategy {
 		}
 
 		let nhAPIkeys = {
-			key: process.env.NICEHASH_API_ID,
+			key: process.env.NICEHASH_API_KEY,
 			id: process.env.NICEHASH_API_ID
 		}
 
