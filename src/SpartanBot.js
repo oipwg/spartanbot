@@ -55,6 +55,7 @@ class SpartanBot {
 		this.receipts = []
 
 		this.emitter = new EventEmitter()
+		this.setupListeners()
 
 		// Try to load state from LocalStorage if we are not memory only
 		if (!this.settings.memory){
@@ -84,6 +85,29 @@ class SpartanBot {
 				}
 			})
 		}
+	}
+
+	/**
+	 * Setup event listeners for rental activity
+	 */
+	setupListeners() {
+		this.emitter.on(RentalFunctionFinish, this.onRentalFnFinish)
+		this.emitter.on('error', (err) => {
+			console.error('whoops! there was an error in an event emitter: ', err);
+		});
+		this.onRentalSuccess()
+		this.onRentalWarning()
+		this.onRentalError()
+	}
+
+	onRentalSuccess(onSuccess = (rental_info) => {console.log('Rental Success', rental_info)}) {
+		this.emitter.on(RENTAL_SUCCESS, onSuccess)
+	}
+	onRentalWarning(onWarning = (rental_info) => {console.log('Rental Warning', rental_info)}) {
+		this.emitter.on(RENTAL_WARNING, onWarning)
+	}
+	onRentalError(onError = (rental_info) => {console.log('Rental Error', rental_info)}) {
+		this.emitter.on(RENTAL_ERROR, onError)
 	}
 
 	/**
