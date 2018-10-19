@@ -19,6 +19,9 @@ class MRRProvider extends RentalProvider {
 	constructor(settings){
 		super(settings)
 
+		this.api_key = settings.api_key || settings.key;
+		this.api_secret = settings.api_secret || settings.secret
+
 		this.api = new MiningRigRentals({key: this.api_key, secret: this.api_secret})
 	}
 
