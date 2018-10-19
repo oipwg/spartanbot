@@ -49,7 +49,8 @@ class SpartanBot {
 
 		this.rental_providers = []
 		this.rental_strategies = {}
-		this.pool = []
+
+		this.pools = []
 		this.poolProfiles = []
 		this.receipts = []
 		this.emitter = new EventEmitter()
