@@ -5,6 +5,16 @@ import EventEmitter from 'eventemitter3'
 import { MRRProvider, NiceHashProvider } from './RentalProviders'
 import { SpartanSenseStrategy, ManualRentStrategy } from './RentalStrategies'
 import AutoRenter from './AutoRenter'
+import {
+	RECEIPT,
+	RentalFunctionFinish,
+	ManualRent,
+	SpotRent,
+	TradeBot,
+	CollectiveDefense,
+	NORMAL,
+	WARNING, RENTAL_SUCCESS, RENTAL_WARNING, RENTAL_ERROR
+} from "./constants";
 
 const SUPPORTED_RENTAL_PROVIDERS = [ MRRProvider, NiceHashProvider ]
 const SUPPORTED_RENTAL_STRATEGIES = [ SpartanSenseStrategy, ManualRentStrategy ]
@@ -20,13 +30,6 @@ if (typeof window === "undefined" || typeof window.localStorage === "undefined")
 
 let waitFn = async (time) => {
 	setTimeout(() => { return }, time || 1000)
-}
-
-const RENTAL_MODES = {
-	ManualRent: 'ManualRent',
-	SpotRent: 'SpotRent',
-	TradeBot: 'TradeBot',
-	CollectiveDefense: 'CollectiveDefense'
 }
 
 /**
