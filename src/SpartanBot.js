@@ -329,13 +329,8 @@ class SpartanBot {
 	 * @returns {Object}
 	 */
 	getRentalStrategies(type) {
-		if (type) {
-			for (let strat in this.rental_strategies) {
-				if (this.rental_strategies[strat].getInternalType() === type) {
-					return this.rental_strategies[strat]
-				}
-			}
-		}
+		if (type)
+			return this.rental_strategies[type]
 		return this.rental_strategies
 	}
 
