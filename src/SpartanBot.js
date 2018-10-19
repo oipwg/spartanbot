@@ -813,6 +813,13 @@ class SpartanBot {
 	}
 
 	/**
+	 * Get receipts
+	 */
+	returnReceipts() {
+		return this.receipts
+	}
+
+	/**
 	 * Serialize all information about SpartanBot to LocalStorage (save the current state)
 	 * @return {Boolean} Returns true if successful
 	 * @private
