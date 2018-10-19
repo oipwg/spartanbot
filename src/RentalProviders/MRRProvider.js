@@ -623,7 +623,7 @@ class MRRProvider extends RentalProvider {
 				let rental = await this.api.createRental(rig)
 				rentalConfirmation[rig.rig] = rental
 			} catch (err) {
-				rentalConfirmation[rig.rig] = {success: false, message: `Error renting rig`, error: err}
+				rentalConfirmation[rig.rig] = {success: false, message: `Error renting rig`, error: err, status: ERROR}
 			}
 		}
 
@@ -638,12 +638,12 @@ class MRRProvider extends RentalProvider {
 				rentalObject.limit = (rentalConfirmation[rig].data.hashrate.advertised.hash)/1000/1000
 				rentalObject.duration = rentalConfirmation[rig].data.length
 				rentalObject.id = rig
-				rentalObject.status = {status: "NORMAL"}
+				rentalObject.status = {status: NORMAL}
 				rentalObject.uid = this.getUID()
 				rentalObject.mrrData = rentalConfirmation[rig].data
 				rented_rigs.push(rentalObject)
 			} else {
-				rented_rigs.push({success: false, ...rentalConfirmation[rig], status: {status: "NORMAl"}, rig})
+				rented_rigs.push({success: false, ...rentalConfirmation[rig], status: {status: ERROR}, rig})
 			}
 		}
 
