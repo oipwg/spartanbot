@@ -189,7 +189,7 @@ class AutoRenter {
 	 * @param {Number} options.duration - The duration (IN SECONDS) that you wish to rent hashrate for
 	 * @return {Promise<Object>} Returns a Promise that will resolve to an Object containing info about the rental made
 	 */
-	async manualRentPreprocess(options) {
+	async rentPreprocess(options) {
 		let mrrProviders = []
 		let nhProviders = []
 
