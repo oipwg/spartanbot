@@ -53,9 +53,8 @@ class SpartanBot {
 		this.pools = []
 		this.poolProfiles = []
 		this.receipts = []
-		this.emitter = new EventEmitter()
 
-		this.self = this
+		this.emitter = new EventEmitter()
 
 		// Try to load state from LocalStorage if we are not memory only
 		if (!this.settings.memory){
