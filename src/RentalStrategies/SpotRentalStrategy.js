@@ -47,7 +47,7 @@ class ManualRentStrategy extends GenericStrategy {
 		btcFLO = btcFLO.result.Last
 		let floPriceUSD = usdBTC * btcFLO
 
-		const time = 3 // time can be lowered or should be calculated
+		const time = 3 // ToDo: lowered or should be calculated
 		const PWTh1 = 0.3
 		const FLOperBlock = 12.5
 		const TargetBlockTime = 40
