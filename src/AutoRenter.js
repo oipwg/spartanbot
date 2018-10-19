@@ -394,7 +394,7 @@ class AutoRenter {
 			}
 			badges = selector.badges
 		} else {
-			badges = await this.manualRentSelector(preprocess, options)
+			badges = await this.rentSelector(preprocess, options)
 		}
 
 		//rent
