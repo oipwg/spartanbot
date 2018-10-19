@@ -41,7 +41,7 @@
     "dotenv": "^6.0.0",
     "lodash": "^4.17.11",
     "lodash.combinations": "^18.9.19",
-    "market-rental-stats": "^3.0.2",
+    "market-rental-stats": "^3.0.3",
     "miningrigrentals-api-v2": "^1.1.1",
     "moment": "^2.22.2",
     "nicehash-api": "^1.1.4",
