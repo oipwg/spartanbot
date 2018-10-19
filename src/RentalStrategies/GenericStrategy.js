@@ -1,12 +1,11 @@
 import uid from 'uid'
-import EventEmitter from 'eventemitter3'
 
 class GenericStrategy {
 	constructor(settings){
 		this.type = "Generic"
 
 		this.uid = settings.uid || uid()
-		this.emitter = new EventEmitter()
+		this.emitter = settings.emitter
 	}
 
 	onRentalTrigger(rentalFunction){
