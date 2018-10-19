@@ -360,6 +360,12 @@ class SpartanBot {
 	manualRent(hashrate, duration, rentSelector) {
 		this.emitter.emit(ManualRent, hashrate, duration, rentSelector, this.self)
 	}
+
+	/**
+	 * Fire off an event to start calculating spot profitability
+	 */
+	spotRent() {
+		this.emitter.emit(SpotRent)
 	}
 
 	/**
