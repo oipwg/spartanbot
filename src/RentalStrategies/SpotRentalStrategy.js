@@ -76,10 +76,15 @@ class ManualRentStrategy extends GenericStrategy {
 			amount
 		}
 	}
-	async checkProfitability() {
-		let spotProfit = await this.calculateSpotProfitability()
-		let isProfitable = spotProfit > 0
-		if (isProfitable) {
+	async checkProfitability(self) {
+		console.log('check profit')
+		let spotProfit = {}
+		try {
+			spotProfit = await self.calculateSpotProfitability()
+		} catch (err) {
+			this.emitter.emit('error', err)
+		}
+		if (spotProfit.isProfitable) {
 			console.log('trigger rental')
 			// this.emitter.emit(TriggerRental, hashrate, duration, rentSelector)
 		} else {
