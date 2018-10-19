@@ -40,16 +40,12 @@ class ManualRentStrategy extends GenericStrategy {
 			id: process.env.NICEHASH_API_ID
 		}
 
-		const powLimit = new BN('0x00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff', 16)
-
-		let weights = await getMarketStats(mrrAPIkeys, nhAPIkeys)
-		console.log('weights: ', weights)
+		let weightedRentalCosts = await getMarketStats(mrrAPIkeys, nhAPIkeys)
 		let usdBTC = (await axios.get("https://bittrex.com/api/v1.1/public/getticker?market=usd-btc")).data
 		let btcFLO = (await axios.get("https://bittrex.com/api/v1.1/public/getticker?market=btc-flo")).data
 		usdBTC = usdBTC.result.Last
 		btcFLO = btcFLO.result.Last
 		let floPriceUSD = usdBTC * btcFLO
-		console.log(usdBTC, btcFLO, floPriceUSD)
 
 		const time = 3 // time can be lowered or should be calculated
 		const PWTh1 = 0.3
