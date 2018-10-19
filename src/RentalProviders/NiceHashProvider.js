@@ -327,11 +327,11 @@ class NiceHashProvider extends RentalProvider {
 		}
 
 		if (!this.returnPools()) {
-			return {success: false, message: `No pool found`}
+			return {success: false, message: `No pool found`, status: ERROR}
 		}
 
 		if (!this._returnActivePool()) {
-			return {success: false, message: `No active pool set`}
+			return {success: false, message: `No active pool set`, status: ERROR}
 		}
 
 		let poolID = this._returnActivePool();
@@ -354,7 +354,7 @@ class NiceHashProvider extends RentalProvider {
 		try {
 			res = await this.api.createOrder(rentOptions)
 		} catch (err) {
-			return {success: false, message: `Failed to create NiceHash order`, error: err}
+			return {success: false, message: `Failed to create NiceHash order`, error: err, status: ERROR}
 		}
 		let id, success = true
 		if (res.result && res.result.success) {
