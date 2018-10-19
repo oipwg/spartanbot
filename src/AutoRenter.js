@@ -6,13 +6,7 @@ const NiceHash = "NiceHash"
 const MiningRigRentals = "MiningRigRentals"
 
 import {toNiceHashPrice} from "./util";
-
-const ERROR = 'ERROR'
-const NORMAL = 'NORMAL'
-const WARNING = 'WARNING'
-const LOW_BALANCE = 'LOW_BALANCE'
-const LOW_HASHRATE = 'LOW_HASHRATE'
-const CUTOFF = 'CUTOFF'
+import {ERROR, NORMAL, WARNING, LOW_BALANCE, LOW_HASHRATE, CUTOFF, RECEIPT} from "./constants";
 
 /**
  * Manages Rentals of Miners from multiple API's
