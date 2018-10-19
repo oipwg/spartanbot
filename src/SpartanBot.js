@@ -45,6 +45,7 @@ class SpartanBot {
 	 */
 	constructor(settings){
 		this.settings = settings || {}
+		this.self = this
 
 		this.rental_providers = []
 		this.rental_strategies = {}
