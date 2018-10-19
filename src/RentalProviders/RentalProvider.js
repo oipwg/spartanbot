@@ -323,12 +323,15 @@ class RentalProvider {
 			for (let rig of options.rigs) {
 				rigs_to_rent.push(rig.rental_info)
 			}
-
-			return await this._rent(rigs_to_rent)
+			rental =  await this._rent(rigs_to_rent)
 		}
 		if (options.market === NiceHash) {
-			return await this._rent(options)
+			rental = await this._rent(options)
 		}
+
+		if (!Array.isArray(rental))
+			rental = [rental]
+		return rental
 	}
 
 	/**
