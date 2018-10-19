@@ -313,11 +313,12 @@ class SpartanBot {
 		if (!rental_strategy)
 			throw new Error("No Strategy match found for `settings.type`!")
 
+		settings.emitter = this.emitter
 		let strat = new rental_strategy(settings)
 
-		strat.onRentalTrigger(this._rent)
+		strat.onRentalTrigger(this.rent)
 
-		this.rental_strategies[strat.getInternalType] = strat
+		this.rental_strategies[strat.getInternalType()] = strat
 
 		this.serialize()
 	}
