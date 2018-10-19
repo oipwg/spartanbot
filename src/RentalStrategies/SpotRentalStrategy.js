@@ -28,6 +28,8 @@ class ManualRentStrategy extends GenericStrategy {
 	}
 	async calculateSpotProfitability() {
 		//ToDo: Standardize env var names
+		if (!process.env.API_KEY || !process.env.API_SECRET || !process.env.NICEHASH_API_KEY || !process.env.NICEHASH_API_ID)
+			throw new Error('Must provide MRR and NiceHash API_KEYS')
 		let mrrAPIkeys = {
 			key: process.env.API_KEY,
 			secret: process.env.API_SECRET
