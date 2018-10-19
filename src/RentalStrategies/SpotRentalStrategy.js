@@ -1,5 +1,5 @@
 import GenericStrategy from './GenericStrategy'
-import {getMarketStats} from 'market-rental-stats'
+import getMarketStats from 'market-rental-stats'
 import axios from 'axios'
 import BN from 'bn.js'
 import { config } from 'dotenv'
