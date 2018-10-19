@@ -461,6 +461,8 @@ class AutoRenter {
 		let weightedLimit = weightedSum / duration
 
 		return {
+			status,
+			message,
 			total_cost: amount,
 			average_hashrate_rented: weightedLimit,
 			average_duration: duration / rentals.length,
