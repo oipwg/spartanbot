@@ -261,44 +261,60 @@ describe("SpartanBot", () => {
 			await setupProviders()
 			await spartan.setupRentalStrategy({type: 'ManualRent'})
 
-			const rentSelector = async (p, o) => {
-				console.log('badges: ', p.badges)
-				return {badges: p.badges, confirm: false}
-			}
+			spartan.manualRent(10000, 3, async (prepr, opts) => {
+				let badges = prepr.badges
+				let _badge;
+				for (let badge of badges) {
+					if (badge.cutoff) {
+						console.log('cutoff badge: ', badge)
+						_badge = badge
+					}
+				}
+				if (!_badge)
+					_badge = badges[0]
+
+				return {confirm: true, message: 'manual cancel', badges: _badge}
+			})
+
+			done()
+			// const rentSelector = async (p, o) => {
+			// 	console.log('badges: ', p.badges)
+			// 	return {badges: p.badges, confirm: false}
+			// }
 			// let rentOptions = {
 			// 	hashrate: 10000,
 			// 	duration: 3,
 			// 	rentSelector
 			// }
 
-			let hashrate = 10000,
-				duration = 3
-
-			let options = {
-				algo: 'scrypt',
-				host: 'thecoin.pw',
-				port: 3978,
-				user: 'bitspill.1',
-				pass: 'x',
-				name: 'created in spartanbot manual rent (new) test'
-			}
-
-			await spartan.createPool(options)
-
-			spartan.manualRent(hashrate, duration, rentSelector)
-
-			let id;
-			for (let p of spartan.getRentalProviders()) {
-				for (let pool of p.returnPools()) {
-					if (pool.name === options.name) {
-						id = pool.id
-					}
-				}
-			}
-
-			let res = await spartan.deletePool(id)
-			expect(res.success).toBeTruthy()
-			done()
+			// let hashrate = 10000,
+			// 	duration = 3
+			//
+			// let options = {
+			// 	algo: 'scrypt',
+			// 	host: 'thecoin.pw',
+			// 	port: 3978,
+			// 	user: 'bitspill.1',
+			// 	pass: 'x',
+			// 	name: 'created in spartanbot manual rent (new) test'
+			// }
+			//
+			// await spartan.createPool(options)
+			//
+			// spartan.manualRent(hashrate, duration, rentSelector)
+			//
+			// let id;
+			// for (let p of spartan.getRentalProviders()) {
+			// 	for (let pool of p.returnPools()) {
+			// 		if (pool.name === options.name) {
+			// 			id = pool.id
+			// 		}
+			// 	}
+			// }
+			//
+			// let res = await spartan.deletePool(id)
+			// expect(res.success).toBeTruthy()
+			// done()
 		}, 250 * 100 * 100);
 		it.skip('create and cancel nicehash order', async (done) => {
 			await setupProviders()
