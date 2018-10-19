@@ -7,10 +7,10 @@ class NiceHashProvider extends RentalProvider {
 	constructor(settings) {
 		super(settings)
 
-		this.key = settings.api_key || settings.key;
-		this.id = settings.api_id || settings.id
+		this.api_key = settings.api_key || settings.key;
+		this.api_id = settings.api_id || settings.id
 
-		this.api = new NiceHash(this.key, this.id)
+		this.api = new NiceHash(this.api_key, this.api_id)
 	}
 
 	/**
