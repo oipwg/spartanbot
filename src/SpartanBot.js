@@ -334,6 +334,22 @@ class SpartanBot {
 		return this.rental_strategies
 	}
 
+	onRentalFnFinish(rental_info, self) {
+		console.log('rental function finished... saving receipt')
+		self.saveReceipt(rental_info)
+		switch(rental_info.status) {
+			case NORMAL:
+				self.emitter.emit(RENTAL_SUCCESS, rental_info)
+				break
+			case WARNING:
+				self.emitter.emit(RENTAL_WARNING, rental_info)
+				break
+			case ERROR:
+				self.emitter.emit(RENTAL_ERROR, rental_info)
+				break
+		}
+	}
+
 	/**
 	 * Fire off a manual rent event
 	 *
