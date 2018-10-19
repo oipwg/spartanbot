@@ -56,7 +56,7 @@ class ManualRentStrategy extends GenericStrategy {
 		//this.chain.getTarget(Date.now(), this.chain.tip)
 		let NextDiff = 0
 		let NetHashrate = (NextDiff * Math.pow(2, 32)) / TargetBlockTime
-		let WeightedAverageRentalCost = weights.weighted
+		let WeightedAverageRentalCost = weightedRentalCosts.weighted.toFixed(9)
 		let FLOPrice = floPriceUSD
 		// -----------------
 
