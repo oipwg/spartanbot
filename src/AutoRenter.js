@@ -472,7 +472,7 @@ class AutoRenter {
 			rentals,
 			timestamp: moment().format("dddd, MMMM Do YYYY, h:mm:ss a"),
 			unixTimestamp: Date.now(),
-			type: "RECEIPT",
+			type: RECEIPT,
 			id: uid()
 		}
 	}
