@@ -564,6 +564,7 @@ class MRRProvider extends RentalProvider {
 			throw new Error(`Could not fetch account balance \n ${err}`)
 		}
 	}
+
 	/**
 	 * Get Back balances for all coins, confirmed and unconfirmed
 	 * @returns {Promise<Object>}
@@ -581,6 +582,7 @@ class MRRProvider extends RentalProvider {
 			throw new Error(`Could not fetch account balance \n ${err}`)
 		}
 	}
+
 	/**
 	 * Get the total cost to rent multiple rigs
 	 * @param {Array.<Object>} rigs_to_rent - See MRRProvider.getRigsToRent()
