@@ -1,6 +1,7 @@
 import RentalProvider from './RentalProvider'
 import MiningRigRentals from 'miningrigrentals-api-v2'
 import {selectBestCombination, serializePool, toNiceHashPrice} from "../util";
+import {NORMAL} from "../constants";
 
 /**
  * A Rental Provider for MiningRigRentals
