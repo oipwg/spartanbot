@@ -375,29 +375,23 @@ class SpartanBot {
 	 * @param  {Function} [rentSelector] - Pass in a function that returns a Promise to offer rent options to user
 	 * @param  {Object} self - a reference to 'this', the SpartanBot class (needed because the reference is lost when using event emitters)
  	 * @private
-	 * @async
 	 * @return {Promise<Object>} Returns a Promise that will resolve to an Object that contains information about the rental request
 	 */
-	async _rent(hashrate, duration, rentSelector, self){
+	rent(hashrate, duration, rentSelector, self){
 		self.autorenter = new AutoRenter({
-			rental_providers: self.rental_providers
+			rental_providers: self.rental_providers,
+			emitter: self.emitter
 		})
-		let rental_info
-		try {
-			rental_info = await self.autorenter.manualRent({
-				hashrate,
-				duration,
-				rentSelector
-			})
-		} catch (e) {
-			throw new Error("Unable to rent using SpartanBot!\n" + e)
-		}
-		if (rental_info.type !== 'RECEIPT') {
-			return rental_info
-		} else {
-			this.saveReceipt(rental_info)
-			return rental_info
-		}
+		self.autorenter.rent({
+			hashrate,
+			duration,
+			rentSelector
+		}).then(rental_info => {
+			self.emitter.emit(RentalFunctionFinish, rental_info, self)
+		}).catch(err => {
+			let rental_info = {status: ERROR, message: "Unable to rent using SpartanBot!", error: err}
+			self.emitter.emit(RentalFunctionFinish, rental_info, self)
+		})
 	}
 
 	/**
