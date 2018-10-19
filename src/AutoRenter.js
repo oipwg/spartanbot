@@ -375,7 +375,7 @@ class AutoRenter {
 		//preprocess
 		let preprocess;
 		try {
-			preprocess = await this.manualRentPreprocess(options)
+			preprocess = await this.rentPreprocess(options)
 		} catch (err) {
 			throw new Error(`Failed to get prepurchase_info! \n ${err}`)
 		}
