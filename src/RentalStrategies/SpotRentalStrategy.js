@@ -52,8 +52,8 @@ class ManualRentStrategy extends GenericStrategy {
 		const FLOperBlock = 12.5
 		const TargetBlockTime = 40
 
+		const powLimit = new BN('0x00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff', 16)
 		//this.chain.getTarget(Date.now(), this.chain.tip)
-		// get the following
 		let NextDiff = 0
 		let NetHashrate = (NextDiff * Math.pow(2, 32)) / TargetBlockTime
 		let WeightedAverageRentalCost = weights.weighted
