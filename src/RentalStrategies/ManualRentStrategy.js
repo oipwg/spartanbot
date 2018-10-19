@@ -1,6 +1,5 @@
 import GenericStrategy from './GenericStrategy'
-
-const ManualRent = 'ManualRent'
+import {TriggerRental, ManualRent} from "../constants";
 
 class ManualRentStrategy extends GenericStrategy {
 	constructor(settings){
@@ -17,7 +16,7 @@ class ManualRentStrategy extends GenericStrategy {
 
 	startup(){
 		this.emitter.on(ManualRent, (hashrate, duration, rentSelector, self) => {
-			this.emitter.emit('TriggerRental', hashrate, duration, rentSelector, self)
+			this.emitter.emit(TriggerRental, hashrate, duration, rentSelector, self)
 		})
 	}
 }
