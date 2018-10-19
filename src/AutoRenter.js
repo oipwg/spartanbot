@@ -365,6 +365,7 @@ class AutoRenter {
 	async rent(options) {
 		if (!this.rental_providers || this.rental_providers.length === 0) {
 			return {
+				status: ERROR,
 				success: false,
 				type: "NO_RENTAL_PROVIDERS",
 				message: "Rent Cancelled, no RentalProviders found to rent from"
