@@ -399,7 +399,6 @@ class AutoRenter {
 
 		//rent
 		let rentals = []
-		if (Array.isArray(badges)) {
 		if (!Array.isArray(badges))
 			badges = [badges]
 		for (let badge of badges) {
@@ -407,6 +406,23 @@ class AutoRenter {
 			for (let rental of rentalReturn) {
 				rentals.push(rental)
 			}
+		}
+		let status = NORMAL
+		let message = 'Rent Successful'
+		let successfulRentals = 0
+		let unsuccessfulRentals = 0
+		for (let rental of rentals) {
+			if (rental.success) {
+				successfulRentals++
+			} else unsuccessfulRentals++
+		}
+		if (unsuccessfulRentals > 0 && successfulRentals > 0) {
+			status = WARNING
+			message = 'Not all rentals were successful'
+		}
+		if (unsuccessfulRentals >= 0 && successfulRentals === 0) {
+			status = ERROR
+			message = 'Failed to rent'
 		}
 
 		let amount = 0
