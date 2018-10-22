@@ -123,4 +123,4 @@ class SpotRentStrategy extends GenericStrategy {
 
 }
 
-export default ManualRentStrategy
+export default SpotRentStrategy
