@@ -462,6 +462,7 @@ class AutoRenter {
 		}
 		let weightedLimit = weightedSum / duration
 
+		//receipt
 		return {
 			status,
 			message,
