@@ -75,16 +75,20 @@ class SpotRentStrategy extends GenericStrategy {
 		let WeightedAverageRentalCostBtcThHour = parseFloat(weightedRentalCosts.weighted.toFixed(9)) // currently in BTC/GH/Hour
 		let FLOPrice = btcFLO
 
-		let cost = NetHashrate * WeightedAverageRentalCost * time * PWTh1
-		let ret = FLOperBlock * TargetBlockTime / (60*60) * time * FLOPrice * PWTh1
+		// console.log(time, FLOPrice, NextDiff, TargetBlockTime, FLOperBlock, PWTh1, WeightedAverageRentalCostBtcThHour, NetHashrate)
 
-		let profit = -cost + ret
-		let margin = profit / ret
+		//convert net hash rate to terahashes
+		let costBTC = (NetHashrate / 1e12) * (WeightedAverageRentalCostBtcThHour) * time * PWTh1
+		let costFLO = costBTC / btcFLO
+		let revenueBTC = FLOperBlock * ((60 * 60) / TargetBlockTime) * time * FLOPrice * PWTh1
+		let revenueFLO = revenueBTC / btcFLO
 
-		let spotProfitCheck = -(NetHashrate * WeightedAverageRentalCost * time * PWTh1) + ((FLOperBlock) * (TargetBlockTime) / (60 * 60) * time * PWTh1) * FLOPrice
+		let profitBTC = revenueBTC - costBTC
+		let profitFLO = profitBTC / btcFLO
+		let margin = Math.round((profitBTC / revenueBTC) * 10000) / 100
 
-		let CurrentPoolHashrate = 0
-		let amount = ((NextDiff * Math.pow(2, 32)) / (TargetBlockTime / PWTh1)) - CurrentPoolHashrate
+		let CurrentPoolHashrate = 0 //ToDo: get this value when there's a livenet pool ready pool.oip.fun/api/pools
+		let hashrateToRent = ((NextDiff * Math.pow(2, 32)) / (TargetBlockTime / PWTh1)) - CurrentPoolHashrate
 
 		return {
 			isProfitable: spotProfitCheck > 0,
