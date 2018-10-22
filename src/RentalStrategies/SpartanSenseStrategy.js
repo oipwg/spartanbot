@@ -30,6 +30,14 @@ class SpartanSenseStrategy extends GenericStrategy {
 		self.checkNodeStatus(self)
 	}
 
+	checkNodeStatus(self){
+		let syncStatus = self.scanner.getSyncStatus()
+		console.log('sync status: ', syncStatus)
+		if (syncStatus.synced && syncStatus.sync_percent > 0.99)
+			self.emitter.emit(NODE_SYNCED, self.scanner)
+		else
+			setTimeout(() => self.checkNodeStatus(self), 20 * 1000)
+	}
 			// Using this reorg_info, you can decide if you should emit a "TriggerRental" event.
 			//{ best_height_tip: this.best_active_tip, reorg_tip: tip }
 			console.log(reorg_info)
