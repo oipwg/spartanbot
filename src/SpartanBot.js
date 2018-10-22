@@ -335,7 +335,7 @@ class SpartanBot {
 	}
 
 	onRentalFnFinish(rental_info, self) {
-		console.log('rental function finished... saving receipt')
+		console.log('rental function finished... saving rental_info')
 		self.saveReceipt(rental_info)
 		switch(rental_info.status) {
 			case NORMAL:
