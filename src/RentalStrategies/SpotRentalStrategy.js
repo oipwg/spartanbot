@@ -14,7 +14,7 @@ import {
 	NODE_SYNCED, CHECK_SPOT_PROFIT
 } from "../constants";
 
-class SpotRentStrategy extends GenericStrategy {
+class SpotRentalStrategy extends GenericStrategy {
 	constructor(settings) {
 		super(settings);
 
@@ -122,4 +122,4 @@ class SpotRentStrategy extends GenericStrategy {
 
 }
 
-export default SpotRentStrategy
+export default SpotRentalStrategy
