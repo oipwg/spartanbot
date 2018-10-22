@@ -102,19 +102,22 @@ class SpotRentStrategy extends GenericStrategy {
 			hashrateToRent
 		}
 	}
+
 	async checkProfitability(self) {
-		console.log('check profit')
+		// console.log('checkProfitability')
 		let spotProfit = {}
 		try {
-			spotProfit = await self.calculateSpotProfitability()
+			spotProfit = await self.calculateSpotProfitability(self)
+			// console.log('profitability: ', spotProfit)
 		} catch (err) {
-			this.emitter.emit('error', err)
+			this.emitter.emit(error, CHECK_SPOT_PROFIT, err)
 		}
-		if (spotProfit.isProfitable) {
-			console.log('trigger rental')
+		if (spotProfit.margin >= 10) {
+			console.log('Profit margin is equal to or above 10%: trigger rental')
 			// this.emitter.emit(TriggerRental, hashrate, duration, rentSelector)
 		} else {
-			setTimeout(this.checkProfitability(), 1000 * 40)
+			// console.log("Not yet profitable... continue scanning")
+			setTimeout(() => self.checkProfitability(self), 1000 * 40)
 		}
 	}
 
