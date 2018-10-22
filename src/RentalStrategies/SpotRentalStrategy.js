@@ -59,11 +59,11 @@ class SpotRentStrategy extends GenericStrategy {
 		}
 
 		let weightedRentalCosts = await getMarketStats(mrrAPIkeys, nhAPIkeys)
-		let usdBTC = (await axios.get("https://bittrex.com/api/v1.1/public/getticker?market=usd-btc")).data
+		// let usdBTC = (await axios.get("https://bittrex.com/api/v1.1/public/getticker?market=usd-btc")).data
 		let btcFLO = (await axios.get("https://bittrex.com/api/v1.1/public/getticker?market=btc-flo")).data
-		usdBTC = usdBTC.result.Last
+		// usdBTC = usdBTC.result.Last
 		btcFLO = btcFLO.result.Last
-		let floPriceUSD = usdBTC * btcFLO
+		// let floPriceUSD = usdBTC * btcFLO
 
 		const time = 3 // ToDo: lowered or should be calculated
 		const PWTh1 = 0.3
