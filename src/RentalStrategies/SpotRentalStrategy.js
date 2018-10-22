@@ -24,7 +24,7 @@ class SpotRentStrategy extends GenericStrategy {
 		this.setup()
 	}
 
-	static getType(){
+	static getType() {
 		return SpotRent
 	}
 
