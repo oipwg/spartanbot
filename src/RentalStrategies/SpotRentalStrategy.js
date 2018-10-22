@@ -5,8 +5,18 @@ import {config} from 'dotenv'
 
 config()
 
-class ManualRentStrategy extends GenericStrategy {
-	constructor(settings){
+import {
+	error,
+	TriggerRental,
+	SpotRent,
+	CollectiveDefense,
+	StartupSpotRentalStrategy,
+	StartupChainScanner,
+	NODE_SYNCED, CHECK_SPOT_PROFIT
+} from "../constants";
+
+class SpotRentStrategy extends GenericStrategy {
+	constructor(settings) {
 		super(settings);
 
 		this.type = SpotRent
