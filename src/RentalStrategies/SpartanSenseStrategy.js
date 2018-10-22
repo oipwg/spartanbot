@@ -38,6 +38,9 @@ class SpartanSenseStrategy extends GenericStrategy {
 		else
 			setTimeout(() => self.checkNodeStatus(self), 20 * 1000)
 	}
+
+	collectiveDefensive(self) {
+		self.scanner.onReorgTrigger((reorg_info) => {
 			// Using this reorg_info, you can decide if you should emit a "TriggerRental" event.
 			//{ best_height_tip: this.best_active_tip, reorg_tip: tip }
 			console.log(reorg_info)
