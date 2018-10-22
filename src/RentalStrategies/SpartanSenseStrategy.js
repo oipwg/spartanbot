@@ -19,12 +19,17 @@ class SpartanSenseStrategy extends GenericStrategy {
 		this.emitter.on(StartupChainScanner, () => this.startup(this))
 	}
 
+	startup(self){
+		self.scanner = new ChainScanner({
 			log_level: "silent",
 			peer_log_level: "silent",
 			disableLogUpdate: true
 		})
 
-		this.scanner.onReorgTrigger((reorg_info) => {
+		self.emitter.on(CollectiveDefense, () => self.collectiveDefensive(self))
+		self.checkNodeStatus(self)
+	}
+
 			// Using this reorg_info, you can decide if you should emit a "TriggerRental" event.
 			//{ best_height_tip: this.best_active_tip, reorg_tip: tip }
 			console.log(reorg_info)
