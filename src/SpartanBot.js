@@ -840,7 +840,7 @@ class SpartanBot {
 
 		for (let strategyType in this.rental_strategies)
 			serialized.rental_strategies[strategyType] = this.rental_strategies[strategyType].serialize()
-		
+
 
 		serialized.oip_account = this.oip_account
 
