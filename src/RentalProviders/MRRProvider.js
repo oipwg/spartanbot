@@ -99,7 +99,7 @@ class MRRProvider extends RentalProvider {
 				return profile.data[0].id
 			}
 		} else {
-			throw new Error(`Error getting profile data: \n ${JSON.stringify(profile, null, 4)}`)
+			throw new Error(`Error getting profile data. Invalid nonce most likely: ${JSON.stringify(profile, null, 4)}`)
 		}
 	}
 
@@ -662,7 +662,7 @@ class MRRProvider extends RentalProvider {
 		try {
 			profileID =  await this.getProfileID()
 		} catch (err) {
-			throw new Error(`Could not fetch profile ID \n ${err}`)
+			throw new Error(`Could not fetch profile ID: ${err}`)
 		}
 
 		let rigOpts = {
