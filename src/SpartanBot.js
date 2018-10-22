@@ -1,5 +1,6 @@
 import { Account } from 'oip-account'
 import uid from 'uid';
+import moment from 'moment'
 import EventEmitter from 'eventemitter3'
 
 import { MRRProvider, NiceHashProvider } from './RentalProviders'
@@ -773,6 +774,9 @@ class SpartanBot {
 	 * @param {Object} receipt - an object containing information about a rental
 	 */
 	saveReceipt(receipt) {
+		receipt.timestamp = moment().format("dddd, MMMM Do YYYY, h:mm:ss a")
+		receipt.unixTimestamp = Date.now()
+		receipt.id = uid()
 		this.receipts.push(receipt)
 		this.serialize()
 	}
