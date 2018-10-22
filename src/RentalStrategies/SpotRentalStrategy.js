@@ -91,8 +91,15 @@ class SpotRentStrategy extends GenericStrategy {
 		let hashrateToRent = ((NextDiff * Math.pow(2, 32)) / (TargetBlockTime / PWTh1)) - CurrentPoolHashrate
 
 		return {
-			isProfitable: spotProfitCheck > 0,
-			amount
+			isProfitable: profitBTC > 0,
+			costBTC,
+			costFLO,
+			revenueBTC,
+			revenueFLO,
+			profitBTC,
+			profitFLO,
+			margin,
+			hashrateToRent
 		}
 	}
 	async checkProfitability(self) {
