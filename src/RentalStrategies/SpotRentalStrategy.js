@@ -39,6 +39,12 @@ class SpotRentStrategy extends GenericStrategy {
 		self.emitter.emit(StartupChainScanner)
 	}
 
+	onNodeSynced(self, scanner) {
+		console.log(NODE_SYNCED)
+		self.scanner = scanner
+		self.emitter.emit(CHECK_SPOT_PROFIT)
+	}
+
 		//ToDo: Standardize env var names
 		if (!process.env.API_KEY || !process.env.API_SECRET || !process.env.NICEHASH_API_KEY || !process.env.NICEHASH_API_ID)
 			throw new Error('Must provide MRR and NiceHash API_KEYS')
