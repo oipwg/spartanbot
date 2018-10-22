@@ -3,7 +3,7 @@ import uid from 'uid';
 import EventEmitter from 'eventemitter3'
 
 import { MRRProvider, NiceHashProvider } from './RentalProviders'
-import { SpartanSenseStrategy, ManualRentStrategy, SpotRentStrategy } from './RentalStrategies'
+import { SpartanSenseStrategy, ManualRentStrategy, SpotRentalStrategy } from './RentalStrategies'
 import AutoRenter from './AutoRenter'
 import {
 	RECEIPT,
@@ -17,7 +17,7 @@ import {
 } from "./constants";
 
 const SUPPORTED_RENTAL_PROVIDERS = [ MRRProvider, NiceHashProvider ]
-const SUPPORTED_RENTAL_STRATEGIES = [ SpartanSenseStrategy, ManualRentStrategy, SpotRentStrategy ]
+const SUPPORTED_RENTAL_STRATEGIES = [ SpartanSenseStrategy, ManualRentStrategy, SpotRentalStrategy ]
 
 let localStorage
 
