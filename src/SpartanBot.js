@@ -92,8 +92,8 @@ class SpartanBot {
 	 */
 	setupListeners() {
 		this.emitter.on(RentalFunctionFinish, this.onRentalFnFinish)
-		this.emitter.on('error', (err) => {
-			console.error('whoops! there was an error in an event emitter: ', err);
+		this.emitter.on('error', (type, error) => {
+			console.error(`There was an error in the ${type} event: `, error);
 		});
 		this.onRentalSuccess()
 		this.onRentalWarning()
