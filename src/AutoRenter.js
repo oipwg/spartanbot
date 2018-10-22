@@ -243,6 +243,8 @@ class AutoRenter {
 						badge.extension = true
 						usable_badges.push(badge)
 					} else {
+						if (badge.status.type === LOW_BALANCE)
+							badge.low_balance = true
 						//these will be your LOW_BALANCE badges
 						usable_badges.push(badge)
 					}
