@@ -1,5 +1,4 @@
 import Exchange from 'oip-exchange-rate';
-import moment from 'moment'
 import uid from 'uid'
 
 const NiceHash = "NiceHash"
@@ -473,10 +472,7 @@ class AutoRenter {
 			hashrateTH_desired: options.hashrate / 1000 / 1000,
 			duration_desired: options.duration,
 			rentals,
-			timestamp: moment().format("dddd, MMMM Do YYYY, h:mm:ss a"),
-			unixTimestamp: Date.now(),
 			type: RECEIPT,
-			id: uid()
 		}
 	}
 
