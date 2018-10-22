@@ -1,5 +1,6 @@
 import GenericStrategy from './GenericStrategy'
 import { ChainScanner } from 'spartansense'
+import {CHECK_NODE_STATUS, CollectiveDefense, NODE_SYNCED, STARTUP, StartupChainScanner} from "../constants";
 
 class SpartanSenseStrategy extends GenericStrategy {
 	constructor(settings){
