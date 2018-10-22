@@ -374,8 +374,7 @@ class AutoRenter {
 		try {
 			preprocess = await this.rentPreprocess(options)
 		} catch (err) {
-			if (err)
-				return {status: ERROR, success: false, message: `Failed to get prepurchase_info!`, error: err}
+			return {status: ERROR, success: false, message: `Failed to get prepurchase_info`, error: err}
 		}
 
 		if (preprocess.status === ERROR) {
