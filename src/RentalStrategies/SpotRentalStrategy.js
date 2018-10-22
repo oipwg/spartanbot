@@ -1,12 +1,9 @@
 import GenericStrategy from './GenericStrategy'
 import getMarketStats from 'market-rental-stats'
 import axios from 'axios'
-import BN from 'bn.js'
-import { config } from 'dotenv'
+import {config} from 'dotenv'
+
 config()
-
-
-import {TriggerRental, SpotRent} from "../constants";
 
 class ManualRentStrategy extends GenericStrategy {
 	constructor(settings){
