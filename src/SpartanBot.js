@@ -14,7 +14,7 @@ import {
 	TradeBot,
 	CollectiveDefense,
 	NORMAL,
-	WARNING, RENTAL_SUCCESS, RENTAL_WARNING, RENTAL_ERROR
+	WARNING, RENTAL_SUCCESS, RENTAL_WARNING, RENTAL_ERROR, ERROR
 } from "./constants";
 
 const SUPPORTED_RENTAL_PROVIDERS = [ MRRProvider, NiceHashProvider ]
