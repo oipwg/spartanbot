@@ -72,9 +72,8 @@ class SpotRentStrategy extends GenericStrategy {
 
 		let NextDiff = await self.scanner.getDifficulty()
 		let NetHashrate = (NextDiff * Math.pow(2, 32)) / TargetBlockTime
-		let FLOPrice = floPriceUSD
-		// -----------------
 		let WeightedAverageRentalCostBtcThHour = parseFloat(weightedRentalCosts.weighted.toFixed(9)) // currently in BTC/GH/Hour
+		let FLOPrice = btcFLO
 
 		let cost = NetHashrate * WeightedAverageRentalCost * time * PWTh1
 		let ret = FLOperBlock * TargetBlockTime / (60*60) * time * FLOPrice * PWTh1
