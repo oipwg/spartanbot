@@ -21,8 +21,7 @@ class SpotRentStrategy extends GenericStrategy {
 
 		this.type = SpotRent
 
-		if (this.emitter)
-			this.startup()
+		this.setup()
 	}
 
 	static getType(){
