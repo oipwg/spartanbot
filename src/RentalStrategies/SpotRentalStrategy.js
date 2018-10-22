@@ -20,7 +20,6 @@ class SpotRentStrategy extends GenericStrategy {
 		super(settings);
 
 		this.type = SpotRent
-		this.self = this
 
 		if (this.emitter)
 			this.startup()
