@@ -3,7 +3,7 @@ import uid from 'uid';
 import EventEmitter from 'eventemitter3'
 
 import { MRRProvider, NiceHashProvider } from './RentalProviders'
-import { SpartanSenseStrategy, ManualRentStrategy } from './RentalStrategies'
+import { SpartanSenseStrategy, ManualRentStrategy, SpotRentStrategy } from './RentalStrategies'
 import AutoRenter from './AutoRenter'
 import {
 	RECEIPT,
