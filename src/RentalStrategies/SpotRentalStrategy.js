@@ -32,6 +32,13 @@ class SpotRentStrategy extends GenericStrategy {
 		this.emitter.on(StartupSpotRentalStrategy, () => this.startup(this))
 	}
 	async calculateSpotProfitability() {
+
+	startup(self) {
+		self.emitter.on(NODE_SYNCED, (scanner) => self.onNodeSynced(self, scanner))
+		self.emitter.on(CHECK_SPOT_PROFIT, () => self.checkProfitability(self))
+		self.emitter.emit(StartupChainScanner)
+	}
+
 		//ToDo: Standardize env var names
 		if (!process.env.API_KEY || !process.env.API_SECRET || !process.env.NICEHASH_API_KEY || !process.env.NICEHASH_API_ID)
 			throw new Error('Must provide MRR and NiceHash API_KEYS')
