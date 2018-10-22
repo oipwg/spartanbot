@@ -88,7 +88,7 @@ class SpotRentStrategy extends GenericStrategy {
 		let margin = Math.round((profitBTC / revenueBTC) * 10000) / 100
 
 		let CurrentPoolHashrate = 0 //ToDo: get this value when there's a livenet pool ready pool.oip.fun/api/pools
-		let hashrateToRent = ((NextDiff * Math.pow(2, 32)) / (TargetBlockTime / PWTh1)) - CurrentPoolHashrate
+		let hashrateToRentMH = Math.round((((NextDiff * Math.pow(2, 32)) / (TargetBlockTime / PWTh1)) - CurrentPoolHashrate)/1e6)
 
 		return {
 			isProfitable: profitBTC > 0,
@@ -99,7 +99,7 @@ class SpotRentStrategy extends GenericStrategy {
 			profitBTC,
 			profitFLO,
 			margin,
-			hashrateToRent
+			hashrateToRentMH,
 		}
 	}
 
