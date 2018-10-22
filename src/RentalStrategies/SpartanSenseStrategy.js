@@ -15,8 +15,10 @@ class SpartanSenseStrategy extends GenericStrategy {
 		return "SpartanSense"
 	}
 
-	startup(){
-		this.scanner = new ChainScanner({
+	setup(){
+		this.emitter.on(StartupChainScanner, () => this.startup(this))
+	}
+
 			log_level: "silent",
 			peer_log_level: "silent",
 			disableLogUpdate: true
