@@ -20,4 +20,10 @@ export const TradeBot = 'TradeBot'
 export const SpartanSense = 'SpartanSense'
 export const CollectiveDefense = 'CollectiveDefense'
 
-
+export const error = 'error'
+export const StartupSpotRentalStrategy = 'StartupSpotRentalStrategy'
+export const StartupChainScanner = 'StartupChainScanner'
+export const NODE_SYNCED = 'NODE_SYNCED'
+export const CHECK_SPOT_PROFIT = 'CHECK_SPOT_PROFIT'
+export const CHECK_NODE_STATUS = 'CHECK_NODE_STATUS'
+export const STARTUP = 'STARTUP'
