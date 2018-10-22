@@ -42,7 +42,7 @@ const setupProviders = async () => {
 		type: "MiningRigRentals",
 		api_key: apikey.api_key,
 		api_secret: apikey.api_secret,
-		name: "Master"
+		name: "MiningRigRentals"
 	})
 	mrr = mrrSetup.provider
 
@@ -50,7 +50,7 @@ const setupProviders = async () => {
 		type: "NiceHash",
 		api_key: niceHashAPI.api_key,
 		api_id: niceHashAPI.api_id,
-		name: "Ryan"
+		name: "NiceHash"
 	})
 	nh = nhSetup.provider
 
@@ -80,7 +80,6 @@ describe("SpartanBot", () => {
 			expect(spartan.getSettings()).toEqual({"memory": true, "test-setting2": "test-setting-data2"})
 		})
 	})
-
 	describe("RentalProviders", () => {
 		it("Should be able to setup new MRR RentalProvider", async () => {
 			let spartan = new SpartanBot({memory: true})
@@ -148,201 +147,7 @@ describe("SpartanBot", () => {
 			expect(updated_providers[0].api_secret).toBe(providers[1].api_secret)
 		})
 	})
-
-	describe("Manual Rental", () => {
-		/*
-		it("Should be able to rent manually (no confirmation function)", async () => {
-			let spartan = new SpartanBot({ memory: true })
-
-			let rental = await spartan.manualRental(1000, 86400)
-
-			expect(rental.success).toBe(true)
-		})
-		it("Should be able to use confirmation function", async () => {
-			let spartan = new SpartanBot({ memory: true })
-
-			let rental = await spartan.manualRental(1000, 86400, async (info) => {
-				return true
-			})
-
-			expect(rental.success).toBe(true)
-		})
-		*/
-		it("Should be able to cancel", async () => {
-			let spartan = new SpartanBot({memory: true})
-
-			await spartan.setupRentalProvider({
-				type: "MiningRigRentals",
-				api_key: apikey.api_key,
-				api_secret: apikey.api_secret
-			})
-
-			let rental = await spartan.manualRental(1000, 86400, async (info) => {
-				return false
-			})
-
-			expect(rental.success).toBe(false)
-			expect(rental.info).toBe("Rental Cancelled")
-		})
-	})
-
-	describe("Save and Reload", () => {
-		it("Should be able to Serialize & Deserialize", async () => {
-			let spartan = new SpartanBot({test: "setting"})
-
-			await spartan._deserialize
-			await spartan._wallet_create
-
-			let account_identifier = spartan.oip_account
-			let wallet_mnemonic = spartan.wallet._account.wallet.mnemonic
-
-			expect(spartan.wallet._storageAdapter._username).toBe(account_identifier)
-			expect(spartan.wallet._account.wallet.mnemonic).toBe(wallet_mnemonic)
-
-			let setup = await spartan.setupRentalProvider({
-				type: "MiningRigRentals",
-				api_key: apikey.api_key,
-				api_secret: apikey.api_secret
-			})
-
-			spartan.serialize()
-
-			let spartan2 = new SpartanBot()
-
-			// Wait for deserialization to finish
-			await spartan2._deserialize
-			await spartan2._wallet_login
-
-			expect(spartan2.oip_account).toBe(account_identifier)
-			expect(spartan2.wallet._storageAdapter._username).toBe(account_identifier)
-			expect(spartan2.wallet._account.wallet.mnemonic).toBe(wallet_mnemonic)
-
-			expect(spartan2.getSetting('test')).toBe("setting")
-		})
-	});
-	describe('Rent / Preprocess', () => {
-		it('preprocess mrr rent | mrrPreprocessRent', async (done) => {
-			await setupProviders()
-
-			let rentOptions = {
-				hashrate: 20000,
-				duration: 5
-			}
-
-			let response = await autorenter.mrrRentPreprocess(rentOptions)
-			expect(response.success).toBeTruthy()
-
-			done()
-		}, 250 * 100);
-		it('manual preprocess rent | manualRentPreprocess', async (done) => {
-			await setupProviders()
-
-			let rentOptions = {
-				hashrate: 10000,
-				duration: 3
-			}
-
-			let preprocess = await autorenter.manualRentPreprocess(rentOptions)
-			let statusCheck = false;
-			switch (preprocess.status) {
-				case 'NORMAL':
-				case 'LOW_BALANCE':
-				case 'ERROR':
-					statusCheck = true
-					break
-				default:
-					break
-			}
-			expect(statusCheck).toBeTruthy()
-
-			done()
-		}, 250 * 100);
-		it.skip('manual rent (new) | manualRent', async (done) => {
-			await setupProviders()
-			await spartan.setupRentalStrategy({type: 'ManualRent'})
-
-			spartan.manualRent(10000, 3, async (prepr, opts) => {
-				let badges = prepr.badges
-				let _badge;
-				for (let badge of badges) {
-					if (badge.cutoff) {
-						console.log('cutoff badge: ', badge)
-						_badge = badge
-					}
-				}
-				if (!_badge)
-					_badge = badges[0]
-
-				return {confirm: true, message: 'manual cancel', badges: _badge}
-			})
-
-			done()
-			// const rentSelector = async (p, o) => {
-			// 	console.log('badges: ', p.badges)
-			// 	return {badges: p.badges, confirm: false}
-			// }
-			// let rentOptions = {
-			// 	hashrate: 10000,
-			// 	duration: 3,
-			// 	rentSelector
-			// }
-
-			// let hashrate = 10000,
-			// 	duration = 3
-			//
-			// let options = {
-			// 	algo: 'scrypt',
-			// 	host: 'thecoin.pw',
-			// 	port: 3978,
-			// 	user: 'bitspill.1',
-			// 	pass: 'x',
-			// 	name: 'created in spartanbot manual rent (new) test'
-			// }
-			//
-			// await spartan.createPool(options)
-			//
-			// spartan.manualRent(hashrate, duration, rentSelector)
-			//
-			// let id;
-			// for (let p of spartan.getRentalProviders()) {
-			// 	for (let pool of p.returnPools()) {
-			// 		if (pool.name === options.name) {
-			// 			id = pool.id
-			// 		}
-			// 	}
-			// }
-			//
-			// let res = await spartan.deletePool(id)
-			// expect(res.success).toBeTruthy()
-			// done()
-		}, 250 * 100 * 100);
-		it.skip('create and cancel nicehash order', async (done) => {
-			await setupProviders()
-
-			let poolOptions = {
-				algo: 'scrypt',
-				host: 'thecoin.pw',
-				port: 3977,
-				user: 'bitspill.1',
-				pass: 'x',
-				location: 1,
-				name: 'Ryans Test Order'
-			}
-			await nh.createPool(poolOptions)
-
-			let rentOptions = {
-				amount: 0.005,
-				limit: .01,
-				price: .500
-			}
-			let rental = await nh._rent(rentOptions)
-			console.log(rental)
-			autorenter.cutoffRental(rental.id, rental.uid, .035)
-
-			done()
-		})
-	})
-	describe('Setup multile providers of different types', () => {
+	describe('Multiple Providers', () => {
 		it('setup both MRR and NiceHash', async (done) => {
 			let spartan = new SpartanBot({memory: true});
 
@@ -668,5 +473,152 @@ describe("SpartanBot", () => {
 			let p = spartan.returnPoolProfiles()
 			expect(p.length > 0).toBeTruthy()
 		})
+	})
+	describe("Save and Reload", () => {
+		it("Should be able to Serialize & Deserialize", async () => {
+			let spartan = new SpartanBot({test: "setting"})
+
+			await spartan._deserialize
+			await spartan._wallet_create
+
+			let account_identifier = spartan.oip_account
+			let wallet_mnemonic = spartan.wallet._account.wallet.mnemonic
+
+			expect(spartan.wallet._storageAdapter._username).toBe(account_identifier)
+			expect(spartan.wallet._account.wallet.mnemonic).toBe(wallet_mnemonic)
+
+			let setup = await spartan.setupRentalProvider({
+				type: "MiningRigRentals",
+				api_key: apikey.api_key,
+				api_secret: apikey.api_secret
+			})
+
+			spartan.serialize()
+
+			let spartan2 = new SpartanBot()
+
+			// Wait for deserialization to finish
+			await spartan2._deserialize
+			await spartan2._wallet_login
+
+			expect(spartan2.oip_account).toBe(account_identifier)
+			expect(spartan2.wallet._storageAdapter._username).toBe(account_identifier)
+			expect(spartan2.wallet._account.wallet.mnemonic).toBe(wallet_mnemonic)
+
+			expect(spartan2.getSetting('test')).toBe("setting")
+		})
+	});
+	describe('Rent / Preprocess', () => {
+		it('MiningRigRentals Preprocess | mrrPreprocessRent', async (done) => {
+			await setupProviders()
+
+			let rentOptions = {
+				hashrate: 20000,
+				duration: 5
+			}
+
+			let response = await autorenter.mrrRentPreprocess(rentOptions)
+			// console.log(response)
+			expect(response.success).toBeTruthy()
+			expect(response.badges.status.status !== "ERROR")
+
+			done()
+		}, 250 * 100);
+		it('Preprocess Rent | rentPreprocess', async (done) => {
+			await setupProviders()
+
+			let rentOptions = {
+				hashrate: 100000,
+				duration: 3
+			}
+
+			let preprocess = await autorenter.rentPreprocess(rentOptions)
+			console.log(preprocess.badges)
+			let statusCheck = false;
+			switch (preprocess.status) {
+				case 'NORMAL':
+				case 'LOW_BALANCE':
+				case 'ERROR':
+					statusCheck = true
+					break
+				default:
+					break
+			}
+			expect(statusCheck).toBeTruthy()
+
+			done()
+		}, 250 * 100);
+		it.skip('Create and Cancel NiceHash order', async (done) => {
+			await setupProviders()
+
+			let poolOptions = {
+				algo: 'scrypt',
+				host: 'thecoin.pw',
+				port: 3978,
+				user: 'orpheus.1',
+				pass: 'x',
+				location: 1,
+				name: 'Ryans Test Order'
+			}
+			await nh.createPool(poolOptions)
+
+			let rentOptions = {
+				amount: 0.005,
+				limit: .01,
+				price: .500
+			}
+			let rental = await nh._rent(rentOptions)
+			console.log(rental)
+			autorenter.cutoffRental(rental.id, rental.uid, .035)
+
+			done()
+		})
+		it('Emit Manual Rent Strategy', async (done) => {
+			await setupProviders()
+			await spartan.setupRentalStrategy({type: 'ManualRent'})
+
+			//create test pool for NiceHash renting and get its id for later deletion
+			let poolOpts = {
+				algo: 'scrypt',
+				host: 'thecoin.pw',
+				port: 3978,
+				user: 'orpheus.1',
+				pass: 'x',
+				name: 'created in spartanbot manual rent (new) test'
+			}
+			await spartan.createPool(poolOpts)
+			let id;
+			for (let p of spartan.getRentalProviders()) {
+				for (let pool of p.returnPools()) {
+					if (pool.name === poolOpts.name) {
+						id = pool.id
+					}
+				}
+			}
+
+			let hashrate = 100000
+			let duration = 3
+
+			spartan.manualRent(hashrate, duration, async (prepr, opts) => {
+				let badges = prepr.badges
+				let _badge;
+				for (let badge of badges) {
+					console.log(badge)
+					if (badge.cutoff) {
+						_badge = badge
+					}
+				}
+				if (!_badge)
+					_badge = badges[0]
+
+				return {confirm: false, message: 'manual cancel', badges: _badge}
+			})
+
+			//delete pool
+			let res = await spartan.deletePool(id)
+			expect(res.success).toBeTruthy()
+			done()
+
+		}, 250 * 100 * 100);
 	})
 })
