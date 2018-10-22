@@ -257,6 +257,7 @@ class NiceHashProvider extends RentalProvider {
 			status.balance = balance
 			status.fundsNeeded = (idealAmount - balance).toFixed(6)
 			status.duration = duration
+			status.price = price
 			status.desiredDuration = desiredDuration
 			status.message = `Don't have high enough balance to rent hash for desired duration.`
 		} else {
