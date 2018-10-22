@@ -8,7 +8,7 @@ class SpartanSenseStrategy extends GenericStrategy {
 
 		this.type = "SpartanSense"
 
-		this.startup()
+		this.setup()
 	}
 
 	static getType(){
