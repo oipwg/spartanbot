@@ -70,9 +70,7 @@ class SpotRentStrategy extends GenericStrategy {
 		const FLOperBlock = 12.5
 		const TargetBlockTime = 40
 
-		const powLimit = new BN('0x00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff', 16)
-		//this.chain.getTarget(Date.now(), this.chain.tip)
-		let NextDiff = 0
+		let NextDiff = await self.scanner.getDifficulty()
 		let NetHashrate = (NextDiff * Math.pow(2, 32)) / TargetBlockTime
 		let WeightedAverageRentalCost = weightedRentalCosts.weighted.toFixed(9)
 		let FLOPrice = floPriceUSD
