@@ -28,8 +28,8 @@ class SpotRentStrategy extends GenericStrategy {
 		return SpotRent
 	}
 
-	startup(){
-		this.emitter.on(SpotRent, this.checkProfitability)
+	setup() {
+		this.emitter.on(StartupSpotRentalStrategy, () => this.startup(this))
 	}
 	async calculateSpotProfitability() {
 		//ToDo: Standardize env var names
