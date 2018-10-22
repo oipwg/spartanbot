@@ -9,7 +9,6 @@ import {
 	error,
 	TriggerRental,
 	SpotRent,
-	CollectiveDefense,
 	StartupSpotRentalStrategy,
 	StartupChainScanner,
 	NODE_SYNCED, CHECK_SPOT_PROFIT
