@@ -33,9 +33,6 @@ class AutoRenter {
 	 */
 	async mrrRentPreprocess(options) {
 		//ToDo: make sure providers profileIDs aren't the same
-
-		let status = {status: NORMAL}
-
 		//get available rigs based on hashpower and duration
 		let _provider;
 		let mrr_providers = []
@@ -52,8 +49,7 @@ class AutoRenter {
 		try {
 			rigs_to_rent = await _provider.getRigsToRent(options.hashrate, options.duration)
 		} catch (err) {
-			status.status = ERROR
-			return {status, market: MiningRigRentals, message: 'failed to fetch rigs', err}
+			return {status: ERROR, market: MiningRigRentals, message: 'failed to fetch rigs from API', err}
 		}
 
 		//divvy up providers and create Provider object
