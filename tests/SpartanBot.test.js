@@ -7,27 +7,14 @@ import {RentalFunctionFinish} from "../src/constants";
 config()
 
 const apikey = {
-	api_key: process.env.API_KEY,
-	api_secret: process.env.API_SECRET
+	api_key: process.env.MRR_API_KEY,
+	api_secret: process.env.MRR_API_SECRET
 };
-
-const apikey2 = {
-	api_key: process.env.API_KEY_2,
-	api_secret: process.env.API_SECRET_2
-}
-
-const ryansKey = {
-	api_key: process.env.API_KEY_ORPHEUS,
-	api_secret: process.env.API_SECRET_ORPHEUS
-}
 
 const niceHashAPI = {
 	api_id: process.env.NICEHASH_API_ID,
 	api_key: process.env.NICEHASH_API_KEY
 }
-
-const NiceHash = "NiceHash"
-const MiningRigRentals = "MiningRigRentals"
 
 // After all the tests have run, remove the test data :)
 afterAll(() => {
@@ -99,7 +86,7 @@ describe("SpartanBot", () => {
 
 			let providers = spartan.getSupportedRentalProviders()
 
-			expect(providers).toEqual(["MiningRigRentals"])
+			expect(providers).toEqual(["MiningRigRentals", "NiceHash"])
 		})
 		it("Should be able to get all rental providers", async () => {
 			let spartan = new SpartanBot({memory: true})
@@ -169,19 +156,19 @@ describe("SpartanBot", () => {
 			expect(mrr.success).toBeTruthy()
 			done()
 		})
-		it('load multi provider data from storage', async (done) => {
+		it('load providers from storage | deserialize', async (done) => {
 			let spartan = new SpartanBot({memory: false})
 			await spartan._deserialize
 			await spartan._wallet_create
 
-			let nicehash = await spartan.setupRentalProvider({
+			await spartan.setupRentalProvider({
 				type: "NiceHash",
 				api_key: niceHashAPI.api_key,
 				api_id: niceHashAPI.api_id,
 				name: "NiceHash"
 			})
 
-			let mrr = await spartan.setupRentalProvider({
+			await spartan.setupRentalProvider({
 				type: "MiningRigRentals",
 				api_key: apikey.api_key,
 				api_secret: apikey.api_secret,
@@ -205,7 +192,7 @@ describe("SpartanBot", () => {
 		it('create a global pool (1 provider)', async (done) => {
 			let spartan = new SpartanBot({memory: true})
 
-			let mrr = await spartan.setupRentalProvider({
+			await spartan.setupRentalProvider({
 				type: "MiningRigRentals",
 				api_key: apikey.api_key,
 				api_secret: apikey.api_secret,
@@ -213,35 +200,37 @@ describe("SpartanBot", () => {
 			})
 
 			let options = {
-				algo: 'scrypt',
-				host: 'ryan',
-				port: 33,
-				user: 'y',
-				pass: 'x',
-				name: 'lightsaber'
+				algo: 'test',
+				host: 'test',
+				port: 7357,
+				user: 'test',
+				pass: 'test',
+				name: 'test'
 			}
-			await spartan.createPool(options)
+			let poolID = await spartan.createPool(options)
 
 			let match = false;
-			for (let pool of spartan.pools) {
-				if (pool.name === options.name) {
+
+			for (let pool of spartan.returnPools()) {
+				if (poolID === pool.id) {
 					match = true
 				}
 			}
 			expect(match).toBeTruthy()
+			await spartan.deletePool(poolID)
 			done()
 		})
-		it('create a global pool (2 providers)', async (done) => {
+		it('create global pool (2 providers)', async (done) => {
 			let spartan = new SpartanBot({memory: true})
 
-			let nicehash = await spartan.setupRentalProvider({
+			await spartan.setupRentalProvider({
 				type: "NiceHash",
 				api_key: niceHashAPI.api_key,
 				api_id: niceHashAPI.api_id,
 				name: "NiceHash"
 			})
 
-			let mrr = await spartan.setupRentalProvider({
+			await spartan.setupRentalProvider({
 				type: "MiningRigRentals",
 				api_key: apikey.api_key,
 				api_secret: apikey.api_secret,
@@ -249,14 +238,14 @@ describe("SpartanBot", () => {
 			})
 
 			let options = {
-				algo: 'scrypt',
-				host: 'host.test.this',
-				port: 33,
-				user: 'y',
-				pass: 'x',
-				name: 'thunderbird'
+				algo: 'test',
+				host: 'test',
+				port: 7357,
+				user: 'test',
+				pass: 'test',
+				name: 'test'
 			}
-			await spartan.createPool(options)
+			let poolID = await spartan.createPool(options)
 
 			for (let p of spartan.getRentalProviders()) {
 				let match = false
@@ -267,19 +256,19 @@ describe("SpartanBot", () => {
 				}
 				expect(match).toBeTruthy()
 			}
+			await spartan.deletePool(poolID)
 			done()
 		})
-		it('create and then delete pool (2 providers)', async (done) => {
+		it('delete a global pool (2 providers)', async () => {
 			let spartan = new SpartanBot({memory: true})
 
-			let nicehash = await spartan.setupRentalProvider({
+			await spartan.setupRentalProvider({
 				type: "NiceHash",
 				api_key: niceHashAPI.api_key,
 				api_id: niceHashAPI.api_id,
 				name: "NiceHash"
 			})
-
-			let mrr = await spartan.setupRentalProvider({
+			await spartan.setupRentalProvider({
 				type: "MiningRigRentals",
 				api_key: apikey.api_key,
 				api_secret: apikey.api_secret,
@@ -287,67 +276,21 @@ describe("SpartanBot", () => {
 			})
 
 			let options = {
-				algo: 'scrypt',
-				host: 'test.test.this',
-				port: 33,
-				user: 'y',
-				pass: 'x',
-				name: uid()
+				algo: 'test',
+				host: 'test',
+				port: 7357,
+				user: 'test',
+				pass: 'test',
+				name: 'test'
 			}
-			await spartan.createPool(options)
-
-			let id;
-			let results = []
-			let poolsFound = []
-			for (let p of spartan.getRentalProviders()) {
-				for (let pool of p.returnPools()) {
-					if (pool.name === options.name) {
-						id = pool.id
-						results.push(true)
-						poolsFound.push(pool)
-					}
-				}
-			}
-			expect(results.length).toEqual(2)
-			let res = await spartan.deletePool(id)
-			expect(res.success).toBeTruthy()
-
-			done()
-		});
-		it('delete a pool that only one provider has', async () => {
-			let spartan = new SpartanBot({memory: true})
-
-			let nicehash = await spartan.setupRentalProvider({
-				type: "NiceHash",
-				api_key: niceHashAPI.api_key,
-				api_id: niceHashAPI.api_id,
-				name: "NiceHash"
-			})
-
-			let mrr = await spartan.setupRentalProvider({
-				type: "MiningRigRentals",
-				api_key: apikey.api_key,
-				api_secret: apikey.api_secret,
-				name: "MRR"
-			})
-
-			let options = {
-				algo: 'scrypt',
-				host: 'test.DELETE.test.DELETE.test.DELETE.',
-				port: 33,
-				user: 'y',
-				pass: 'x',
-				name: uid()
-			}
-			let poolsCreated = await spartan.createPool(options)
+			let poolID = await spartan.createPool(options)
 			let nh = spartan.getRentalProviders()[0]
 			expect(nh.returnPools().length === 1)
 
 			let mrrP = spartan.getRentalProviders()[1]
 			let mrrPoolsLen = mrrP.returnPools().length
 
-			let idToDelete = poolsCreated[0].id
-			await spartan.deletePool(idToDelete)
+			await spartan.deletePool(poolID)
 
 			expect(nh.returnPools().length === 0)
 			expect(mrrP.returnPools().length).toEqual(mrrPoolsLen - 1)
@@ -355,14 +298,13 @@ describe("SpartanBot", () => {
 		it('create, update, and delete a pool', async (done) => {
 			let spartan = new SpartanBot({memory: true})
 
-			let nh = await spartan.setupRentalProvider({
+			await spartan.setupRentalProvider({
 				type: "NiceHash",
 				api_key: niceHashAPI.api_key,
 				api_id: niceHashAPI.api_id,
 				name: "NiceHash"
 			})
-
-			let mrr = await spartan.setupRentalProvider({
+			await spartan.setupRentalProvider({
 				type: "MiningRigRentals",
 				api_key: apikey.api_key,
 				api_secret: apikey.api_secret,
@@ -370,16 +312,15 @@ describe("SpartanBot", () => {
 			})
 
 			let options = {
-				algo: 'scrypt',
-				host: 'AAAAAAAAAAAAAAAAAAAAAAAAAA',
-				port: 333,
-				user: 'AAAAAAAAAAAAAAAAAAAAAAAAAA',
-				pass: 'AAAAAAAAAAAAAAAAAAAAAAAAAA',
-				name: 'AAAAAAAAAAAAAAAAAAAAAAAAAA'
+				algo: 'test',
+				host: 'test',
+				port: 7357,
+				user: 'test',
+				pass: 'test',
+				name: 'test'
 			}
-			let poolsCreated = await spartan.createPool(options)
-			let id = poolsCreated[0].mrrID || poolsCreated[0].id
 
+			let poolID = await spartan.createPool(options)
 			for (let provider of spartan.getRentalProviders()) {
 				let checkFn = (id, name, provider) => {
 					for (let pool of provider.returnPools()) {
@@ -387,19 +328,19 @@ describe("SpartanBot", () => {
 							expect(pool.name === name)
 					}
 				}
-				checkFn(id, options.name, provider)
+				checkFn(poolID, options.name, provider)
 			}
 
 			let newOptions = {
-				algo: 'x11',
-				host: 'BBBBBBBBBBBBBBBBBBBBBBBBBBB',
-				port: 555,
-				user: 'BBBBBBBBBBBBBBBBBBBBBBBBBBB',
-				pass: 'BBBBBBBBBBBBBBBBBBBBBBBBBBB',
-				name: 'BBBBBBBBBBBBBBBBBBBBBBBBBBB'
+				algo: 'rest',
+				host: 'rest',
+				port: 7537,
+				user: 'rest',
+				pass: 'rest',
+				name: 'rest'
 			}
 
-			await spartan.updatePool(id, newOptions)
+			await spartan.updatePool(poolID, newOptions)
 
 			for (let provider of spartan.getRentalProviders()) {
 				let checkFn = (id, name, provider) => {
@@ -408,9 +349,9 @@ describe("SpartanBot", () => {
 							expect(pool.name === name)
 					}
 				}
-				checkFn(id, newOptions.name, provider)
+				checkFn(poolID, newOptions.name, provider)
 			}
-			await spartan.deletePool(id)
+			await spartan.deletePool(poolID)
 
 			done()
 		})
@@ -419,7 +360,7 @@ describe("SpartanBot", () => {
 		it('get pool profiles', async () => {
 			let spartan = new SpartanBot({memory: true})
 
-			let mrr = await spartan.setupRentalProvider({
+			await spartan.setupRentalProvider({
 				type: "MiningRigRentals",
 				api_key: apikey.api_key,
 				api_secret: apikey.api_secret,
@@ -427,19 +368,20 @@ describe("SpartanBot", () => {
 			})
 
 			let profs = await spartan.getPoolProfiles()
+			console.log(profs)
 			expect(profs.length > 0).toBeTruthy()
 		})
 		it('create and delete a pool profile', async () => {
 			let spartan = new SpartanBot({memory: true})
 
-			let mrr = await spartan.setupRentalProvider({
+			await spartan.setupRentalProvider({
 				type: "MiningRigRentals",
 				api_key: apikey.api_key,
 				api_secret: apikey.api_secret,
 				name: "MRR"
 			})
 
-			let name = 'Test Profile Name';
+			let name = 'test';
 			let algo = 'scrypt'
 
 			let create = await spartan.createPoolProfile(name, algo)
@@ -464,7 +406,7 @@ describe("SpartanBot", () => {
 		it('return pool profiles', async () => {
 			let spartan = new SpartanBot({memory: true})
 
-			let mrr = await spartan.setupRentalProvider({
+			await spartan.setupRentalProvider({
 				type: "MiningRigRentals",
 				api_key: apikey.api_key,
 				api_secret: apikey.api_secret,
@@ -488,7 +430,7 @@ describe("SpartanBot", () => {
 			expect(spartan.wallet._storageAdapter._username).toBe(account_identifier)
 			expect(spartan.wallet._account.wallet.mnemonic).toBe(wallet_mnemonic)
 
-			let setup = await spartan.setupRentalProvider({
+			await spartan.setupRentalProvider({
 				type: "MiningRigRentals",
 				api_key: apikey.api_key,
 				api_secret: apikey.api_secret
@@ -517,10 +459,16 @@ describe("SpartanBot", () => {
 				hashrate: 20000,
 				duration: 5
 			}
+			let h = rentOptions.hashrate
+			let max = h + 1000
+			let min = h - 1000
 
 			let response = await autorenter.mrrRentPreprocess(rentOptions)
-			// console.log(response)
-			expect(response.success).toBeTruthy()
+
+			let hashfound = response.badges.query.hashrate_found
+			let hashTest = hashfound >= min && hashfound <= max
+			expect(hashTest).toBeTruthy()
+
 			expect(response.badges.status.status !== "ERROR")
 
 			done()
@@ -529,17 +477,17 @@ describe("SpartanBot", () => {
 			await setupProviders()
 
 			let rentOptions = {
-				hashrate: 100000,
+				hashrate: 10000,
 				duration: 3
 			}
 
 			let preprocess = await autorenter.rentPreprocess(rentOptions)
-			console.log(preprocess.badges)
+
 			let statusCheck = false;
 			switch (preprocess.status) {
 				case 'NORMAL':
 				case 'LOW_BALANCE':
-				case 'ERROR':
+				case 'WARNING':
 					statusCheck = true
 					break
 				default:
@@ -549,7 +497,7 @@ describe("SpartanBot", () => {
 
 			done()
 		}, 250 * 100);
-		it.skip('Create and Cancel NiceHash order', async (done) => {
+		it.skip('Create and Cancel NiceHash order | cutoff rental', async (done) => {
 			await setupProviders()
 
 			let poolOptions = {
@@ -559,7 +507,7 @@ describe("SpartanBot", () => {
 				user: 'orpheus.1',
 				pass: 'x',
 				location: 1,
-				name: 'Ryans Test Order'
+				name: 'Orpheus'
 			}
 			await nh.createPool(poolOptions)
 
@@ -574,7 +522,7 @@ describe("SpartanBot", () => {
 
 			done()
 		})
-		it.skip('Emit Manual Rent Strategy', async (done) => {
+		it.skip('Emit Manual Rent Strategy | manual rent', async (done) => {
 			await setupProviders()
 			await spartan.setupRentalStrategy({type: 'ManualRent'})
 
@@ -596,6 +544,7 @@ describe("SpartanBot", () => {
 					}
 				}
 			}
+			function expectReceipts() {
 				expect(spartan.returnReceipts().length === 1)
 				spartan.emitter.off(RentalFunctionFinish)
 			}
@@ -606,7 +555,7 @@ describe("SpartanBot", () => {
 
 			spartan.manualRent(hashrate, duration, async (prepr, opts) => {
 				console.log("prep: ", prepr)
-				return {confirm: false, message: 'manual cancel'}
+				return {confirm: true, badges: prepr.badges[0], message: 'manual cancel'}
 			})
 
 			//delete pool
@@ -616,5 +565,13 @@ describe("SpartanBot", () => {
 			done()
 
 		}, 250 * 100 * 100);
+		it.skip('Emit Spot Rental Strategy | spot rent', async (done) => {
+			await setupProviders()
+			await spartan.setupRentalStrategy({type: 'SpotRental'})
+			await spartan.setupRentalStrategy({type: 'SpartanSense'})
+			spartan.spotRental()
+			done()
+
+		}, 250 * 100 * 100)
 	})
 })
