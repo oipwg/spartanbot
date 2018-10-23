@@ -8,7 +8,7 @@ config()
 import {
 	error,
 	TriggerRental,
-	SpotRent,
+	SpotRental,
 	StartupSpotRentalStrategy,
 	StartupChainScanner,
 	NODE_SYNCED, CHECK_SPOT_PROFIT
@@ -18,17 +18,20 @@ class SpotRentalStrategy extends GenericStrategy {
 	constructor(settings) {
 		super(settings);
 
-		this.type = SpotRent
-
+		this.type = SpotRental
 		this.setup()
 	}
 
 	static getType() {
-		return SpotRent
+		return SpotRental
 	}
 
 	setup() {
-		this.emitter.on(StartupSpotRentalStrategy, () => this.startup(this))
+		this.emitter.on(SpotRental, (spartan) => this.startup(spartan))
+	}
+
+	spotRental(spartan) {
+		this.emitter.emit(SpotRental, spartan)
 	}
 
 	startup(self) {
