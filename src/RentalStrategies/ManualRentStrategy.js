@@ -6,7 +6,6 @@ class ManualRentStrategy extends GenericStrategy {
 		super(settings);
 
 		this.type = ManualRent
-
 		this.startup()
 	}
 
@@ -15,10 +14,15 @@ class ManualRentStrategy extends GenericStrategy {
 	}
 
 	startup(){
-		this.emitter.on(ManualRent, (hashrate, duration, rentSelector, self) => {
-			this.emitter.emit(TriggerRental, hashrate, duration, rentSelector, self)
+		this.emitter.on(ManualRent, (hashrate, duration, rentSelector) => {
+			this.emitter.emit(TriggerRental, hashrate, duration, rentSelector)
 		})
 	}
+
+	manualRent(hashrate, duration, rentSelector) {
+		this.emitter.emit(ManualRent, hashrate, duration, rentSelector)
+	}
+
 }
 
 export default ManualRentStrategy
