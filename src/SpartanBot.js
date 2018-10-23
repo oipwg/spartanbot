@@ -88,7 +88,7 @@ class SpartanBot {
 	 * Setup event listeners for rental activity
 	 */
 	setupListeners() {
-		this.emitter.on(RentalFunctionFinish, this.onRentalFnFinish)
+		this.emitter.on(RentalFunctionFinish, this.onRentalFnFinish.bind(this))
 		this.emitter.on('error', (type, error) => {
 			console.error(`There was an error in the ${type} event: `, error);
 		});
