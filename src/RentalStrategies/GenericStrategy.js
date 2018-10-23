@@ -1,8 +1,9 @@
 import uid from 'uid'
+import {TriggerRental, GENERIC} from "../constants";
 
 class GenericStrategy {
 	constructor(settings){
-		this.type = "Generic"
+		this.type = GENERIC
 
 		this.uid = settings.uid || uid()
 		this.emitter = settings.emitter
@@ -25,11 +26,7 @@ class GenericStrategy {
 	}
 
 	static getType(){
-		return "Generic"
-	}
-
-	getEmitter() {
-		return this.emitter
+		return GENERIC
 	}
 
 	serialize(){
