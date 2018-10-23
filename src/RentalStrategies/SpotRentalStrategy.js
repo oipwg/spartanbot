@@ -11,7 +11,7 @@ import {
 	SpotRental,
 	StartupSpotRentalStrategy,
 	StartupChainScanner,
-	NODE_SYNCED, CHECK_SPOT_PROFIT
+	NODE_SYNCED, CHECK_SPOT_PROFIT, NORMAL, SpartanSense
 } from "../constants";
 
 class SpotRentalStrategy extends GenericStrategy {
