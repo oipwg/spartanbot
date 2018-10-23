@@ -253,9 +253,17 @@ class AutoRenter {
 			return {status: ERROR, badges: error_badges}
 		} else {
 			//give each badge a unique id other than the provider id (uid)
+			let normalBadges = 0
+			let warningBadges = 0
 			for (let badge of usable_badges) {
+				if (badge.status.status === NORMAL)
+					normalBadges++
+				if (badge.status.status === WARNING)
+					warningBadges++
 				badge.id = uid()
 			}
+			if (warningBadges > 0 )
+				return {status: WARNING, badges: usable_badges}
 			return {status: NORMAL, badges: usable_badges}
 		}
 	}
