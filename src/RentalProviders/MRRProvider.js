@@ -85,6 +85,9 @@ class MRRProvider extends RentalProvider {
 	 * @returns {Promise<number>} - the id of the first data object
 	 */
 	async getProfileID() {
+		if (this.returnActivePoolProfile())
+			return this.returnActivePoolProfile()
+		console.log('calling: getProfileID')
 		let profile;
 		try {
 			profile = await this.api.getPoolProfiles();
