@@ -529,23 +529,18 @@ class SpartanBot {
 	 * @param {number} options.priority - MRR var only: 0-4
 	 * @param {string} [options.notes] - MRR var only: Additional notes to help identify the pool for you
 	 * @async
-	 * @return {Promise}
+	 * @return {Promise<Number>} - the local pool id generated for the pools
 	 */
 	async createPool(options) {
 		options.id = uid()
-		let poolsCreated = []
 		for (let p of this.getRentalProviders()) {
-			let pool;
 			try {
-				pool = await p.createPool(options)
+				await p.createPool(options)
 			} catch (err) {
 				throw new Error(`Failed to create pool: ${err}`)
 			}
-			if (pool)
-				poolsCreated.push(pool)
-
 		}
-		return poolsCreated
+		return options.id
 	}
 
 	/**
