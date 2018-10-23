@@ -1,4 +1,5 @@
 import uid from 'uid'
+import EventEmitter from 'eventemitter3'
 import {TriggerRental, GENERIC} from "../constants";
 
 class GenericStrategy {
@@ -6,11 +7,12 @@ class GenericStrategy {
 		this.type = GENERIC
 
 		this.uid = settings.uid || uid()
-		this.emitter = settings.emitter
+		this.emitter = new EventEmitter()
+
 	}
 
 	onRentalTrigger(rentalFunction){
-		this.emitter.on("TriggerRental", rentalFunction)
+		this.emitter.on(TriggerRental, rentalFunction)
 	}
 
 	setUID(id) {
