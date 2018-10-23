@@ -141,7 +141,7 @@ class MRRProvider extends RentalProvider {
 			pass: options.pass,
 			providerUID: this.getUID(),
 			market: this.getInternalType()}
-		this.addPools(pool)
+		this._addPools(pool)
 		return pool
 	}
 
