@@ -1,18 +1,17 @@
 import GenericStrategy from './GenericStrategy'
 import { ChainScanner } from 'spartansense'
-import {CollectiveDefense, NODE_SYNCED, StartupChainScanner} from "../constants";
+import {CollectiveDefense, NODE_SYNCED, StartupChainScanner, SpartanSense} from "../constants";
 
 class SpartanSenseStrategy extends GenericStrategy {
 	constructor(settings){
 		super(settings);
 
-		this.type = "SpartanSense"
-
+		this.type = SpartanSense
 		this.setup()
 	}
 
 	static getType(){
-		return "SpartanSense"
+		return SpartanSense
 	}
 
 	setup(){
