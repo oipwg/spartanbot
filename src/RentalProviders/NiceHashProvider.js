@@ -317,7 +317,7 @@ class NiceHashProvider extends RentalProvider {
 	 * @returns {Promise<Object>}
 	 */
 	async _rent(options) {
-		if (!this.id || !this.key)
+		if (!this.api_key || !this.api_id)
 			throw new Error('Must provide api key and api id on initialize')
 
 		if (options.amount < 0.005)
