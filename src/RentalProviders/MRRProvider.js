@@ -167,10 +167,9 @@ class MRRProvider extends RentalProvider {
 		} catch (err) {
 			throw new Error(`Failed to delete pool: ${err}`)
 		}
-		if (res.success) {
+		if (res.success)
 			this.pools.splice(index, 1)
-			return res
-		} else {return res}
+		return res
 	}
 
 	/**
