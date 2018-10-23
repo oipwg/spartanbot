@@ -41,10 +41,10 @@ class SpotRentalStrategy extends GenericStrategy {
 		SpartanSenseEE.emit(StartupChainScanner)
 	}
 
-	onNodeSynced(self, scanner) {
+	onNodeSynced(scanner) {
 		console.log(NODE_SYNCED)
-		self.scanner = scanner
-		self.emitter.emit(CHECK_SPOT_PROFIT)
+		this.scanner = scanner
+		this.emitter.emit(CHECK_SPOT_PROFIT)
 	}
 
 	async calculateSpotProfitability(self) {
