@@ -3,14 +3,10 @@ import { config } from 'dotenv'
 config()
 
 const apikey = {
-	api_key: process.env.API_KEY,
-	api_secret: process.env.API_SECRET
+	api_key: process.env.MRR_API_KEY,
+	api_secret: process.env.MRR_API_SECRET
 };
 
-const ryansKey = {
-	api_key: process.env.API_KEY_ORPHEUS,
-	api_secret: process.env.API_SECRET_ORPHEUS
-}
 
 describe("MRRProvider", () => {
 	it('should authorize MRR API access | testAuthorization', async () => {
@@ -21,7 +17,7 @@ describe("MRRProvider", () => {
 	it('should get my profile ID | getProfileID', async () => {
 		let mrr = new MRRProvider(apikey);
 		let profileID = await mrr.getProfileID();
-		expect(typeof profileID === 'number').toBeTruthy()
+		expect(typeof profileID === 'string').toBeTruthy()
 	});
 	it('get default account balance (BTC) | _getBalance', async () => {
 		let mrr = new MRRProvider(apikey);
@@ -87,38 +83,47 @@ describe("MRRProvider", () => {
 		// console.log(response)
 	});
 	it('create pool and add it to profile | createPoolAndProfile', async () => {
-		let mrr = new MRRProvider(ryansKey);
+		let mrr = new MRRProvider(apikey);
 		let options = {
-			profileName: 'SUPERRYAN',
-			algo: 'scrypt',
-			name: 'RYANSUPER',
-			host: 'yadadadadaa',
+			profileName: 'test',
+			algo: 'test',
+			name: 'test',
+			host: 'test',
 			port: 8080,
-			user: 'Lex Luther',
+			user: 'test',
 			priority: 0,
-			notes: 'ryan wins!'
+			notes: 'test'
 		};
 		let response = await mrr.createPoolAndProfile(options)
 		expect(response.success).toBeTruthy()
-		// console.log(response)
+
+		let profileID = response.success.profileID
+		let poolID = response.pool.id
+		await mrr.deletePoolProfile(profileID)
+		await mrr.deletePool(poolID)
 	}, 250 * 1000);
 	it('get all pools | getPools', async () => {
 		let mrr = new MRRProvider(apikey);
 		let response = await mrr.getPools()
-		console.log(response)
-		expect(response.success).toBeTruthy()
+		// console.log(response)
+		expect(Array.isArray(response)).toBeTruthy()
 	});
 	it('get pools by ID| getPools', async () => {
 		let mrr = new MRRProvider(apikey);
-		let ids = [176897, 176889]
-		let response = await mrr.getPools(ids)
-		// console.log(response)
-		expect(response.success).toBeTruthy()
+		let pools = await mrr.getPools()
+		let poolIDs = []
+		if (pools.length > 0) {
+			for (let pool of pools) {
+				poolIDs.push(pool.id)
+			}
+			let response = await mrr.getPools(poolIDs)
+			expect(response.length === pools.length)
+		}
 	});
 	it('get all pool profiles | getPoolProviders', async () => {
 		let mrr = new MRRProvider(apikey);
 		let response = await mrr.getPoolProfiles()
-		console.log(response)
+		// console.log(response)
 		expect(response.success).toBeTruthy()
 	});
 	it('add active rentals to local variable', async () => {
