@@ -7,14 +7,10 @@ import { MRRProvider, NiceHashProvider } from './RentalProviders'
 import { SpartanSenseStrategy, ManualRentStrategy, SpotRentalStrategy } from './RentalStrategies'
 import AutoRenter from './AutoRenter'
 import {
-	RECEIPT,
 	RentalFunctionFinish,
 	ManualRent,
-	SpotRent,
-	TradeBot,
-	CollectiveDefense,
 	NORMAL,
-	WARNING, RENTAL_SUCCESS, RENTAL_WARNING, RENTAL_ERROR, ERROR
+	WARNING, RENTAL_SUCCESS, RENTAL_WARNING, RENTAL_ERROR, ERROR, SpotRental
 } from "./constants";
 
 const SUPPORTED_RENTAL_PROVIDERS = [ MRRProvider, NiceHashProvider ]
