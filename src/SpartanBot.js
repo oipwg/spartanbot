@@ -177,6 +177,7 @@ class SpartanBot {
 
 		this.rental_providers.push(new_provider)
 
+		//ToDo: serialize and deserialize active pools and profile IDs
 		if (settings.activePool) {
 			new_provider.setActivePool(settings.activePool)
 		}
