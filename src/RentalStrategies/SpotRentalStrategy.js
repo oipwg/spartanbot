@@ -72,7 +72,7 @@ class SpotRentalStrategy extends GenericStrategy {
 		const FLOperBlock = 12.5
 		const TargetBlockTime = 40
 
-		let NextDiff = await self.scanner.getDifficulty()
+		let NextDiff = await this.scanner.getDifficulty()
 		let NetHashrate = (NextDiff * Math.pow(2, 32)) / TargetBlockTime
 		let WeightedAverageRentalCostBtcThHour = parseFloat(weightedRentalCosts.weighted.toFixed(9)) // currently in BTC/GH/Hour
 		let FLOPrice = btcFLO
@@ -107,10 +107,10 @@ class SpotRentalStrategy extends GenericStrategy {
 
 	async checkProfitability(self) {
 		// console.log('checkProfitability')
+	async checkProfitability() {
 		let spotProfit = {}
 		try {
-			spotProfit = await self.calculateSpotProfitability(self)
-			// console.log('profitability: ', spotProfit)
+			spotProfit = await this.calculateSpotProfitability()
 		} catch (err) {
 			this.emitter.emit(error, CHECK_SPOT_PROFIT, err)
 		}
@@ -118,8 +118,7 @@ class SpotRentalStrategy extends GenericStrategy {
 			console.log('Profit margin is equal to or above 10%: trigger rental')
 			// this.emitter.emit(TriggerRental, hashrate, duration, rentSelector)
 		} else {
-			// console.log("Not yet profitable... continue scanning")
-			setTimeout(() => self.checkProfitability(self), 1000 * 40)
+			setTimeout(() => this.checkProfitability(), 1000 * 40)
 		}
 	}
 
