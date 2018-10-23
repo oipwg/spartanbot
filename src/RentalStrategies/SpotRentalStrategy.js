@@ -114,7 +114,18 @@ class SpotRentalStrategy extends GenericStrategy {
 		}
 		if (spotProfit.margin >= 10) {
 			console.log('Profit margin is equal to or above 10%: trigger rental')
-			// this.emitter.emit(TriggerRental, hashrate, duration, rentSelector)
+			this.emitter.emit(TriggerRental, 500, 3, async (p, o) => {
+				let badges = p.badges;
+				let _badge
+				for (let b of badges) {
+					if (b.status.status === NORMAL) {
+						_badge = b
+						break;
+					}
+				}
+				// console.log("badger: ", _badge)
+				return {confirm: false, badges: _badge}
+			})
 		} else {
 			setTimeout(() => this.checkProfitability(), 1000 * 40)
 		}
