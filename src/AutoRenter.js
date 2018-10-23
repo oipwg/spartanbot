@@ -21,7 +21,6 @@ class AutoRenter {
 		this.settings = settings
 		this.rental_providers = settings.rental_providers
 		this.exchange = new Exchange();
-		this.emitter = settings.emitter
 	}
 
 	/**
