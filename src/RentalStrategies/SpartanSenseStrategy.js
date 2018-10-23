@@ -18,28 +18,28 @@ class SpartanSenseStrategy extends GenericStrategy {
 		this.emitter.on(StartupChainScanner, this.startup.bind(this))
 	}
 
-	startup(self){
-		self.scanner = new ChainScanner({
+	startup(){
+		this.scanner = new ChainScanner({
 			log_level: "silent",
 			peer_log_level: "silent",
 			disableLogUpdate: true
 		})
 
-		self.emitter.on(CollectiveDefense, () => self.collectiveDefensive(self))
-		self.checkNodeStatus(self)
+		this.emitter.on(CollectiveDefense, () => this.collectiveDefensive())
+		this.checkNodeStatus()
 	}
 
-	checkNodeStatus(self){
-		let syncStatus = self.scanner.getSyncStatus()
-		console.log('sync status: ', syncStatus)
+	checkNodeStatus(){
+		let syncStatus = this.scanner.getSyncStatus()
+
 		if (syncStatus.synced && syncStatus.sync_percent > 0.99)
-			self.emitter.emit(NODE_SYNCED, self.scanner)
+			this.emitter.emit(NODE_SYNCED, this.scanner)
 		else
-			setTimeout(() => self.checkNodeStatus(self), 20 * 1000)
+			setTimeout(() => this.checkNodeStatus(this), 10 * 1000)
 	}
 
-	collectiveDefensive(self) {
-		self.scanner.onReorgTrigger((reorg_info) => {
+	collectiveDefensive() {
+		this.scanner.onReorgTrigger((reorg_info) => {
 			// Using this reorg_info, you can decide if you should emit a "TriggerRental" event.
 			//{ best_height_tip: this.best_active_tip, reorg_tip: tip }
 			console.log(reorg_info)
