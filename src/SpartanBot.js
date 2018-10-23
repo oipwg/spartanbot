@@ -108,6 +108,102 @@ class SpartanBot {
 	}
 
 	/**
+	 * Setup a new Rental Strategy to auto-rent machines with.
+	 * @return {Boolean} Returns `true` if setup was successful
+	 */
+	async setupRentalStrategy(settings) {
+		let rental_strategy
+
+		for (let strategy of SUPPORTED_RENTAL_STRATEGIES){
+			if (strategy.getType() === settings.type){
+				rental_strategy = strategy
+			}
+		}
+
+		if (!rental_strategy)
+			throw new Error("No Strategy match found for `settings.type`!")
+
+		let strat = new rental_strategy(settings)
+		strat.onRentalTrigger(this.rent.bind(this))
+
+		this.rental_strategies[strat.getInternalType()] = strat
+
+		this.serialize()
+	}
+
+	/**
+	 * Get all rental strategies or by individual type
+	 * @param {String} [type] - 'ManualRent', 'SpotRental', 'SpartanSense', 'TradeBot
+	 * @returns {Object} - If no type is given, will return all strategies
+	 */
+	getRentalStrategies(type) {
+		if (type)
+			return this.rental_strategies[type]
+		return this.rental_strategies
+	}
+
+	onRentalFnFinish(rental_info) {
+		console.log('rental function finished... saving rental_info')
+		this.saveReceipt(rental_info)
+		switch(rental_info.status) {
+			case NORMAL:
+				this.emitter.emit(RENTAL_SUCCESS, rental_info)
+				break
+			case WARNING:
+				this.emitter.emit(RENTAL_WARNING, rental_info)
+				break
+			case ERROR:
+				this.emitter.emit(RENTAL_ERROR, rental_info)
+				break
+		}
+	}
+
+	/**
+	 * Fire off a manual rent event
+	 * @param  {Number} hashrate - The hashrate you wish to rent (in MegaHash)
+	 * @param  {Number} duration - The number of seconds that you wish to rent the miners for
+	 * @param  {Function} [rentSelector] - Pass in a function that returns a Promise to offer rent options to user
+	 * @return {Promise<Object>} Returns a Promise that will resolve to an Object that contains information about the rental request
+	 */
+	manualRent(hashrate, duration, rentSelector) {
+		let strat = this.getRentalStrategies(ManualRent)
+		strat.manualRent(hashrate, duration, rentSelector)
+	}
+
+	/**
+	 * Fire off an event to start calculating spot profitability
+	 */
+	spotRental() {
+		let strat = this.getRentalStrategies(SpotRental)
+		strat.spotRental(this)
+	}
+
+	/**
+	 * Rent
+	 * @param  {Number} hashrate - The hashrate you wish to rent (in MegaHash)
+	 * @param  {Number} duration - The number of seconds that you wish to rent the miners for
+	 * @param  {Function} [rentSelector] - Pass in a function that returns a Promise to offer rent options to user
+	 * @param  {Object} self - a reference to 'this', the SpartanBot class (needed because the reference is lost when using event emitters)
+ 	 * @private
+	 * @return {Promise<Object>} Returns a Promise that will resolve to an Object that contains information about the rental request
+	 */
+	rent(hashrate, duration, rentSelector){
+		this.autorenter = new AutoRenter({
+			rental_providers: this.rental_providers
+		})
+		this.autorenter.rent({
+			hashrate,
+			duration,
+			rentSelector
+		}).then(rental_info => {
+			this.emitter.emit(RentalFunctionFinish, rental_info)
+		}).catch(err => {
+			let rental_info = {status: ERROR, message: "Unable to rent using SpartanBot!", error: err}
+			this.emitter.emit(RentalFunctionFinish, rental_info)
+		})
+	}
+
+	/**
 	 * Setup a new Rental Provider for use
 	 * @param {Object} settings - The settings for the Rental Provider
 	 * @param {String} settings.type - The "type" of the rental provider. Currently only accepts "MiningRigRentals".
@@ -293,103 +389,6 @@ class SpartanBot {
 		this.serialize()
 
 		return true
-	}
-
-	/**
-	 * Setup a new Rental Strategy to auto-rent machines with.
-	 * @return {Boolean} Returns `true` if setup was successful
-	 */
-	async setupRentalStrategy(settings) {
-		let rental_strategy
-
-		for (let strategy of SUPPORTED_RENTAL_STRATEGIES){
-			if (strategy.getType() === settings.type){
-				rental_strategy = strategy
-			}
-		}
-
-		if (!rental_strategy)
-			throw new Error("No Strategy match found for `settings.type`!")
-
-		settings.emitter = this.emitter
-		let strat = new rental_strategy(settings)
-
-		strat.onRentalTrigger(this.rent)
-
-		this.rental_strategies[strat.getInternalType()] = strat
-
-		this.serialize()
-	}
-
-	/**
-	 * Get all rental strategies or by individual type
-	 * @param {String} [type]
-	 * @returns {Object}
-	 */
-	getRentalStrategies(type) {
-		if (type)
-			return this.rental_strategies[type]
-		return this.rental_strategies
-	}
-
-	onRentalFnFinish(rental_info, self) {
-		console.log('rental function finished... saving rental_info')
-		self.saveReceipt(rental_info)
-		switch(rental_info.status) {
-			case NORMAL:
-				self.emitter.emit(RENTAL_SUCCESS, rental_info)
-				break
-			case WARNING:
-				self.emitter.emit(RENTAL_WARNING, rental_info)
-				break
-			case ERROR:
-				self.emitter.emit(RENTAL_ERROR, rental_info)
-				break
-		}
-	}
-
-	/**
-	 * Fire off a manual rent event
-	 * @param  {Number} hashrate - The hashrate you wish to rent (in MegaHash)
-	 * @param  {Number} duration - The number of seconds that you wish to rent the miners for
-	 * @param  {Function} [rentSelector] - Pass in a function that returns a Promise to offer rent options to user
-	 * @return {Promise<Object>} Returns a Promise that will resolve to an Object that contains information about the rental request
-	 */
-	manualRent(hashrate, duration, rentSelector) {
-		this.emitter.emit(ManualRent, hashrate, duration, rentSelector, this.self)
-	}
-
-	/**
-	 * Fire off an event to start calculating spot profitability
-	 */
-	spotRent() {
-		this.emitter.emit(SpotRent)
-	}
-
-	/**
-	 * Rent
-	 * @param  {Number} hashrate - The hashrate you wish to rent (in MegaHash)
-	 * @param  {Number} duration - The number of seconds that you wish to rent the miners for
-	 * @param  {Function} [rentSelector] - Pass in a function that returns a Promise to offer rent options to user
-	 * @param  {Object} self - a reference to 'this', the SpartanBot class (needed because the reference is lost when using event emitters)
- 	 * @private
-	 * @return {Promise<Object>} Returns a Promise that will resolve to an Object that contains information about the rental request
-	 */
-	rent(hashrate, duration, rentSelector, self){
-		self.autorenter = new AutoRenter({
-			rental_providers: self.rental_providers,
-			emitter: self.emitter
-		})
-		self.autorenter.rent({
-			hashrate,
-			duration,
-			rentSelector
-		}).then(rental_info => {
-			self.emitter.emit(RentalFunctionFinish, rental_info, self)
-		}).catch(err => {
-			let rental_info = {status: ERROR, message: "Unable to rent using SpartanBot!", error: err}
-			self.emitter.emit(RentalFunctionFinish, rental_info, self)
-		})
 	}
 
 	/**
