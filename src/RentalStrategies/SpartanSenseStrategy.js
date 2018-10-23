@@ -15,7 +15,7 @@ class SpartanSenseStrategy extends GenericStrategy {
 	}
 
 	setup(){
-		this.emitter.on(StartupChainScanner, () => this.startup(this))
+		this.emitter.on(StartupChainScanner, this.startup.bind(this))
 	}
 
 	startup(self){
