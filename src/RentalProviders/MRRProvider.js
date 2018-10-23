@@ -1,7 +1,7 @@
 import RentalProvider from './RentalProvider'
 import MiningRigRentals from 'miningrigrentals-api-v2'
 import {selectBestCombination, serializePool, toNiceHashPrice} from "../util";
-import {NORMAL} from "../constants";
+import {NORMAL, ERROR} from "../constants";
 
 /**
  * A Rental Provider for MiningRigRentals
@@ -373,7 +373,6 @@ class MRRProvider extends RentalProvider {
 		} catch (err) {
 			throw new Error(`Could not create pool \n ${err}`)
 		}
-
 
 		this.addPools({...poolParams, id: pool})
 
