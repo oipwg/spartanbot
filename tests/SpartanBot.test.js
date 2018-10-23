@@ -2,6 +2,7 @@ import SpartanBot from '../src/SpartanBot'
 import uid from 'uid'
 import {config} from 'dotenv'
 import AutoRenter from "../src/AutoRenter"
+import {RentalFunctionFinish} from "../src/constants";
 
 config()
 
@@ -573,7 +574,7 @@ describe("SpartanBot", () => {
 
 			done()
 		})
-		it('Emit Manual Rent Strategy', async (done) => {
+		it.skip('Emit Manual Rent Strategy', async (done) => {
 			await setupProviders()
 			await spartan.setupRentalStrategy({type: 'ManualRent'})
 
@@ -595,27 +596,22 @@ describe("SpartanBot", () => {
 					}
 				}
 			}
+				expect(spartan.returnReceipts().length === 1)
+				spartan.emitter.off(RentalFunctionFinish)
+			}
+			spartan.emitter.on(RentalFunctionFinish, expectReceipts)
 
-			let hashrate = 100000
+			let hashrate = 500
 			let duration = 3
 
 			spartan.manualRent(hashrate, duration, async (prepr, opts) => {
-				let badges = prepr.badges
-				let _badge;
-				for (let badge of badges) {
-					console.log(badge)
-					if (badge.cutoff) {
-						_badge = badge
-					}
-				}
-				if (!_badge)
-					_badge = badges[0]
-
-				return {confirm: false, message: 'manual cancel', badges: _badge}
+				console.log("prep: ", prepr)
+				return {confirm: false, message: 'manual cancel'}
 			})
 
 			//delete pool
 			let res = await spartan.deletePool(id)
+			console.log("delete pool: ", res)
 			expect(res.success).toBeTruthy()
 			done()
 
