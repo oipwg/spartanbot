@@ -42,7 +42,7 @@ class AutoRenter {
 			}
 		}
 		if (!_provider)
-			return {success: false, message: 'No MRR Providers'}
+			return {status: ERROR, success: false, message: 'No MRR Providers'}
 
 		let rigs_to_rent = [];
 		try {
