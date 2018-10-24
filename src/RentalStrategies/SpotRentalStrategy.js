@@ -27,11 +27,11 @@ class SpotRentalStrategy extends GenericStrategy {
 	}
 
 	setup() {
-		this.emitter.on(SpotRental, (spartan) => this.startup(spartan))
+		this.emitter.on(SpotRental, (fullnode, spartan) => this.startup(fullnode, spartan))
 	}
 
-	spotRental(spartan) {
-		this.emitter.emit(SpotRental, spartan)
+	spotRental(fullnode, spartan) {
+		this.emitter.emit(SpotRental, fullnode, spartan)
 	}
 
 	startup(spartan) {
