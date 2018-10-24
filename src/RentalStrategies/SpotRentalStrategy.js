@@ -4,14 +4,12 @@ import axios from 'axios'
 import BN from 'bn.js'
 import assert from 'assert'
 import {config} from 'dotenv'
-
 config()
 
 import {
 	error,
 	TriggerRental,
 	SpotRental,
-	StartupSpotRentalStrategy,
 	StartupChainScanner,
 	NODE_SYNCED, CHECK_SPOT_PROFIT, NORMAL, SpartanSense
 } from "../constants";
