@@ -35,6 +35,11 @@ class SpotRentalStrategy extends GenericStrategy {
 	}
 
 	startup(fullnode, spartan) {
+
+		this.emitter.on('error', (type, error, message) => {
+			console.error(`There was an error in the ${type} event: `, error, message);
+		});
+
 		let rental_providers = spartan.getRentalProviders()
 		assert(rental_providers.length === 2, 'Must setup a MRR Provider and a NiceHash Provider')
 		for (let prov of rental_providers) {
