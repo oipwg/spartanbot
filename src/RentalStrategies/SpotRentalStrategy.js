@@ -68,19 +68,15 @@ class SpotRentalStrategy extends GenericStrategy {
 	}
 
 	async calculateSpotProfitability() {
-		if (!process.env.MRR_API_KEY || !process.env.MRR_API_SECRET || !process.env.NICEHASH_API_KEY || !process.env.NICEHASH_API_ID)
-			throw new Error('Must set MRR and NiceHash API_KEYS to env')
-		let mrrAPIkeys = {
-			key: process.env.MRR_API_KEY,
-			secret: process.env.MRR_API_SECRET
+		console.log('calculating spot profit')
+
+		let weightedRentalCosts
+		try {
+			weightedRentalCosts = await getMarketStats(false, this.mrr.api, this.nh.api)
+		} catch (err) {
+			throw new Error(`Failed getting market stats: ${err}`)
 		}
 
-		let nhAPIkeys = {
-			key: process.env.NICEHASH_API_KEY,
-			id: process.env.NICEHASH_API_ID
-		}
-
-		let weightedRentalCosts = await getMarketStats(mrrAPIkeys, nhAPIkeys)
 		// let usdBTC = (await axios.get("https://bittrex.com/api/v1.1/public/getticker?market=usd-btc")).data
 		let btcFLO = (await axios.get("https://bittrex.com/api/v1.1/public/getticker?market=btc-flo")).data
 		// usdBTC = usdBTC.result.Last
