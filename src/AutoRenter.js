@@ -409,6 +409,12 @@ class AutoRenter {
 			badges = await this.rentSelector(preprocess, options)
 		}
 
+
+		if (!badges || (Array.isArray(badges) && badges.length === 0)) {
+			return {status: 'ERROR', message: 'No rent options found after rentSelector fn'}
+		}
+		// return {status: 'WARNING', message: "TESTING"}
+
 		//rent
 		let rentals = []
 		if (!Array.isArray(badges))
