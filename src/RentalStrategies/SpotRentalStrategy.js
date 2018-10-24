@@ -77,10 +77,15 @@ class SpotRentalStrategy extends GenericStrategy {
 			throw new Error(`Failed getting market stats: ${err}`)
 		}
 
+		let btcFLO
+		try {
+			let ret = (await axios.get("https://bittrex.com/api/v1.1/public/getticker?market=btc-flo")).data
+			btcFLO = ret.result.Last
+		} catch (err) {
+			throw new Error(`Failed to get btcFLO price: ${err}`)
+		}
 		// let usdBTC = (await axios.get("https://bittrex.com/api/v1.1/public/getticker?market=usd-btc")).data
-		let btcFLO = (await axios.get("https://bittrex.com/api/v1.1/public/getticker?market=btc-flo")).data
 		// usdBTC = usdBTC.result.Last
-		btcFLO = btcFLO.result.Last
 		// let floPriceUSD = usdBTC * btcFLO
 
 		const time = 3
