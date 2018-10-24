@@ -569,9 +569,8 @@ describe("SpartanBot", () => {
 			await setupProviders()
 			await spartan.setupRentalStrategy({type: 'SpotRental'})
 			await spartan.setupRentalStrategy({type: 'SpartanSense'})
-			spartan.spotRental()
+			spartan.spotRental(false)
 			done()
-
 		}, 250 * 100 * 100)
 	})
 })
