@@ -55,7 +55,16 @@ class AutoRenter {
 		let providers = [], totalBalance = 0;
 		for (let provider of mrr_providers) {
 			//get the balance of each provider
-			let balance = await provider.getBalance();
+			let balance
+			try {
+				balance = await provider.getBalance()
+			} catch (err) {
+				throw new Error(`Failed to get MRR balance: ${err}`)
+			}
+			if (isNaN(balance) && !balance.success) {
+				return {status: ERROR, success: false, message: "Failed to get balance from API", error: balance}
+			}
+
 			totalBalance += balance
 			//get the profile id needed to rent for each provider
 			let profile = provider.returnActivePoolProfile() || await provider.getProfileID();
