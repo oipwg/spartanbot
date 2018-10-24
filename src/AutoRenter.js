@@ -357,7 +357,7 @@ class AutoRenter {
 			let hashes = 0;
 
 			for (let badge of low_balances) {
-				if ((badge.totalHashes + hashes) <= totalHashesDesired) {
+				if ((badge.totalHashesTH + hashes) <= totalHashesDesired) {
 					hashes += badge.limit
 					selected_badges.push(badge)
 				}
