@@ -27,15 +27,14 @@ class SpotRentalStrategy extends GenericStrategy {
 	}
 
 	setup() {
-		this.emitter.on(SpotRental, (fullnode, spartan) => this.startup(fullnode, spartan))
+		this.emitter.on(SpotRental, this.startup.bind(this))
 	}
 
-	spotRental(fullnode, spartan) {
-		this.emitter.emit(SpotRental, fullnode, spartan)
+	spotRental(rentSelector, fullnode, spartan) {
+		this.emitter.emit(SpotRental, rentSelector, fullnode, spartan)
 	}
 
-	startup(fullnode, spartan) {
-
+	startup(rentSelector, fullnode, spartan) {
 		this.emitter.on('error', (type, error, message) => {
 			console.error(`There was an error in the ${type} event: `, error, message);
 		});
@@ -52,10 +51,10 @@ class SpotRentalStrategy extends GenericStrategy {
 		if (fullnode) {
 			let SpartanSenseEE = spartan.getRentalStrategies(SpartanSense).emitter
 			SpartanSenseEE.on(NODE_SYNCED, (scanner) => this.onNodeSynced(scanner))
-			this.emitter.on(CHECK_SPOT_PROFIT, () => this.checkProfitability())
+			this.emitter.on(CHECK_SPOT_PROFIT, () => this.checkProfitability(rentSelector))
 			SpartanSenseEE.emit(StartupChainScanner)
 		} else {
-			this.checkProfitability()
+			this.checkProfitability(rentSelector)
 				.then(() => {})
 				.catch(err => {console.error('error running check profitability', err)})
 		}
@@ -150,27 +149,17 @@ class SpotRentalStrategy extends GenericStrategy {
 	}
 
 	async checkProfitability() {
+	async checkProfitability(rentSelector) {
 		let spotProfit = {}
 		try {
 			spotProfit = await this.calculateSpotProfitability()
 		} catch (err) {
-			this.emitter.emit(error, CHECK_SPOT_PROFIT, err)
+			this.emitter.emit(error, CHECK_SPOT_PROFIT, err, 'in function: calculateSpotProfitability')
 		}
 		const idealProfitMargin = 10
 		if (spotProfit.margin >= idealProfitMargin) {
 			console.log('Profit margin is equal to or above 10%: trigger rental')
-			this.emitter.emit(TriggerRental, 500, 3, async (p, o) => {
-				let badges = p.badges;
-				let _badge
-				for (let b of badges) {
-					if (b.status.status === NORMAL) {
-						_badge = b
-						break;
-					}
-				}
-				// console.log("badger: ", _badge)
-				return {confirm: false, badges: _badge}
-			})
+			this.emitter.emit(TriggerRental, spotProfit.hashrateToRentMH, 3, rentSelector)
 		} else {
 			setTimeout(() => this.checkProfitability(), 1000 * 40)
 		}
