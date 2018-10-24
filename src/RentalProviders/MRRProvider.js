@@ -44,7 +44,7 @@ class MRRProvider extends RentalProvider {
 
 	/**
 	 * Test to make sure the API key and secret are correct
-	 * @return {Promise} Returns a Promise that will resolve upon success, and reject on failure
+	 * @return {Promise<Boolean>} Returns a Promise that will resolve upon success, and reject on failure
 	 */
 	async _testAuthorization(){
 		try {
@@ -87,7 +87,7 @@ class MRRProvider extends RentalProvider {
 	async getProfileID() {
 		if (this.returnActivePoolProfile())
 			return this.returnActivePoolProfile()
-		console.log('calling: getProfileID')
+
 		let profile;
 		try {
 			profile = await this.api.getPoolProfiles();
