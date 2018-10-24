@@ -93,7 +93,30 @@ class SpotRentalStrategy extends GenericStrategy {
 		const FLOperBlock = 12.5
 		const TargetBlockTime = 40
 
-		let NextDiff = await this.scanner.getDifficulty()
+		let diff, currentPoolHashrate;
+		if (this.scanner) {
+			diff = await this.scanner.getDifficulty()
+		} else {
+			let poolData
+			try {
+				poolData = (await axios.get("https://mk1.alexandria.io/pool/api/pools")).data
+			} catch (err) {
+				throw new Error(`Failed to get pool data from "https://mk1.alexandria.io/pool/api/pools": ${err}`)
+			}
+
+			if (poolData.pools[0]) {
+				currentPoolHashrate = poolData.pools[0].poolStats.poolHashrate
+
+				const powLimitBN = new BN("0x00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16, 'be')
+				let target = poolData.pools[0].networkStats.nextTarget
+				let targetHex = '0x'+target
+				let targetBN = new BN(targetHex, 16, 'be')
+				let div = powLimitBN.div(targetBN)
+				diff = div/(1024 * 4)
+				console.log('dif', diff)
+			}
+		}
+		let NextDiff = diff
 		let NetHashrate = (NextDiff * Math.pow(2, 32)) / TargetBlockTime
 		let WeightedAverageRentalCostBtcThHour = parseFloat(weightedRentalCosts.weighted.toFixed(9)) // currently in BTC/GH/Hour
 		let FLOPrice = btcFLO
