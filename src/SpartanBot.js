@@ -172,10 +172,11 @@ class SpartanBot {
 
 	/**
 	 * Fire off an event to start calculating spot profitability
+	 * @parem {boolean} [fullnode=false] - specify whether you want to spawn a full node to read from
 	 */
-	spotRental() {
+	spotRental(fullnode = false) {
 		let strat = this.getRentalStrategies(SpotRental)
-		strat.spotRental(this)
+		strat.spotRental(fullnode, this)
 	}
 
 	/**
