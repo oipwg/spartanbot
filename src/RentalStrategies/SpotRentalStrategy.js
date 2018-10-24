@@ -35,6 +35,15 @@ class SpotRentalStrategy extends GenericStrategy {
 	}
 
 	startup(fullnode, spartan) {
+		let rental_providers = spartan.getRentalProviders()
+		assert(rental_providers.length === 2, 'Must setup a MRR Provider and a NiceHash Provider')
+		for (let prov of rental_providers) {
+			if (prov.getInternalType() === "MiningRigRentals")
+				this.mrr = prov
+			if (prov.getInternalType() === "NiceHash")
+				this.nh = prov
+		}
+
 		if (fullnode) {
 			let SpartanSenseEE = spartan.getRentalStrategies(SpartanSense).emitter
 			SpartanSenseEE.on(NODE_SYNCED, (scanner) => this.onNodeSynced(scanner))
