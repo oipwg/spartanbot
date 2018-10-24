@@ -34,11 +34,17 @@ class SpotRentalStrategy extends GenericStrategy {
 		this.emitter.emit(SpotRental, fullnode, spartan)
 	}
 
-	startup(spartan) {
-		let SpartanSenseEE = spartan.getRentalStrategies(SpartanSense).emitter
-		SpartanSenseEE.on(NODE_SYNCED, (scanner) => this.onNodeSynced(scanner))
-		this.emitter.on(CHECK_SPOT_PROFIT, () => this.checkProfitability())
-		SpartanSenseEE.emit(StartupChainScanner)
+	startup(fullnode, spartan) {
+		if (fullnode) {
+			let SpartanSenseEE = spartan.getRentalStrategies(SpartanSense).emitter
+			SpartanSenseEE.on(NODE_SYNCED, (scanner) => this.onNodeSynced(scanner))
+			this.emitter.on(CHECK_SPOT_PROFIT, () => this.checkProfitability())
+			SpartanSenseEE.emit(StartupChainScanner)
+		} else {
+			this.checkProfitability()
+				.then(() => {})
+				.catch(err => {console.error('error running check profitability', err)})
+		}
 	}
 
 	onNodeSynced(scanner) {
