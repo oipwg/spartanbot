@@ -11,7 +11,7 @@ import {
 	TriggerRental,
 	SpotRental,
 	StartupChainScanner,
-	NODE_SYNCED, CHECK_SPOT_PROFIT, NORMAL, SpartanSense
+	NODE_SYNCED, CHECK_SPOT_PROFIT, NORMAL, SpartanSense, WARNING, ERROR
 } from "../constants";
 
 class SpotRentalStrategy extends GenericStrategy {
@@ -92,28 +92,30 @@ class SpotRentalStrategy extends GenericStrategy {
 		const FLOperBlock = 12.5
 		const TargetBlockTime = 40
 
-		let diff, currentPoolHashrate;
+		let diff, currentPoolHashrate, target;
+		let poolEndpoint = "https://mk1.alexandria.io/pool/api/pools"
+
+		let poolData
+		try {
+			poolData = (await axios.get(poolEndpoint)).data
+		} catch (err) {
+			throw new Error(`Failed to get pool data from "https://mk1.alexandria.io/pool/api/pools": ${err}`)
+		}
+		if (poolData.pools[0]) {
+			currentPoolHashrate = poolData.pools[0].poolStats.poolHashrate
+			target = poolData.pools[0].networkStats.nextTarget
+		} else {
+			return {status: ERROR, success: false, message: `Failed to get current pool hashrate from ${poolEndpoint}`}
+		}
+
 		if (this.scanner) {
 			diff = await this.scanner.getDifficulty()
 		} else {
-			let poolData
-			try {
-				poolData = (await axios.get("https://mk1.alexandria.io/pool/api/pools")).data
-			} catch (err) {
-				throw new Error(`Failed to get pool data from "https://mk1.alexandria.io/pool/api/pools": ${err}`)
-			}
-
-			if (poolData.pools[0]) {
-				currentPoolHashrate = poolData.pools[0].poolStats.poolHashrate
-
-				const powLimitBN = new BN("0x00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16, 'be')
-				let target = poolData.pools[0].networkStats.nextTarget
-				let targetHex = '0x'+target
-				let targetBN = new BN(targetHex, 16, 'be')
-				let div = powLimitBN.div(targetBN)
-				diff = div/(1024 * 4)
-				console.log('dif', diff)
-			}
+			const powLimitBN = new BN("0x00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16, 'be')
+			let targetHex = '0x'+target
+			let targetBN = new BN(targetHex, 16, 'be')
+			let div = powLimitBN.div(targetBN)
+			diff = div/(1024 * 4)
 		}
 		let NextDiff = diff
 		let NetHashrate = (NextDiff * Math.pow(2, 32)) / TargetBlockTime
