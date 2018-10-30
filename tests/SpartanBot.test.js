@@ -477,12 +477,12 @@ describe("SpartanBot", () => {
 			await setupProviders()
 
 			let rentOptions = {
-				hashrate: 10000,
+				hashrate: 50000,
 				duration: 3
 			}
 
 			let preprocess = await autorenter.rentPreprocess(rentOptions)
-
+			// console.log(preprocess)
 			let statusCheck = false;
 			switch (preprocess.status) {
 				case 'NORMAL':
@@ -569,7 +569,14 @@ describe("SpartanBot", () => {
 			await setupProviders()
 			await spartan.setupRentalStrategy({type: 'SpotRental'})
 			await spartan.setupRentalStrategy({type: 'SpartanSense'})
-			spartan.spotRental(false)
+			let rentSelector = async function(p, o) {
+				console.log("user defined rentSelector function: ", p);
+				for (let b of p.badges) {
+					console.log(b.status)
+				}
+				return {confirm: false, message: "manual cancel"}
+			}
+			spartan.spotRental(rentSelector, true)
 			done()
 		}, 250 * 100 * 100)
 	})
