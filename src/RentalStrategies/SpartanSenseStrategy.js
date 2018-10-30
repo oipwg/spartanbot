@@ -1,24 +1,25 @@
 import GenericStrategy from './GenericStrategy'
-import { ChainScanner } from 'spartansense'
+import {ChainScanner} from 'spartansense'
 import {CollectiveDefense, NODE_SYNCED, StartupChainScanner, SpartanSense} from "../constants";
 
 class SpartanSenseStrategy extends GenericStrategy {
-	constructor(settings){
+	constructor(settings) {
 		super(settings);
 
 		this.type = SpartanSense
 		this.setup()
 	}
 
-	static getType(){
+	static getType() {
 		return SpartanSense
 	}
 
-	setup(){
+	setup() {
 		this.emitter.on(StartupChainScanner, this.startup.bind(this))
 	}
 
-	startup(){
+	startup() {
+		// console.log('Startup Chain Scanner')
 		this.scanner = new ChainScanner({
 			log_level: "silent",
 			peer_log_level: "silent",
@@ -29,9 +30,10 @@ class SpartanSenseStrategy extends GenericStrategy {
 		this.checkNodeStatus()
 	}
 
-	checkNodeStatus(){
+	checkNodeStatus() {
+		// console.log('Checking Node Status')
 		let syncStatus = this.scanner.getSyncStatus()
-
+		// console.log(syncStatus)
 		if (syncStatus.synced && syncStatus.sync_percent > 0.99)
 			this.emitter.emit(NODE_SYNCED, this.scanner)
 		else
