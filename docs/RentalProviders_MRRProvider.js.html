@@ -645,7 +645,6 @@ class MRRProvider extends RentalProvider {
 	async _getBalance(coin) {
 		try {
 			let response = await this.api.getAccountBalance()
-			console.log('balance response: ', response)
 			if (response.success) {
 				if (coin) {
 					return Number(response.data[coin.toUpperCase()].confirmed)
@@ -711,14 +710,11 @@ class MRRProvider extends RentalProvider {
 	 * @returns {Promise&lt;Object>}>}
 	 */
 	async _rent(rigs_to_rent) {
-		console.log("AUTHED???: ",await this._testAuthorization())
-		return
 		//rent rigs
 		let rentalConfirmation = {};
 		for (let rig of rigs_to_rent) {
 			try {
 				let rental = await this.api.createRental(rig)
-				console.log('mrr rental: ', rental)
 				rentalConfirmation[rig.rig] = rental
 			} catch (err) {
 				rentalConfirmation[rig.rig] = {success: false, message: `Error renting rig`, error: err, status: ERROR}

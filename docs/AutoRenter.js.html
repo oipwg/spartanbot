@@ -135,7 +135,7 @@ class AutoRenter {
 			}
 		}
 		if (!_provider)
-			return {success: false, message: 'No MRR Providers'}
+			return {status: ERROR, success: false, message: 'No MRR Providers'}
 
 		let rigs_to_rent = [];
 		try {
@@ -154,8 +154,9 @@ class AutoRenter {
 			} catch (err) {
 				throw new Error(`Failed to get MRR balance: ${err}`)
 			}
-			//ToDo check balance success
-			console.log('balance: ', balance)
+			if (isNaN(balance) &amp;&amp; !balance.success) {
+				return {status: ERROR, success: false, message: "Failed to get balance from API", error: balance}
+			}
 
 			totalBalance += balance
 			//get the profile id needed to rent for each provider
@@ -449,7 +450,7 @@ class AutoRenter {
 			let hashes = 0;
 
 			for (let badge of low_balances) {
-				if ((badge.totalHashes + hashes) &lt;= totalHashesDesired) {
+				if ((badge.totalHashesTH + hashes) &lt;= totalHashesDesired) {
 					hashes += badge.limit
 					selected_badges.push(badge)
 				}
@@ -489,6 +490,10 @@ class AutoRenter {
 			return {status: ERROR, success: false, message: 'Error in rent preprocess', preprocess}
 		}
 
+		if (preprocess.badges === []) {
+			return {status: ERROR, success: false, message: 'Preprocess found no available renting options', preprocess}
+		}
+
 		//confirm/select
 		let badges = preprocess.badges
 		if (options.rentSelector) {
@@ -500,6 +505,12 @@ class AutoRenter {
 		} else {
 			badges = await this.rentSelector(preprocess, options)
 		}
+
+
+		if (!badges || (Array.isArray(badges) &amp;&amp; badges.length === 0)) {
+			return {status: 'ERROR', message: 'No rent options found after rentSelector fn'}
+		}
+		// return {status: 'WARNING', message: "TESTING"}
 
 		//rent
 		let rentals = []

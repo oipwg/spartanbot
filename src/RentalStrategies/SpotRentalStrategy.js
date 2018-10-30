@@ -152,7 +152,6 @@ class SpotRentalStrategy extends GenericStrategy {
 		}
 	}
 
-	async checkProfitability() {
 	async checkProfitability(rentSelector) {
 		let spotProfit = {}
 		try {

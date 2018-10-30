@@ -248,6 +248,8 @@ class SpartanBot {
 			case ERROR:
 				this.emitter.emit(RENTAL_ERROR, rental_info)
 				break
+			default:
+				console.log('Rental info not of expected type!', rental_info)
 		}
 	}
 
@@ -265,11 +267,12 @@ class SpartanBot {
 
 	/**
 	 * Fire off an event to start calculating spot profitability
-	 * @parem {boolean} [fullnode=false] - specify whether you want to spawn a full node to read from
+	 * @param {function} rentSelector - an async function that takes in two parameters, `preprocess_rent` and `options`. Use to select which rent option to go with.
+	 * @param {boolean} [fullnode=false] - specify whether you want to spawn a full node to read from
 	 */
-	spotRental(fullnode = false) {
+	spotRental(rentSelector, fullnode = false) {
 		let strat = this.getRentalStrategies(SpotRental)
-		strat.spotRental(fullnode, this)
+		strat.spotRental(rentSelector, fullnode, this)
 	}
 
 	/**
