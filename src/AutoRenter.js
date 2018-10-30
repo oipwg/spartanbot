@@ -397,6 +397,10 @@ class AutoRenter {
 			return {status: ERROR, success: false, message: 'Error in rent preprocess', preprocess}
 		}
 
+		if (preprocess.badges === []) {
+			return {status: ERROR, success: false, message: 'Preprocess found no available renting options', preprocess}
+		}
+
 		//confirm/select
 		let badges = preprocess.badges
 		if (options.rentSelector) {
