@@ -153,7 +153,7 @@ class SpartanBot {
 			this._deserialize = this.deserialize().then(() => {
 				//check first to see if a mnemonic was passed in and load the wallet from there
 				if (this.settings.mnemonic) {
-					this.wallet = new Account(settings.mnemonic, undefined, {discover: false})
+					this.wallet = new Account(this.settings.mnemonic, undefined, {discover: false})
 					this._wallet_login = this.wallet.login()
 
 					// If we are not memory only, load the wallet using OIP Account
