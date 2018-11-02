@@ -859,7 +859,23 @@ class SpartanBot {
 			data_from_storage = JSON.parse(localStorage.getItem('spartanbot-storage'))
 
 		if (data_from_storage.settings)
-			this.settings = {...data_from_storage.settings, ... this.settings}
+			this.settings = {...data_from_storage.settings, ...this.settings}
+
+		if (data_from_storage.oip_account){
+			this.oip_account = data_from_storage.oip_account
+		}
+
+		if (data_from_storage.pools){
+			this.pools = data_from_storage.pools
+		}
+
+		if (data_from_storage.poolProfiles){
+			this.poolProfiles = data_from_storage.poolProfiles
+		}
+
+		if (data_from_storage.receipts){
+			this.receipts = data_from_storage.receipts
+		}
 
 		if (data_from_storage.rental_providers){
 			for (let provider of data_from_storage.rental_providers){
@@ -871,22 +887,6 @@ class SpartanBot {
 			for (let strategyType in data_from_storage.rental_strategies){
 				await this.setupRentalStrategy(data_from_storage.rental_strategies[strategyType])
 			}
-		}
-
-		if (data_from_storage.pools){
-			this.pools = data_from_storage.pools
-		}
-
-		if (data_from_storage.poolProfiles){
-			this.poolProfiles = data_from_storage.poolProfiles
-		}
-
-		if (data_from_storage.oip_account){
-			this.oip_account = data_from_storage.oip_account
-		}
-
-		if (data_from_storage.receipts){
-			this.receipts = data_from_storage.receipts
 		}
 
 		return true
