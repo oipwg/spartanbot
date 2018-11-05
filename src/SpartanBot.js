@@ -178,9 +178,11 @@ class SpartanBot {
 	 * @param  {Number} hashrate - The hashrate you wish to rent (in MegaHash)
 	 * @param  {Number} duration - The number of seconds that you wish to rent the miners for
 	 * @param  {Function} [rentSelector] - Pass in a function that returns a Promise to offer rent options to user
-	 * @return {Promise<Object>} Returns a Promise that will resolve to an Object that contains information about the rental request
 	 */
 	manualRent(hashrate, duration, rentSelector) {
+		if (!this.getRentalStrategies(ManualRent))
+			this.setupRentalStrategy({type: ManualRent})
+
 		let strat = this.getRentalStrategies(ManualRent)
 		strat.manualRent(hashrate, duration, rentSelector)
 	}
@@ -191,6 +193,9 @@ class SpartanBot {
 	 * @param {boolean} [fullnode=false] - specify whether you want to spawn a full node to read from
 	 */
 	spotRental(rentSelector, fullnode = false) {
+		if (!this.getRentalStrategies(SpotRental))
+			this.setupRentalStrategy({type: SpotRental})
+
 		let strat = this.getRentalStrategies(SpotRental)
 		strat.spotRental(rentSelector, fullnode, this)
 	}
