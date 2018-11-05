@@ -120,6 +120,24 @@ class SpartanBot {
 		this.emitter.on(RENTAL_ERROR, onError)
 	}
 
+	onRentalFnFinish(rental_info) {
+		console.log('rental function finished... saving rental_info')
+		this.saveReceipt(rental_info)
+		switch(rental_info.status) {
+			case NORMAL:
+				this.emitter.emit(RENTAL_SUCCESS, rental_info)
+				break
+			case WARNING:
+				this.emitter.emit(RENTAL_WARNING, rental_info)
+				break
+			case ERROR:
+				this.emitter.emit(RENTAL_ERROR, rental_info)
+				break
+			default:
+				console.log('Rental info not of expected type!', rental_info)
+		}
+	}
+
 	/**
 	 * Setup a new Rental Strategy to auto-rent machines with.
 	 * @return {Boolean} Returns `true` if setup was successful
@@ -153,24 +171,6 @@ class SpartanBot {
 		if (type)
 			return this.rental_strategies[type]
 		return this.rental_strategies
-	}
-
-	onRentalFnFinish(rental_info) {
-		console.log('rental function finished... saving rental_info')
-		this.saveReceipt(rental_info)
-		switch(rental_info.status) {
-			case NORMAL:
-				this.emitter.emit(RENTAL_SUCCESS, rental_info)
-				break
-			case WARNING:
-				this.emitter.emit(RENTAL_WARNING, rental_info)
-				break
-			case ERROR:
-				this.emitter.emit(RENTAL_ERROR, rental_info)
-				break
-			default:
-				console.log('Rental info not of expected type!', rental_info)
-		}
 	}
 
 	/**
