@@ -2,6 +2,8 @@ import { Account } from 'oip-account'
 import uid from 'uid';
 import moment from 'moment'
 import EventEmitter from 'eventemitter3'
+import {config} from 'dotenv'
+config()
 
 import { MRRProvider, NiceHashProvider } from './RentalProviders'
 import { SpartanSenseStrategy, ManualRentStrategy, SpotRentalStrategy } from './RentalStrategies'
@@ -296,6 +298,9 @@ class SpartanBot {
 		let poolProfiles = []
 
 		if (settings.type === "MiningRigRentals") {
+			process.env.MRR_API_KEY = settings.api_key || settings.key
+			process.env.MRR_API_SECRET = settings.api_secret || settings.id
+
 			let profiles = [];
 			try {
 				let res = await new_provider.getPoolProfiles()
@@ -327,6 +332,9 @@ class SpartanBot {
 					new_provider.setActivePoolProfile(ids[0].id)
 			}
 		} else if (settings.type === "NiceHash") {
+			process.env.NICEHASH_API_KEY = settings.api_key || settings.key
+			process.env.NICEHASH_API_ID = settings.api_id || settings.id
+
 			if (settings.pools) {
 				new_provider.setPools(settings.pools)
 			}
