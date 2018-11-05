@@ -154,7 +154,15 @@ class SpartanBot {
 				//check first to see if a mnemonic was passed in and load the wallet from there
 				if (this.settings.mnemonic) {
 					this.wallet = new Account(this.settings.mnemonic, undefined, {discover: false})
+					//set mnemonic to undefined so it doesn't get serialize
+					this.settings.mnemonic = undefined
+					//wallet.login return promise
 					this._wallet_login = this.wallet.login()
+					//set the account identifier
+					this._wallet_login.then((data) => {
+						this.oip_account = data.identifier
+						this.serialize()
+					}).catch(err => {console.log('Error resolving wallet login: ', err)})
 
 					// If we are not memory only, load the wallet using OIP Account
 					// Check if the oip_account has been created
@@ -923,6 +931,7 @@ class SpartanBot {
 		}
 
 		serialized.settings = this.settings
+		serialized.oip_account = this.oip_account
 		serialized.pools = this.pools
 		serialized.poolProfiles = this.poolProfiles
 		serialized.receipts = this.receipts
@@ -932,9 +941,6 @@ class SpartanBot {
 
 		for (let strategyType in this.rental_strategies)
 			serialized.rental_strategies[strategyType] = this.rental_strategies[strategyType].serialize()
-
-
-		serialized.oip_account = this.oip_account
 
 		if (!this.settings.memory)
 			localStorage.setItem('spartanbot-storage', JSON.stringify(serialized))
