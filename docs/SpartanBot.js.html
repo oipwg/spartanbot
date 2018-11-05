@@ -95,6 +95,8 @@
 import uid from 'uid';
 import moment from 'moment'
 import EventEmitter from 'eventemitter3'
+import {config} from 'dotenv'
+config()
 
 import { MRRProvider, NiceHashProvider } from './RentalProviders'
 import { SpartanSenseStrategy, ManualRentStrategy, SpotRentalStrategy } from './RentalStrategies'
@@ -199,20 +201,41 @@ class SpartanBot {
 	}
 
 	onRentalSuccess(onSuccess = (rental_info) => {console.log('Rental Success', rental_info)}) {
+		this.emitter.off(RENTAL_SUCCESS)
 		this.emitter.on(RENTAL_SUCCESS, onSuccess)
 	}
 	onRentalWarning(onWarning = (rental_info) => {console.log('Rental Warning', rental_info)}) {
+		this.emitter.off(RENTAL_WARNING)
 		this.emitter.on(RENTAL_WARNING, onWarning)
 	}
 	onRentalError(onError = (rental_info) => {console.log('Rental Error', rental_info)}) {
+		this.emitter.off(RENTAL_ERROR)
 		this.emitter.on(RENTAL_ERROR, onError)
+	}
+
+	onRentalFnFinish(rental_info) {
+		console.log('rental function finished... saving rental_info')
+		this.saveReceipt(rental_info)
+		switch(rental_info.status) {
+			case NORMAL:
+				this.emitter.emit(RENTAL_SUCCESS, rental_info)
+				break
+			case WARNING:
+				this.emitter.emit(RENTAL_WARNING, rental_info)
+				break
+			case ERROR:
+				this.emitter.emit(RENTAL_ERROR, rental_info)
+				break
+			default:
+				console.log('Rental info not of expected type!', rental_info)
+		}
 	}
 
 	/**
 	 * Setup a new Rental Strategy to auto-rent machines with.
 	 * @return {Boolean} Returns `true` if setup was successful
 	 */
-	async setupRentalStrategy(settings) {
+	setupRentalStrategy(settings) {
 		let rental_strategy
 
 		for (let strategy of SUPPORTED_RENTAL_STRATEGIES){
@@ -243,32 +266,16 @@ class SpartanBot {
 		return this.rental_strategies
 	}
 
-	onRentalFnFinish(rental_info) {
-		console.log('rental function finished... saving rental_info')
-		this.saveReceipt(rental_info)
-		switch(rental_info.status) {
-			case NORMAL:
-				this.emitter.emit(RENTAL_SUCCESS, rental_info)
-				break
-			case WARNING:
-				this.emitter.emit(RENTAL_WARNING, rental_info)
-				break
-			case ERROR:
-				this.emitter.emit(RENTAL_ERROR, rental_info)
-				break
-			default:
-				console.log('Rental info not of expected type!', rental_info)
-		}
-	}
-
 	/**
 	 * Fire off a manual rent event
 	 * @param  {Number} hashrate - The hashrate you wish to rent (in MegaHash)
 	 * @param  {Number} duration - The number of seconds that you wish to rent the miners for
 	 * @param  {Function} [rentSelector] - Pass in a function that returns a Promise to offer rent options to user
-	 * @return {Promise&lt;Object>} Returns a Promise that will resolve to an Object that contains information about the rental request
 	 */
 	manualRent(hashrate, duration, rentSelector) {
+		if (!this.getRentalStrategies(ManualRent))
+			this.setupRentalStrategy({type: ManualRent})
+
 		let strat = this.getRentalStrategies(ManualRent)
 		strat.manualRent(hashrate, duration, rentSelector)
 	}
@@ -279,6 +286,9 @@ class SpartanBot {
 	 * @param {boolean} [fullnode=false] - specify whether you want to spawn a full node to read from
 	 */
 	spotRental(rentSelector, fullnode = false) {
+		if (!this.getRentalStrategies(SpotRental))
+			this.setupRentalStrategy({type: SpotRental})
+
 		let strat = this.getRentalStrategies(SpotRental)
 		strat.spotRental(rentSelector, fullnode, this)
 	}
@@ -374,7 +384,6 @@ class SpartanBot {
 
 		this.rental_providers.push(new_provider)
 
-		//ToDo: serialize and deserialize active pools and profile IDs
 		if (settings.activePool) {
 			new_provider.setActivePool(settings.activePool)
 		}
@@ -389,6 +398,9 @@ class SpartanBot {
 		let poolProfiles = []
 
 		if (settings.type === "MiningRigRentals") {
+			process.env.MRR_API_KEY = settings.api_key || settings.key
+			process.env.MRR_API_SECRET = settings.api_secret || settings.id
+
 			let profiles = [];
 			try {
 				let res = await new_provider.getPoolProfiles()
@@ -420,6 +432,9 @@ class SpartanBot {
 					new_provider.setActivePoolProfile(ids[0].id)
 			}
 		} else if (settings.type === "NiceHash") {
+			process.env.NICEHASH_API_KEY = settings.api_key || settings.key
+			process.env.NICEHASH_API_ID = settings.api_id || settings.id
+
 			if (settings.pools) {
 				new_provider.setPools(settings.pools)
 			}
@@ -984,7 +999,7 @@ class SpartanBot {
 
 		if (data_from_storage.rental_strategies){
 			for (let strategyType in data_from_storage.rental_strategies){
-				await this.setupRentalStrategy(data_from_storage.rental_strategies[strategyType])
+				this.setupRentalStrategy(data_from_storage.rental_strategies[strategyType])
 			}
 		}
 
