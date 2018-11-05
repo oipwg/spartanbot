@@ -142,7 +142,7 @@ class SpartanBot {
 	 * Setup a new Rental Strategy to auto-rent machines with.
 	 * @return {Boolean} Returns `true` if setup was successful
 	 */
-	async setupRentalStrategy(settings) {
+	setupRentalStrategy(settings) {
 		let rental_strategy
 
 		for (let strategy of SUPPORTED_RENTAL_STRATEGIES){
@@ -286,7 +286,6 @@ class SpartanBot {
 
 		this.rental_providers.push(new_provider)
 
-		//ToDo: serialize and deserialize active pools and profile IDs
 		if (settings.activePool) {
 			new_provider.setActivePool(settings.activePool)
 		}
@@ -902,7 +901,7 @@ class SpartanBot {
 
 		if (data_from_storage.rental_strategies){
 			for (let strategyType in data_from_storage.rental_strategies){
-				await this.setupRentalStrategy(data_from_storage.rental_strategies[strategyType])
+				this.setupRentalStrategy(data_from_storage.rental_strategies[strategyType])
 			}
 		}
 
