@@ -2,7 +2,7 @@ import SpartanBot from '../src/SpartanBot'
 import uid from 'uid'
 import {config} from 'dotenv'
 import AutoRenter from "../src/AutoRenter"
-import {RentalFunctionFinish} from "../src/constants";
+import {RENTAL_WARNING, RentalFunctionFinish} from "../src/constants";
 
 config()
 
@@ -579,5 +579,19 @@ describe("SpartanBot", () => {
 			spartan.spotRental(rentSelector, true)
 			done()
 		}, 250 * 100 * 100)
+	})
+	describe('Emitters', () => {
+		it('overwrite onRental[Status] listener', async () => {
+			await setupProviders()
+			let mockObject = {status: 'WARNING', message: 'test'}
+			spartan.onRentalWarning(function(rental_info) {
+				console.log('Rental Warning Emitter', rental_info)
+			})
+			function checkWarning(rental_info) {
+				expect(rental_info.message).toEqual('test')
+			}
+			spartan.emitter.on(RENTAL_WARNING, checkWarning)
+			spartan.emitter.emit(RentalFunctionFinish, mockObject)
+		})
 	})
 })
