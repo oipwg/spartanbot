@@ -108,12 +108,15 @@ class SpartanBot {
 	}
 
 	onRentalSuccess(onSuccess = (rental_info) => {console.log('Rental Success', rental_info)}) {
+		this.emitter.off(RENTAL_SUCCESS)
 		this.emitter.on(RENTAL_SUCCESS, onSuccess)
 	}
 	onRentalWarning(onWarning = (rental_info) => {console.log('Rental Warning', rental_info)}) {
+		this.emitter.off(RENTAL_WARNING)
 		this.emitter.on(RENTAL_WARNING, onWarning)
 	}
 	onRentalError(onError = (rental_info) => {console.log('Rental Error', rental_info)}) {
+		this.emitter.off(RENTAL_ERROR)
 		this.emitter.on(RENTAL_ERROR, onError)
 	}
 
