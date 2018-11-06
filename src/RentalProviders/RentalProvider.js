@@ -16,7 +16,7 @@ class RentalProvider {
 	 * @param {String} [settings.name] - Alias/arbitrary name for the provider
 	 * @param {Array.<Object>} [settings.pools] - Array of pools (pool profiles for MRR)
 	 * @param {String} [settings.uid] - The unique identifier for this Rental Provider
-	 * @return {RentalProvider} 
+	 * @return {RentalProvider}
 	 */
 	constructor(settings = {}){
 		this.uid = settings.uid || uid()
@@ -224,11 +224,15 @@ class RentalProvider {
 	 * @returns {Promise<number>}
 	 */
 	async getBalance(coin) {
+		let balance
 		try {
-			return await this._getBalance();
+			balance = await this._getBalance();
 		} catch (err) {
 			throw new Error(`Error fetching balance \n ${err}`)
 		}
+		if (typeof balance !== 'number')
+			return parseFloat(balance)
+		return balance
 	}
 
 	/**
