@@ -653,11 +653,19 @@ class MRRProvider extends RentalProvider {
 
 	/**
 	 * Get the rigs needed to fulfill rental requirements
-	 * @param {number} hashrate - in megahertz(mh)
+	 * @param {number | string} hashrate - in megahertz(mh)
 	 * @param {number} duration - in hours
 	 * @returns {Promise<Array.<Object>>}
 	 */
 	async getRigsToRent(hashrate, duration) {
+		if (typeof hashrate !== 'number')
+			hashrate = parseFloat(hashrate)
+		let balance;
+		try {
+			balance = await this.getBalance()
+		} catch (err) {
+			throw new Error(`Could not fetch balance from MRR API: ${err} `)
+		}
 		//get profileID
 		let profileID
 		try {
@@ -689,6 +697,7 @@ class MRRProvider extends RentalProvider {
 					newRPIrigs.push(rig)
 				} else {allOtherRigs.push(rig)}
 			}
+
 			//ToDo: Sort by price/rpi
 			allOtherRigs.sort((a,b) => {
 				return (b.rpi - a.rpi)
@@ -706,13 +715,15 @@ class MRRProvider extends RentalProvider {
 			}
 			let filteredRigs = [];
 			for (let rig of available_rigs) {
+				if (parseFloat(rig.price.BTC.hour < 1e-6))
+					continue
 				filteredRigs.push({
 					rental_info: {
 						rig: parseInt(rig.id),
 						length: duration,
 						profile: parseInt(profileID)
 					},
-					hashrate: rig.hashrate.advertised.hash,
+					hashrate: parseFloat(rig.hashrate.last_30min.hash),
 					btc_price: parseFloat(rig.price.BTC.hour) * duration
 				})
 			}
@@ -721,13 +732,15 @@ class MRRProvider extends RentalProvider {
 			}
 		}
 
-		//ToDo: add up by last_30min hash and not advertised
-		let rigs_to_rent = [], hashpower = 0;
+		let rigs_to_rent = [], hashpower = 0, totalCost = 0;
 		for (let rig of available_rigs) {
-			let rig_hashrate = rig.hashrate.advertised.hash
-			if ((hashpower + rig_hashrate) <= hashrate) {
-				hashpower += rig_hashrate
+			if (parseFloat(rig.price.BTC.hour < 1e-6))
+				continue
+			let btc_price = parseFloat(rig.price.BTC.hour) * duration
+			let rig_hashrate = parseFloat(rig.hashrate.last_30min.hash)
 
+			if ((hashpower + rig_hashrate) <= hashrate && rig_hashrate > 0 && (totalCost += btc_price <= balance)) {
+				hashpower += rig_hashrate
 				rigs_to_rent.push({
 					rental_info: {
 						rig: parseInt(rig.id),
@@ -735,7 +748,7 @@ class MRRProvider extends RentalProvider {
 						profile: parseInt(profileID)
 					},
 					hashrate: rig_hashrate,
-					btc_price: parseFloat(rig.price.BTC.hour) * duration
+					btc_price
 				})
 			}
 		}
