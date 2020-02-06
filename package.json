@@ -46,7 +46,7 @@
     "moment": "^2.22.2",
     "nicehash-api": "^1.1.4",
     "node-localstorage": "^1.3.1",
-    "oip-account": "git+https://github.com/bradicalone/oip-account.git",
+    "oip-account": "^1.4.1",
     "oip-exchange-rate": "^1.0.7",
     "spartansense": "git+https://github.com/oipwg/SpartanSense.git",
     "uid": "0.0.2"
