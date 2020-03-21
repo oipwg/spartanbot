@@ -29,7 +29,7 @@ export function selectBestCombination(original_array, target_value, object_value
 
 			if (total_up_array(best_match) === target_value)
 				stop_for_loop = true
-			
+
 			recurse_combos(result_arr, array_to_use.slice(i + 1));
 		}
 	}
@@ -62,6 +62,7 @@ export const serializePool = (pool, type) => {
 	let serPool = {}
 	if (type === "MiningRigRentals") {
 		for (let opt in pool) {
+			if (!Object.prototype.hasOwnProperty.call(pool, opt)) continue
 			if (opt === 'algo') {
 				serPool.type = pool[opt]
 			} else if (opt === 'pool_host') {
@@ -79,6 +80,7 @@ export const serializePool = (pool, type) => {
 	}
 	if (type === "NiceHash") {
 		for (let opt in pool) {
+			if (!Object.prototype.hasOwnProperty.call(pool, opt)) continue
 			if (opt === 'type') {
 				serPool.algo = pool[opt]
 			} else if (opt === 'host') {

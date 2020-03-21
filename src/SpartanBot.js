@@ -518,11 +518,10 @@ class SpartanBot {
 
 	/**
 	 * Get pool by id
-	 * @param {string|number} id - ID of the pool you want to fetch
 	 * @return {Object} pool
 	 */
 	async getPool(id) {
-		if (typeof id !== 'number' || typeof id !== 'string') {
+		if (!(typeof id == 'number' || typeof id == 'string')) {
 			throw new Error('Cannot get pool: id must be of type number or string')
 		}
 		let pools = []

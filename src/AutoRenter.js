@@ -1,4 +1,4 @@
-import Exchange from 'oip-exchange-rate';
+import Exchange from '@oipwg/exchange-rate';
 import uid from 'uid'
 
 const NiceHash = "NiceHash"

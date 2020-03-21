@@ -145,7 +145,7 @@ class RentalProvider {
 	 * @param {string|number} id - ID of the pool you want to fetch
 	 */
 	async getPool(id) {
-		if (typeof id !== 'number' || typeof id !== 'string') {
+		if (!(typeof id == 'number' || typeof id == 'string')) {
 			throw new Error('Cannot get pool: id must be of type number or string')
 		}
 		try {
@@ -266,7 +266,7 @@ class RentalProvider {
 	}
 
 	/**
-	 * Returns the active rigs set already in the local vaiable 'this.activeRigs'
+	 * Returns the active rigs set already in the local variable 'this.activeRigs'
 	 * @returns {Array}
 	 */
 	returnActiveRigs() {

@@ -203,7 +203,9 @@ class MRRProvider extends RentalProvider {
 			for (let pool of this.pools) {
 				if (pool.id === id || pool.mrrID === id) {
 					for (let opt in pool) {
+						if (!Object.prototype.hasOwnProperty.call(pool, opt)) continue
 						for (let _opt in options) {
+							if (!Object.prototype.hasOwnProperty.call(options, _opt)) continue
 							if (opt === _opt) {
 								pool[opt] = options[_opt]
 							}

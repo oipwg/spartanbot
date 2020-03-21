@@ -89,6 +89,7 @@ class NiceHashProvider extends RentalProvider {
 	 */
 	async _deletePool(id) {
 		for (let pool in this.pools) {
+			if (!Object.prototype.hasOwnProperty.call(this.pools, pool)) continue
 			if (this.pools[pool].id === id) {
 				this.pools.splice(pool, 1)
 			}
@@ -120,7 +121,9 @@ class NiceHashProvider extends RentalProvider {
 		for (let pool of this.pools) {
 			if (pool.id === id || pool.mrrID === id) {
 				for (let opt in pool) {
+					if (!Object.prototype.hasOwnProperty.call(pool, opt)) continue
 					for (let _opt in options) {
+						if (!Object.prototype.hasOwnProperty.call(options, _opt)) continue
 						if (_opt === 'host' && opt === 'pool_host')
 							pool[opt] = options[_opt]
 						if (_opt === 'port' && opt === 'pool_port')
@@ -148,7 +151,7 @@ class NiceHashProvider extends RentalProvider {
 	 * @return {Array.<Object>}
 	 */
 	async _getPools() {
-		return await this.pools
+		return this.pools
 	}
 
 	_addPools(pools) {
