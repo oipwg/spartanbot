@@ -21,7 +21,7 @@ export const RENTAL_SUCCESS = 'RENTAL_SUCCESS'
 export const RENTAL_WARNING = 'RENTAL_WARNING'
 export const RENTAL_ERROR = 'RENTAL_ERROR'
 
-//Rental Strategie Constants
+//Rental Strategy Constants
 export const ManualRent = 'ManualRent'
 export const SpotRental = 'SpotRental'
 export const TradeBot = 'TradeBot'
